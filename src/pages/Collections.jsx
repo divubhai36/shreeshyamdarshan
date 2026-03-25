@@ -88,10 +88,10 @@ export default function Collections() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 lg:px-8 py-8 lg:py-24 flex flex-col lg:flex-row gap-8 lg:gap-20">
+      <div className="container mx-auto px-4 lg:px-8 py-8 lg:py-24 flex flex-col lg:flex-row gap-8 lg:gap-14">
 
         {/* Horizontal Filters for Mobile, Sidebar for Desktop */}
-        <aside className="w-full lg:w-80 shrink-0">
+        <aside className="w-full lg:w-64 shrink-0">
           <div className="lg:sticky lg:top-32">
             <h3 className="hidden lg:flex text-2xl font-serif font-bold text-brand-primary mb-10 pb-4 border-b border-brand-primary/5 uppercase tracking-widest items-center gap-3">
               <Filter size={20} className="text-brand-secondary" /> Navigation
