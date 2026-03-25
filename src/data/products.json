@@ -59,7 +59,7 @@
       "section": "BANDHANI",
       "price": 499,
       "description": "Traditional bandhani print poshak with premium finish.",
-      "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=600&h=600&sig=p2",
+      "image": "/shringar.png",
       "sizes": ["1", "2", "3", "4", "5"],
       "isBestSeller": false,
       "color": "Yellow",

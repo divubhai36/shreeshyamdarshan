@@ -11,7 +11,7 @@ export default function ProductCard({ product }) {
       transition={{ duration: 0.5 }}
       className="premium-card group relative flex flex-col h-full bg-white rounded-2xl lg:rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-brand-primary/5"
     >
-      <div className="relative aspect-square lg:aspect-[4/5] overflow-hidden bg-brand-accent">
+      <div className="relative aspect-square lg:aspect-square overflow-hidden bg-brand-accent">
         <img
           src={product.image}
           alt={product.name}
@@ -31,7 +31,7 @@ export default function ProductCard({ product }) {
         </div>
       </div>
 
-      <div className="p-3 lg:p-6 flex-grow flex flex-col text-center">
+      <div className="p-3 lg:p-4 flex-grow flex flex-col text-center">
         <p className="text-[7px] lg:text-[10px] font-bold uppercase tracking-[0.15em] lg:tracking-[0.2em] text-brand-secondary/80 mb-1 lg:mb-2 line-clamp-1">
           {product.category}
         </p>

@@ -30,7 +30,7 @@ function Home() {
              Explore Divinity
              <div className="h-[1px] w-8 lg:w-12 bg-brand-secondary/40"></div>
           </motion.div>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -43,32 +43,30 @@ function Home() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
           {categories.map((cat, index) => (
-            <motion.div
-              key={cat.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05, duration: 0.6 }}
-              className="group relative overflow-hidden rounded-[24px] lg:rounded-[40px] aspect-[3/4] shadow-lg bg-white border border-brand-primary/5"
-            >
-              <img 
-                 src={cat.image} 
-                 alt={cat.label} 
-                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms] brightness-90 group-hover:brightness-100"
-              />
-              <div className="absolute inset-x-0 bottom-0 p-4 lg:p-8 bg-gradient-to-t from-brand-primary/95 via-brand-primary/40 to-transparent flex flex-col items-center justify-end text-center z-10">
-                 <h3 className="text-lg lg:text-2xl font-serif font-bold text-white mb-2 lg:mb-3 transition-transform group-hover:-translate-y-1">{cat.label}</h3>
-                 <p className="hidden lg:block text-[9px] text-brand-secondary font-bold tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 duration-500 mb-4">
-                    {cat.subCategories.length} Categories
-                 </p>
-                 <Link 
-                    to={`/collections/${cat.id}`}
-                    className="px-4 py-2 lg:px-6 lg:py-2.5 bg-white text-brand-primary text-[8px] lg:text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-brand-secondary hover:text-white transition-all duration-300 shadow-md"
-                 >
-                    Shop
-                 </Link>
-              </div>
-            </motion.div>
+            <Link key={cat.id} to={`/collections/${cat.id}`} className="block">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.05, duration: 0.6 }}
+                className="group relative overflow-hidden rounded-[24px] lg:rounded-[40px] aspect-[3/4] shadow-lg bg-white border border-brand-primary/5"
+              >
+                <img
+                   src={cat.image}
+                   alt={cat.label}
+                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms] brightness-90 group-hover:brightness-100"
+                />
+                <div className="absolute inset-x-0 bottom-0 p-4 lg:p-8 bg-gradient-to-t from-brand-primary/95 via-brand-primary/40 to-transparent flex flex-col items-center justify-end text-center z-10">
+                   <h3 className="text-lg lg:text-2xl font-serif font-bold text-white mb-2 lg:mb-3 transition-transform group-hover:-translate-y-1">{cat.label}</h3>
+                   <p className="hidden lg:block text-[9px] text-brand-secondary font-bold tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 duration-500 mb-4">
+                      {cat.subCategories.length} Categories
+                   </p>
+                   <div className="px-4 py-2 lg:px-6 lg:py-2.5 bg-white text-brand-primary text-[8px] lg:text-[10px] font-bold uppercase tracking-widest rounded-full group-hover:bg-brand-secondary group-hover:text-white transition-all duration-300 shadow-md">
+                      Shop
+                   </div>
+                </div>
+              </motion.div>
+            </Link>
           ))}
         </div>
       </section>
@@ -81,7 +79,7 @@ function Home() {
                    <p className="text-brand-secondary font-bold text-[10px] lg:text-xs tracking-widest uppercase mb-2 lg:mb-3">Trending Now</p>
                    <h2 className="text-2xl lg:text-4xl font-serif font-bold text-brand-primary leading-tight uppercase">Handpicked <br className="hidden md:block" /> <span className="italic font-normal">Best Sellers</span></h2>
                 </div>
-                <Link to="/collections/dresses" className="hidden md:flex btn-outline group text-xs py-2 px-5">
+                <Link to="/collections/dresses" className="hidden md:flex btn-outline group text-xs py-2 px-5 rounded-full">
                    View All
                    <ArrowRight className="group-hover:translate-x-1.5 transition-transform duration-300" size={14} />
                 </Link>
@@ -151,7 +149,7 @@ function Home() {
              <p className="text-brand-primary/50 text-[10px] lg:text-sm italic mb-10 lg:mb-12 max-w-xl leading-relaxed px-4">
                "Adorning Divinity with Elegance and Love. Premium Handcrafted Poshaks for every special occasion."
              </p>
-             
+
              <div className="flex justify-center gap-6 lg:gap-10 mb-10 lg:mb-12 text-brand-primary/40 uppercase text-[8px] lg:text-[10px] font-bold tracking-widest">
                 <a href="#" className="hover:text-brand-secondary transition-all">Privacy</a>
                 <a href="#" className="hover:text-brand-secondary transition-all">Shipping</a>
