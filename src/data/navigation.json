@@ -1,0 +1,279 @@
+[
+  {
+    "id": "dresses",
+    "name": "DRESSES",
+    "image": "/hero.png",
+    "subCategories": [
+      {
+        "id": "laddu-gopal-poshak",
+        "name": "laddu gopal poshak",
+        "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub1",
+        "sections": [
+          { "name": "REGULAR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s1" },
+          { "name": "BANDHANI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s2" },
+          { "name": "LERIYU", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s3" },
+          { "name": "PREMIUM (3 PCS SET)", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s4" },
+          { "name": "EXCLUSIVE (4 PCS SET)", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s5" },
+          { "name": "WOOLAN", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s6" },
+          { "name": "VALVET (SENIL)", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s7" },
+          { "name": "COTTON", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s8" },
+          { "name": "KALKATTI BOX PACKING", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s9" },
+          { "name": "JARKAN DIAMOND", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s10" },
+          { "name": "JARDOSI HANDWORK", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s11" },
+          { "name": "CHAPTI VASTRA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s12" }
+        ]
+      },
+      {
+        "id": "lengha-fatka",
+        "name": "LENGHA FATKA",
+        "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub2",
+        "sections": [
+          { "name": "REGULAR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s13" },
+          { "name": "BANDHANI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s14" },
+          { "name": "PREMIUM", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s15" },
+          { "name": "HANDWORK BEADS", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s16" },
+          { "name": "WOOLAN", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s17" },
+          { "name": "VALVET (SENIL)", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s18" },
+          { "name": "COTTON", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s19" },
+          { "name": "KALKATTI BOX PACKING", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s20" },
+          { "name": "JARKAN DIAMOND", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s21" }
+        ]
+      },
+      {
+        "id": "maa-durga-ji",
+        "name": "MAA DURGA JI",
+        "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub3",
+        "sections": [
+          { "name": "REGULAR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s22" },
+          { "name": "BANDHANI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s23" },
+          { "name": "EXCLUSIVE", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s24" },
+          { "name": "HANDWORK BEADS", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s25" },
+          { "name": "VALVET (SENIL)", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s26" },
+          { "name": "KALKATTI BOX PACKING", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s27" }
+        ]
+      },
+      {
+        "id": "radhe-krishna-set",
+        "name": "RADHE KRISHNA SET",
+        "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub4",
+        "sections": [
+          { "name": "REGULAR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s28" },
+          { "name": "BANDHANI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s29" },
+          { "name": "HANDWORK BEADS", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s30" },
+          { "name": "WOOLAN", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s31" },
+          { "name": "VALVET (SENIL)", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s32" },
+          { "name": "KALKATTI BOX PACKING", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s33" }
+        ]
+      },
+      {
+        "id": "jama",
+        "name": "JAMA",
+        "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub5",
+        "sections": [
+          { "name": "REGULAR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s34" },
+          { "name": "BANDHANI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s35" },
+          { "name": "PREMIUM", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s36" },
+          { "name": "VALVET (SENIL)", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s37" },
+          { "name": "HANDWORK BEADS", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s38" },
+          { "name": "CHAPTI VASTRA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s39" }
+        ]
+      },
+      {
+        "id": "night-wear",
+        "name": "NIGHT WEAR",
+        "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub6",
+        "sections": [
+          { "name": "REGULAR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s40" },
+          { "name": "WOOLAN", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s41" },
+          { "name": "COTTON", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s42" },
+          { "name": "PONCHU SUIT", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s43" },
+          { "name": "PANTY", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s44" },
+          { "name": "JABHO-DHOTI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s45" }
+        ]
+      },
+      {
+        "id": "mukut-dresses",
+        "name": "MUKUT",
+        "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub7",
+        "sections": [
+          { "name": "REGULAR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s46" },
+          { "name": "PREMIUM", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s47" },
+          { "name": "HANDWORK BEADS", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s48" },
+          { "name": "BANDHANI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s49" },
+          { "name": "JARKAN DIAMOND", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s50" }
+        ]
+      },
+      { "id": "ram-darbar-set", "name": "RAM DARBAR SET", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub8", "sections": [] },
+      { "id": "hanumanji-poshak", "name": "HANUMAJNI POSHAK", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub9", "sections": [] },
+      { "id": "ghanshyam-maharaj", "name": "GANSHYAM MAHARAJ", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub9-1", "sections": [] },
+      { "id": "ramdevpir-poshak", "name": "RAMDEVPIR POSHAK", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub9-2", "sections": [] },
+      { "id": "sai-baba", "name": "SAI BABA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub9-3", "sections": [] },
+      { "id": "ganesh-laxmi", "name": "GANESH LAXMI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub9-4", "sections": [] },
+      { "id": "ganpati-khes", "name": "GANPATI KHES", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub9-5", "sections": [] },
+      { "id": "ganpati-mukut", "name": "GANPATI MUKUT", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub9-6", "sections": [] },
+      { "id": "dhoti-fatka", "name": "DHOTI FATKA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub9-7", "sections": [] },
+      { "id": "chira-vastra", "name": "CHIRA VASTRA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub9-8", "sections": [] }
+    ]
+  },
+  {
+    "id": "shringar",
+    "name": "SHRINGAR",
+    "image": "/shringar.png",
+    "subCategories": [
+      {
+        "id": "paghadi",
+        "name": "PAGHADI",
+        "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub10",
+        "sections": [
+          { "name": "PLAN", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s51" },
+          { "name": "BANDHANI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s52" },
+          { "name": "NET", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s53" },
+          { "name": "HANDWORK BEADS", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s54" }
+        ]
+      },
+      {
+        "id": "mala",
+        "name": "MALA",
+        "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub11",
+        "sections": [
+          { "name": "MOTI MALA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s55" },
+          { "name": "DIAMOND MALA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s56" },
+          { "name": "JEKO MOTI MALA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s56-1" },
+          { "name": "GINNI MALA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s56-2" },
+          { "name": "VYEJANTI MALA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s56-3" },
+          { "name": "GUNJA MALA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s56-4" },
+          { "name": "TULSI MALA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s57" },
+          { "name": "RUDRAX MALA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=s57-1" }
+        ]
+      },
+      {
+        "id": "kada",
+        "name": "KADA",
+        "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub11-k",
+        "sections": [
+          { "name": "DIAMOND KADA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=k1" },
+          { "name": "MOTI KADA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=k2" },
+          { "name": "JEKO MOTI KADA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=k3" }
+        ]
+      },
+      {
+        "id": "mukut-shringar",
+        "name": "MUKUT",
+        "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub11-m",
+        "sections": [
+          { "name": "DIAMOND MUKUT", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=m1" },
+          { "name": "GOLDEN MUKUT", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=m2" },
+          { "name": "SILVER MUKUT", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=m3" },
+          { "name": "MINA MUKUT", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=m4" },
+          { "name": "JARDOSHI MUKUT", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=200&h=200&sig=m5" }
+        ]
+      },
+      { "id": "bansuri", "name": "BANSURI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh1", "sections": [] },
+      { "id": "tilak", "name": "TILAK", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh2", "sections": [] },
+      { "id": "kundal", "name": "KUNDAL", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh3", "sections": [] },
+      { "id": "kalagi", "name": "KALAGI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh4", "sections": [] },
+      { "id": "nathani", "name": "NATHANI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh5", "sections": [] },
+      { "id": "tiko", "name": "TIKO", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh6", "sections": [] },
+      { "id": "kamar-bandh", "name": "KAMAR BANDH", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh7", "sections": [] },
+      { "id": "payal-zanzar", "name": "PAYAL & ZANZAR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh8", "sections": [] },
+      { "id": "trishul", "name": "TRISHUL", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh9", "sections": [] },
+      { "id": "alka-vali", "name": "ALKA VALI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh10", "sections": [] },
+      { "id": "mojadi", "name": "MOJADI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh11", "sections": [] },
+      { "id": "topi", "name": "TOPI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh12", "sections": [] },
+      { "id": "pushtimarg", "name": "PUSHTIMARG", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh13", "sections": [] },
+      { "id": "necklace", "name": "NECKLACE", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sh14", "sections": [] }
+    ]
+  },
+  {
+    "id": "furniture",
+    "name": "FURNITURE",
+    "image": "/furniture.png",
+    "subCategories": [
+      { "id": "bed", "name": "BED", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub12", "sections": [] },
+      { "id": "sihasan", "name": "SIHASAN", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub13", "sections": [] },
+      { "id": "zula", "name": "ZULA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub14", "sections": [] },
+      { "id": "khatla", "name": "KHATLA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub14-1", "sections": [] },
+      { "id": "parna", "name": "PARNA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub14-2", "sections": [] },
+      { "id": "bajot", "name": "BAJOT", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub14-3", "sections": [] },
+      { "id": "sofa", "name": "SOFA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub14-4", "sections": [] }
+    ]
+  },
+  {
+    "id": "aasan-chunari",
+    "name": "AASAN & CHUNNARI",
+    "image": "/aasan.png",
+    "subCategories": [
+      { "id": "aasan", "name": "AASAN", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub15", "sections": [] },
+      { "id": "chunnari", "name": "CHUNNARI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub16", "sections": [] }
+    ]
+  },
+  {
+    "id": "accessories",
+    "name": "ACCESSORIES",
+    "image": "/accessories.png",
+    "subCategories": [
+      { "id": "khilona", "name": "KHILONA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub17", "sections": [] },
+      { "id": "gadi-takiya", "name": "GADI TAKIYA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub17-1", "sections": [] },
+      { "id": "hair", "name": "HAIR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub18", "sections": [] },
+      { "id": "eyes", "name": "EYES", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub18-1", "sections": [] },
+      { "id": "attar", "name": "ATTAR & FRAGRANCE", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19", "sections": [] },
+      { "id": "min", "name": "MIN", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-1", "sections": [] },
+      { "id": "abhyan", "name": "ABHYAN", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-2", "sections": [] },
+      { "id": "kanka-vati", "name": "KANKA VATI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-3", "sections": [] },
+      { "id": "pooja-thali", "name": "POOJA THALI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-4", "sections": [] },
+      { "id": "asht-sakha", "name": "ASHT SAKHA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-5", "sections": [] },
+      { "id": "gopi-set", "name": "GOPI SET", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-6", "sections": [] },
+      { "id": "ramapir-paghadi", "name": "RAMAPIR PAGHADI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-7", "sections": [] },
+      { "id": "tokri", "name": "TOKRI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-8", "sections": [] },
+      { "id": "mataki", "name": "MATAKI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-9", "sections": [] },
+      { "id": "vinjana", "name": "VINJANA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-10", "sections": [] },
+      { "id": "ridhhi-sidhdhi", "name": "RIDHHI-SIDHDHI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-11", "sections": [] },
+      { "id": "kapoor", "name": "KAPOOR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-12", "sections": [] },
+      { "id": "mor-pankh", "name": "MOR PANKH", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-13", "sections": [] },
+      { "id": "mor-pankh-zadu", "name": "MOR PANKH ZADU", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-14", "sections": [] },
+      { "id": "bungla-ji", "name": "BUNGLA JI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-15", "sections": [] },
+      { "id": "ghatadi", "name": "GHATADI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-16", "sections": [] },
+      { "id": "nana-chhadi", "name": "NANA CHHADI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-17", "sections": [] },
+      { "id": "har-mala", "name": "HAR MALA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-18", "sections": [] },
+      { "id": "book-stand", "name": "BOOK STAND", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-19", "sections": [] },
+      { "id": "mataji-face", "name": "MATAJI FACE", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-20", "sections": [] },
+      { "id": "chattar", "name": "CHATTAR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub19-21", "sections": [] }
+    ]
+  },
+  {
+    "id": "idol",
+    "name": "IDOL",
+    "image": "/idol.png",
+    "subCategories": [
+      { "id": "laddu-gopal", "name": "LADDU GOPAL", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub20", "sections": [] },
+      { "id": "radha-krishna", "name": "RADHA KRISHNA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub21", "sections": [] },
+      { "id": "mataji-idol", "name": "MATAJI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub21-1", "sections": [] },
+      { "id": "ganpati-idol", "name": "GANPATI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub21-2", "sections": [] },
+      { "id": "shankar-idol", "name": "SHANKAR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub21-3", "sections": [] },
+      { "id": "nandi", "name": "NANDI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub21-4", "sections": [] },
+      { "id": "hanumanji-idol", "name": "HANUMANJI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub21-5", "sections": [] },
+      { "id": "radha-rani", "name": "RADHA RANI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub21-6", "sections": [] },
+      { "id": "gaiya", "name": "GAIYA", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub21-7", "sections": [] },
+      { "id": "kachabo", "name": "KACHABO", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub21-8", "sections": [] },
+      { "id": "nav-grah-idol", "name": "NAV GRAH IDOL", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub21-9", "sections": [] },
+      { "id": "ram-darbar-idol", "name": "RAM DARBAR", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=sub21-10", "sections": [] }
+    ]
+  },
+  {
+    "id": "festival-special",
+    "name": "FESTIVAL SPECIAL",
+    "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=600&h=800&sig=c4",
+    "subCategories": [
+      { "id": "makarshankranti", "name": "MAKARSHANKRANTI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=f1", "sections": [] },
+      { "id": "shivratri", "name": "SHIVRATRI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=f2", "sections": [] },
+      { "id": "holi", "name": "HOLI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=f3", "sections": [] },
+      { "id": "vasant-punchami", "name": "VASANT PUNCHAMI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=f4", "sections": [] },
+      { "id": "chaitra-navratri", "name": "CHAITRA NAVRATRI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=f5", "sections": [] },
+      { "id": "janmashtami", "name": "JANMASHTAMI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=f6", "sections": [] },
+      { "id": "ganesh-chaturthi", "name": "GANESH CHATURTHI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=f7", "sections": [] },
+      { "id": "navratri", "name": "NAVRATRI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=f8", "sections": [] },
+      { "id": "sharad-poonam", "name": "SHARAD POONAM", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=f9", "sections": [] },
+      { "id": "diwali", "name": "DIWALI", "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=300&h=300&sig=f10", "sections": [] }
+    ]
+  }
+]

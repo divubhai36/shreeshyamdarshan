@@ -1,0 +1,146 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Regular Silk Laddu Gopal Poshak",
+      "category": "LADDU GOPAL POSHAK",
+      "section": "REGULAR",
+      "price": 299,
+      "description": "Daily wear silk poshak for Laddu Gopal ji.",
+      "image": "/hero.png",
+      "sizes": ["0", "1", "2", "3", "4", "5", "6"],
+      "isBestSeller": true,
+      "color": "Red",
+      "material": "Silk"
+    },
+    {
+      "id": 2,
+      "name": "Regular Silk Laddu Gopal Poshak",
+      "category": "LADDU GOPAL POSHAK",
+      "section": "REGULAR",
+      "price": 299,
+      "description": "Daily wear silk poshak for Laddu Gopal ji.",
+      "image": "/hero.png",
+      "sizes": ["0", "1", "2", "3", "4", "5", "6"],
+      "isBestSeller": true,
+      "color": "Red",
+      "material": "Silk"
+    },
+    {
+      "id": 3,
+      "name": "Regular Silk Laddu Gopal Poshak",
+      "category": "LADDU GOPAL POSHAK",
+      "section": "REGULAR",
+      "price": 299,
+      "description": "Daily wear silk poshak for Laddu Gopal ji.",
+      "image": "/hero.png",
+      "sizes": ["0", "1", "2", "3", "4", "5", "6"],
+      "isBestSeller": true,
+      "color": "Red",
+      "material": "Silk"
+    },
+    {
+      "id": 4,
+      "name": "Regular Silk Laddu Gopal Poshak",
+      "category": "LADDU GOPAL POSHAK",
+      "section": "REGULAR",
+      "price": 299,
+      "description": "Daily wear silk poshak for Laddu Gopal ji.",
+      "image": "/hero.png",
+      "sizes": ["0", "1", "2", "3", "4", "5", "6"],
+      "isBestSeller": true,
+      "color": "Red",
+      "material": "Silk"
+    },
+    {
+      "id": 2,
+      "name": "Pure Bandhani Print Poshak",
+      "category": "LADDU GOPAL POSHAK",
+      "section": "BANDHANI",
+      "price": 499,
+      "description": "Traditional bandhani print poshak with premium finish.",
+      "image": "https://images.unsplash.com/photo-1590012357758-09d30104710d?auto=format&fit=crop&q=80&w=600&h=600&sig=p2",
+      "sizes": ["1", "2", "3", "4", "5"],
+      "isBestSeller": false,
+      "color": "Yellow",
+      "material": "Cotton"
+    },
+    {
+      "id": 3,
+      "name": "Premium 3 Pcs Velvet Set",
+      "category": "LADDU GOPAL POSHAK",
+      "section": "PREMIUM (3 PCS SET)",
+      "price": 899,
+      "description": "Luxury velvet poshak with matching cap and shawl.",
+      "image": "/furniture.png",
+      "sizes": ["2", "3", "4", "5", "6"],
+      "isBestSeller": true,
+      "color": "Royal Blue",
+      "material": "Velvet"
+    },
+    {
+      "id": 17,
+      "name": "Exclusive 4 Pcs Heavy Set",
+      "category": "LADDU GOPAL POSHAK",
+      "section": "EXCLUSIVE (4 PCS SET)",
+      "price": 1299,
+      "description": "Very heavy exclusive 4-piece set including base, shawl, and heavy jewellery mukut.",
+      "image": "/idol.png",
+      "isBestSeller": true,
+      "color": "Maroon",
+      "material": "Heavy Handwork"
+    },
+    {
+       "id": 4,
+       "name": "Royal Paghadi with Moti",
+       "category": "PAGHADI",
+       "section": "HANDWORK BEADS",
+       "price": 350,
+       "description": "Traditional Paghadi for Laddu Gopal featuring premium beads.",
+       "image": "/idol.png",
+       "isBestSeller": true
+    },
+    {
+       "id": 5,
+       "name": "Heavily Embroidered Durga Poshak",
+       "category": "MAA DURGA JI",
+       "section": "EXCLUSIVE",
+       "price": 1599,
+       "description": "Exquisite heavy work poshak for Maa Durga Ji.",
+       "image": "/shringar.png",
+       "isBestSeller": true
+    },
+    {
+       "id": 6,
+       "name": "Premium Golden Sihasan",
+       "category": "SIHASAN",
+       "price": 2499,
+       "description": "Handcrafted decorative Sihasan with golden polish.",
+       "image": "/furniture.png",
+       "isBestSeller": true
+    },
+    {
+       "id": 7,
+       "name": "Designer Velvet Aasan",
+       "category": "AASAN",
+       "price": 450,
+       "description": "Soft velvet aasan for puja use.",
+       "image": "/aasan.png",
+       "isBestSeller": true
+    }
+  ],
+  "categories": [
+    { "id": "dresses", "label": "Dresses", "image": "/hero.png", "subCategories": ["LADDU GOPAL POSHAK", "LENGHA FATKA", "MAA DURGA JI", "RADHE KRISHNA SET", "JAMA", "NIGHT WEAR", "MUKUT"] },
+    { "id": "shringar", "label": "Shringar", "image": "/shringar.png", "subCategories": ["PAGHADI", "MALA", "KADA", "MUKUT", "BANSURI", "TILAK", "KUNDAL"] },
+    { "id": "furniture", "label": "Furniture", "image": "/furniture.png", "subCategories": ["BED", "SIHASAN", "ZULA", "KHATLA", "PARNA"] },
+    { "id": "aasan-chunari", "label": "Aasan & Chunnari", "image": "/aasan.png", "subCategories": ["AASAN", "CHUNNARI"] },
+    { "id": "accessories", "label": "Accessories", "image": "/accessories.png", "subCategories": ["KHILONA", "GADI TAKIYA", "HAIR", "EYES", "ATTAR & FRAGRANCE"] },
+    { "id": "idol", "label": "Idol", "image": "/idol.png", "subCategories": ["LADDU GOPAL", "RADHA KRISHNA", "MATAJI", "GANPATI"] },
+    { "id": "festival-special", "label": "Festival Special", "image": "/hero.png", "subCategories": ["JANMASHTAMI", "DIWALI", "HOLI", "NAVRATRI"] }
+  ],
+  "slider_images": [
+    { "id": 1, "url": "/hero.png", "title": "Divine Poshaks", "subtitle": "Exquisite Collections for Your Laddu Gopal" },
+    { "id": 2, "url": "/shringar.png", "title": "Royal Shringar", "subtitle": "Curated Jewellery & Ornaments" },
+    { "id": 3, "url": "/furniture.png", "title": "Aangan Special", "subtitle": "Traditional Puja Needs & Accessories" }
+  ]
+}

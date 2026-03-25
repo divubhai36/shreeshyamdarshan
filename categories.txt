@@ -1,0 +1,226 @@
+/*
+category: DRESSES
+sub category: laddu gopal poshak
+section: REGULAR
+section: BANDHANI
+section: LERIYU
+section: PREMIUM (3 PCS SET)
+section: EXCLUSIVE (4 PCS SET)
+section: WOOLAN
+section: VALVET (SENIL)
+section: COTTON
+section: KALKATTI BOX PACKING
+section: JARKAN DIAMOND
+section: JARDOSI HANDWORK
+section: CHAPTI VASTRA
+
+
+sub category: LENGHA FATKA
+section: REGULAR
+section: BANDHANI
+section: PREMIUM
+section: HANDWORK BEADS
+section: WOOLAN
+section: VALVET (SENIL)
+section: COTTON
+section: KALKATTI BOX PACKING
+section: JARKAN DIAMOND
+
+
+sub category: MAA DURGA JI
+section: REGULAR
+section: BANDHANI
+section: EXCLUSIVE
+section: HANDWORK BEADS
+section: VALVET (SENIL)
+section: KALKATTI BOX PACKING
+
+
+sub category: RADHE KRISHNA SET
+section: REGULAR
+section: BANDHANI
+section: HANDWORK BEADS
+section: WOOLAN
+section: VALVET (SENIL)
+section: KALKATTI BOX PACKING
+
+
+sub category: JAMA
+section: REGULAR
+section: BANDHANI
+section: PREMIUM
+section: VALVET (SENIL)
+section: HNADWORK BEADS
+section: CHAPTI VASTRA
+
+sub category: NIGHT WEAR
+section: REGULAR
+section: WOOLAN
+section: COTTON
+section: PONCHU SUIT
+section: PANTY
+section: JABHO-DHOTI
+
+
+sub category: MUKUT
+section: REGULAR
+section: PREMIUM
+section: HANDWORK BEADS
+section: BANDHANI
+section: JARKAN DIAMOND
+
+
+sub category: VENI MUKUT
+section: REGULAR
+section: PREMIUM
+section: HANDWORK BEADS
+section: JARKAN DIAMOND
+
+sub category: RAM DARBAR SET
+sub category: HANUMAJNI POSHAK
+sub category: GANSHYAM MAHARAJ
+sub category: RAMDEVPIR POSHAK
+sub category: SAI BABA
+sub category: GANESH LAXMI
+sub category: GANPATI KHES
+sub category: GANPATI MUKUT
+sub category: DHOTI FATKA
+sub category: CHIRA VASTRA
+
+
+category: SHRINGAR
+sub category: PAGHADI
+section: PLAN
+section: BANDHANI
+section: NET
+section: HANDWORK BEADS
+section: VALCRO PAGHADI
+section: STOCKING PAGHADI
+section: VALVET
+section: COTTON
+section: WOOLAN
+
+
+sub category: MALA
+section: MOTI MALA
+section: DIAMOND MALA
+section: JEKO MOTI MALA
+section: GINNI MALA
+section: VYEJANTI MALA
+section: GUNJA MALA
+section: TULSI MALA
+section: RUDRAX MALA
+
+
+sub category: KADA
+section: DIAMOND KADA
+section: MOTI KADA
+section: JEKO MOTI KADA
+
+
+sub category: MUKUT
+section: DIAMOND MUKUT
+section: GOLDEN MUKUT
+section: SILVER MUKUT
+section: MINA MUKUT
+section: JARDOSHI MUKUT
+
+
+sub category: BANSURI
+sub category: TILAK
+sub category: KUNDAL
+sub category: KALAGI
+sub category: NATHANI
+sub category: TIKO
+sub category: KAMAR BANDH
+sub category: PAYAL & ZANZAR
+sub category: TRISHUL
+sub category: ALKA VALI
+sub category: MOJADI
+sub category: TOPI
+sub category: PUSHTIMARG
+sub category: NECKLACE
+
+
+
+
+category: FURNITURE
+sub category: BED
+sub category: SIHASAN
+sub category: ZULA
+sub category: KHATLA
+sub category: PARNA
+sub category: BAJOT
+sub category: SOFA
+
+
+category: AASAN & CHUNNARI
+sub category: AASAN
+sub category: CHUNNARI
+
+
+
+category: ACCESSORIES
+sub category: KHILONA
+sub category: GADI TAKIYA
+sub category: HAIR
+sub category: EYES
+sub category: ATTAR & FRAGRANCE
+sub category: MIN
+sub category: ABHYAN
+sub category: KANKA VATI
+sub category: POOJA THALI
+sub category: ASHT SAKHA
+sub category: GOPI SET
+sub category: RAMAPIR PAGHADI
+sub category: TOKRI
+sub category: MATAKI
+sub category: VINJANA
+sub category: RIDHHI-SIDHDHI
+sub category: KAPOOR
+sub category: MOR PANKH
+sub category: MOR PANKH ZADU
+sub category: BUNGLA JI
+sub category: GHATADI
+sub category: NANA CHHADI
+sub category: HAR MALA
+sub category: BOOK STAND
+sub category: MATAJI FACE
+sub category: CHATTAR
+
+
+
+category: IDOL
+sub category: LADDU GOPAL
+sub category: RADHA KRISHNA
+sub category: MATAJI
+sub category: GANPATI
+sub category: SHANKAR
+sub category: NANDI
+sub category: HANUMANJI
+sub category: RADHA RANI
+sub category: GAIYA
+sub category: KACHABO
+sub category: NAV GRAH IDOL
+sub category: RAM DARBAR
+
+
+
+
+category: FESTIVAL SPECIAL
+sub category: MAKARSHANKRANTI
+sub category: SHIVRATRI
+sub category: HOLI
+sub category: VASANT PUNCHAMI
+sub category: CHAITRA NAVRATRI
+sub category: JANMASHTAMI
+sub category: GANESH CHATURTHI
+sub category: NAVRATRI
+sub category: SHARAD POONAM
+sub category: DIWALI
+
+
+
+
+/hero.png, /shringar.png, /furniture.png, /aasan.png, /accessories.png, /idol.png,
+*/
