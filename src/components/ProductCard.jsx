@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, ZoomIn, ShoppingBag, Eye } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 
 export default function ProductCard({ product }) {
@@ -45,7 +45,7 @@ export default function ProductCard({ product }) {
           to={`/product/${product.id}`}
           className="w-full mt-auto py-2 lg:py-3 bg-brand-accent text-brand-primary font-bold rounded-xl lg:rounded-2xl flex items-center justify-center gap-2 hover:bg-brand-primary hover:text-white transition-all text-[8px] lg:text-xs uppercase tracking-widest shadow-sm"
         >
-          <Eye size={14} />
+          <Icon icon="lucide:eye" className="w-4 h-4" />
           View Details
         </Link>
       </div>

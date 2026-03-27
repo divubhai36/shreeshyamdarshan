@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, ArrowRight } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import productData from '../data/products.json';
 
 export default function Hero() {
@@ -27,9 +27,9 @@ export default function Hero() {
       <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
 
         {/* Contained Box Style */}
-        <div className="relative h-[400px] md:h-[500px] lg:h-[650px] w-full mx-auto overflow-hidden shadow-2xl rounded-3xl lg:rounded-[60px] border border-brand-primary/5">
+        <div className="relative h-[400px] md:h-[500px] lg:h-[650px] w-full mx-auto overflow-hidden shadow-2xl rounded-3xl lg:rounded-[60px] border border-brand-primary/5 bg-brand-primary/10">
 
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             <motion.div
               key={current}
               initial={{ scale: 1.1, opacity: 0 }}
@@ -72,7 +72,7 @@ export default function Hero() {
                 >
                   <button className="group relative px-8 py-4 lg:px-12 lg:py-5 bg-white text-brand-primary font-bold rounded-full text-[10px] lg:text-sm uppercase tracking-widest flex items-center gap-3 overflow-hidden transition-all hover:pr-14 hover:bg-brand-secondary hover:text-white shadow-2xl">
                     <span className="relative z-10">Explore Collection</span>
-                    <ArrowRight className="relative z-10 transition-transform duration-500 group-hover:translate-x-2" size={18} />
+                    <Icon icon="lucide:arrow-right" className="relative z-10 transition-transform duration-500 group-hover:translate-x-2 w-5 h-5" />
                   </button>
                 </motion.div>
               </div>
@@ -85,24 +85,14 @@ export default function Hero() {
               onClick={prevSlide}
               className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-brand-primary transition-all duration-500 shadow-2xl group"
             >
-              <ChevronLeft size={24} className="" />
+              <Icon icon="lucide:chevron-left" className="w-6 h-6 lg:w-8 lg:h-8" />
             </button>
-
-            {/* <div className="h-0.5 w-12 bg-white/20 rounded-full overflow-hidden">
-               <motion.div
-                 initial={{ width: 0 }}
-                 animate={{ width: "100%" }}
-                 key={current}
-                 transition={{ duration: 3, ease: "linear" }}
-                 className="h-full bg-brand-secondary"
-               />
-            </div> */}
 
             <button
               onClick={nextSlide}
               className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-brand-primary transition-all duration-500 shadow-2xl group"
             >
-              <ChevronRight size={24} className="" />
+              <Icon icon="lucide:chevron-right" className="w-6 h-6 lg:w-8 lg:h-8" />
             </button>
           </div>
 
