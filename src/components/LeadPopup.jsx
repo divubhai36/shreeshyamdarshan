@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react';
 
 export default function LeadPopup() {
    const [show, setShow] = useState(false);
-   const [formData, setFormData] = useState({ name: '', mobile: '', product: '', pieces: '1' });
+   const [formData, setFormData] = useState({ name: '', mobile: '', product: '', pieces: '1', state: '' });
 
    useEffect(() => {
       const isDismissed = sessionStorage.getItem('lead_popup_dismissed');
@@ -107,6 +107,22 @@ export default function LeadPopup() {
                               onChange={(e) => setFormData({ ...formData, product: e.target.value })}
                               className="w-full bg-white border border-brand-primary/5 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-brand-primary placeholder:text-brand-primary/20 shadow-sm focus:ring-4 focus:ring-brand-secondary/10 outline-none transition-all text-left"
                               placeholder="what you want to buy?"
+                           />
+                        </div>
+                     </div>
+                     <div className="text-left group">
+                        <label className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest mb-1.5 block ml-1 text-left">State</label>
+                        <div className="relative text-left">
+                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-secondary text-left">
+                              <Icon icon="solar:cart-large-bold" className="w-4 h-4 text-left" />
+                           </span>
+                           <input
+                              required
+                              type="text"
+                              value={formData.state}
+                              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                              className="w-full bg-white border border-brand-primary/5 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-brand-primary placeholder:text-brand-primary/20 shadow-sm focus:ring-4 focus:ring-brand-secondary/10 outline-none transition-all text-left"
+                              placeholder="Enter your State"
                            />
                         </div>
                      </div>

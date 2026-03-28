@@ -36,18 +36,18 @@ export default function ProductCard({ product }) {
           {product.category}
         </p>
 
-        <h3 className="text-xs lg:text-xl font-serif text-brand-primary font-bold mb-4 lg:mb-6 group-hover:text-brand-secondary transition-colors line-clamp-2 leading-tight">
+        <h3 className="text-xs lg:text-xl font-serif text-brand-primary font-bold mb-2 lg:mb-6 group-hover:text-brand-secondary transition-colors line-clamp-2 leading-tight">
           {product.name}
         </h3>
 
         {/* View Details Button (Replaces WhatsApp for showcase) */}
-        <Link
+        {/* <Link
           to={`/product/${product.id}`}
           className="w-full mt-auto py-2 lg:py-3 bg-brand-accent text-brand-primary font-bold rounded-xl lg:rounded-2xl flex items-center justify-center gap-2 hover:bg-brand-primary hover:text-white transition-all text-[8px] lg:text-xs uppercase tracking-widest shadow-sm"
         >
           <Icon icon="lucide:eye" className="w-4 h-4" />
           View Details
-        </Link>
+        </Link> */}
       </div>
     </motion.div>
   );

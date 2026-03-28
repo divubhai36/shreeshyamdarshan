@@ -116,7 +116,7 @@ export default function SubCategory() {
     const ref = isStickySlider ? stickySliderRef : sliderRef;
 
     return (
-      <div className={`relative group/slider ${isStickySlider ? 'bg-white/80 backdrop-blur-md shadow-lg py-4 px-3 rounded-b-3xl border-b border-brand-primary/5' : 'lg:px-8 mb-6 lg:mb-10 text-left'}`}>
+      <div className={`relative group/slider ${isStickySlider ? 'bg-white/80 backdrop-blur-md shadow-lg py-4 px-3 rounded-b-3xl border-b border-brand-primary/5' : 'lg:px-8 mb-4 lg:mb-10 text-left'}`}>
         {/* Slider Buttons */}
         <button
           onClick={() => scrollSlider('left', isStickySlider)}

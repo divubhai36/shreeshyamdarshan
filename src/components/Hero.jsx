@@ -20,7 +20,7 @@ export default function Hero() {
 
   return (
     <section
-      className="relative pt-16 lg:pt-24 pb-8 lg:pb-12 overflow-hidden bg-brand-accent"
+      className="relative pt-5 lg:pt-10 pb-8 lg:pb-12 overflow-hidden bg-brand-accent"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -57,12 +57,19 @@ export default function Hero() {
                 </motion.div>
 
                 <motion.h2
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                  className="text-4xl md:text-6xl lg:text-8xl font-serif font-bold leading-[1.05] mb-8 lg:mb-12 drop-shadow-2xl"
+                  key={`title-${current}`}
+                  initial={{ y: 80, opacity: 0, skewY: 5 }}
+                  animate={{ y: 0, opacity: 1, skewY: 0 }}
+                  transition={{ delay: 0.5, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-3xl md:text-6xl lg:text-9xl font-serif font-bold leading-[0.95] mb-8 lg:mb-12 drop-shadow-2xl"
                 >
-                  {slides[current].title}
+                   {slides[current].title.split(' ').map((word, i) => (
+                      <span key={i} className="inline-block mr-4">
+                         {word === "Collection" || word === "Excellence" ? (
+                            <span className="italic font-normal text-brand-secondary/90 tracking-tight">{word}</span>
+                         ) : word}
+                      </span>
+                   ))}
                 </motion.h2>
 
                 <motion.div

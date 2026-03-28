@@ -4,11 +4,11 @@ import { Icon } from '@iconify/react';
 
 export default function Footer() {
   return (
-    <footer className="pt-20 pb-10 bg-brand-primary text-white overflow-hidden relative">
+    <footer className="pt-10 pb-10 bg-brand-primary text-white overflow-hidden relative">
       <div className="absolute inset-0 opacity-5 bg-[url('/images/hero_2.jpg')] bg-cover bg-center mix-blend-overlay"></div>
 
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-20 text-left">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-10 text-left">
 
           {/* Column 1: Brand */}
           <div className="space-y-6 lg:space-y-8">
@@ -108,7 +108,7 @@ export default function Footer() {
           </p>
           <div className="flex gap-8 text-[8px] lg:text-[10px] font-bold tracking-widest text-white/20 uppercase">
              <Link to="#" className="hover:text-white transition-all">Privacy</Link>
-             <Link to="#" className="hover:text-white transition-all">Shipping</Link>
+             {/* <Link to="#" className="hover:text-white transition-all">Shipping</Link> */}
              <Link to="#" className="hover:text-white transition-all">Terms</Link>
           </div>
         </div>

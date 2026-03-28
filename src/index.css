@@ -15,7 +15,7 @@
   body {
     @apply font-sans text-brand-dark antialiased bg-brand-accent;
   }
-  
+
   h1, h2, h3, h4 {
     @apply font-serif;
   }

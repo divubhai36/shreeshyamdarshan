@@ -18,7 +18,7 @@ export default function Header() {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const searchResults = searchQuery.length > 2
+  const searchResults = searchQuery.length > 0
     ? productData.products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
     : [];
 
@@ -33,11 +33,11 @@ export default function Header() {
           </button>
 
           {/* Logo (Centered on mobile) */}
-          <Link to="/" className="flex flex-col items-center group scale-[0.85] lg:scale-100 mx-auto lg:mx-0 lg:order-first">
-            <h1 className="text-lg lg:text-xl font-serif font-bold text-brand-primary tracking-[0.05em] lg:tracking-[0.1em] uppercase group-hover:text-brand-secondary transition-colors">
+          <Link to="/" className="flex flex-col items-center group scale-[0.85] lg:scale-100 mx-auto lg:mx-0 lg:order-first min-w-0">
+            <h1 className="text-lg sm:text-xl lg:text-xl font-serif font-bold text-brand-primary tracking-[0.02em] sm:tracking-[0.05em] lg:tracking-[0.1em] uppercase group-hover:text-brand-secondary transition-colors whitespace-nowrap">
               SHREE SHYAM <span className="text-brand-secondary">DARSHAN</span>
             </h1>
-            <p className="text-[7px] tracking-[0.2em] font-medium text-brand-primary/40 uppercase">
+            <p className="text-[8px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] font-medium text-brand-primary/40 uppercase whitespace-nowrap">
               laddu gopal poshak and shringar
             </p>
           </Link>
@@ -53,21 +53,21 @@ export default function Header() {
                 onMouseLeave={() => setActiveCategory(null)}
               >
                 <button className={`relative flex items-center gap-1.5 py-2 transition-all duration-300 group ${activeCategory === cat.id ? 'text-brand-secondary' : 'hover:text-brand-secondary'}`}>
-                   <span className="relative z-10 transition-transform duration-300 group-hover:scale-110">
+                  <span className="relative z-10 transition-transform duration-300 group-hover:scale-110">
                     {cat.name}
-                   </span>
-                   <Icon icon="lucide:chevron-down" className={`w-3 h-3 transition-all duration-500 ${activeCategory === cat.id ? 'rotate-180 text-brand-secondary scale-125' : 'group-hover:translate-y-0.5'}`} />
-                   
-                   {/* Modern Floating Underline */}
-                   {activeCategory === cat.id && (
-                     <motion.div 
-                        layoutId="navUnderline"
-                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-brand-secondary rounded-full"
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                     />
-                   )}
+                  </span>
+                  <Icon icon="lucide:chevron-down" className={`w-3 h-3 transition-all duration-500 ${activeCategory === cat.id ? 'rotate-180 text-brand-secondary scale-125' : 'group-hover:translate-y-0.5'}`} />
+
+                  {/* Modern Floating Underline */}
+                  {activeCategory === cat.id && (
+                    <motion.div
+                      layoutId="navUnderline"
+                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-brand-secondary rounded-full"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
                 </button>
 
                 {/* Integrated Mega Menu Integration */}
@@ -75,13 +75,13 @@ export default function Header() {
                   {activeCategory === cat.id && (
                     <>
                       {/* Background Overlay */}
-                      <motion.div 
+                      <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 top-20 bg-brand-primary/5 backdrop-blur-[2px] z-40"
                       />
-                      
+
                       {/* Mega Menu Panel */}
                       <motion.div
                         initial={{ opacity: 0, y: -10 }}
@@ -91,61 +91,60 @@ export default function Header() {
                         className="fixed top-20 left-0 w-full bg-white border-b border-brand-primary/10 shadow-2xl z-50 overflow-hidden"
                       >
                         <div className="container mx-auto px-10 py-12 max-w-7xl">
-                           <div className="grid grid-cols-12 gap-10">
-                              
-                              {/* Left: Category Info */}
-                              <div className="col-span-3 border-r border-brand-primary/5 pr-10">
-                                 <h3 className="text-2xl font-serif font-bold text-brand-primary mb-3 uppercase tracking-tight">
-                                    {cat.name}
-                                 </h3>
-                                 <p className="text-[10px] font-medium text-brand-primary/40 uppercase tracking-[0.2em] leading-relaxed mb-6">
-                                    Discover our exclusive collection of {cat.name.toLowerCase()} handcrafted for divinity.
-                                 </p>
-                                 <Link 
-                                    to={`/collections/${cat.id}`}
-                                    className="group/btn inline-flex items-center gap-3 bg-brand-primary text-white px-6 py-3 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] hover:bg-brand-secondary transition-all"
-                                 >
-                                    View All
-                                    <Icon icon="lucide:arrow-right" className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
-                                 </Link>
-                              </div>
+                          <div className="grid grid-cols-12 gap-10">
 
-                              {/* Right: Subcategories Grid */}
-                              <div className="col-span-9">
-                                 <motion.div 
-                                   initial="hidden"
-                                   animate="visible"
-                                   variants={{
-                                     visible: { transition: { staggerChildren: 0.03 } }
-                                   }}
-                                   className={`grid gap-x-8 gap-y-1 ${
-                                     cat.subCategories.length > 20 ? 'grid-cols-4' : 
-                                     cat.subCategories.length > 10 ? 'grid-cols-3' : 
-                                     'grid-cols-2'
-                                   }`}
-                                 >
-                                    {cat.subCategories.map((sub, sIdx) => (
-                                      <motion.div
-                                        key={sub.name}
-                                        variants={{
-                                          hidden: { opacity: 0, y: 5 },
-                                          visible: { opacity: 1, y: 0 }
-                                        }}
-                                      >
-                                         <Link
-                                           to={`/category/${cat.id}/${sub.id}`}
-                                           className="group/item flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-brand-accent transition-all duration-300"
-                                         >
-                                           <div className="w-1.5 h-1.5 rounded-full bg-brand-secondary/20 group-hover/item:bg-brand-secondary group-hover/item:scale-125 transition-all duration-300"></div>
-                                           <span className="text-[11px] font-bold tracking-[0.1em] text-brand-primary/70 group-hover/item:text-brand-primary transition-colors uppercase">
-                                             {sub.name}
-                                           </span>
-                                         </Link>
-                                      </motion.div>
-                                    ))}
-                                 </motion.div>
-                              </div>
-                           </div>
+                            {/* Left: Category Info */}
+                            <div className="col-span-3 border-r border-brand-primary/5 pr-10">
+                              <h3 className="text-2xl font-serif font-bold text-brand-primary mb-3 uppercase tracking-tight">
+                                {cat.name}
+                              </h3>
+                              <p className="text-[10px] font-medium text-brand-primary/40 uppercase tracking-[0.2em] leading-relaxed mb-6">
+                                Discover our exclusive collection of {cat.name.toLowerCase()} handcrafted for divinity.
+                              </p>
+                              <Link
+                                to={`/collections/${cat.id}`}
+                                className="group/btn inline-flex items-center gap-3 bg-brand-primary text-white px-6 py-3 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] hover:bg-brand-secondary transition-all"
+                              >
+                                View All
+                                <Icon icon="lucide:arrow-right" className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
+                              </Link>
+                            </div>
+
+                            {/* Right: Subcategories Grid */}
+                            <div className="col-span-9">
+                              <motion.div
+                                initial="hidden"
+                                animate="visible"
+                                variants={{
+                                  visible: { transition: { staggerChildren: 0.03 } }
+                                }}
+                                className={`grid gap-x-8 gap-y-1 ${cat.subCategories.length > 20 ? 'grid-cols-4' :
+                                  cat.subCategories.length > 10 ? 'grid-cols-3' :
+                                    'grid-cols-2'
+                                  }`}
+                              >
+                                {cat.subCategories.map((sub, sIdx) => (
+                                  <motion.div
+                                    key={sub.name}
+                                    variants={{
+                                      hidden: { opacity: 0, y: 5 },
+                                      visible: { opacity: 1, y: 0 }
+                                    }}
+                                  >
+                                    <Link
+                                      to={`/category/${cat.id}/${sub.id}`}
+                                      className="group/item flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-brand-accent transition-all duration-300"
+                                    >
+                                      <div className="w-1.5 h-1.5 rounded-full bg-brand-secondary/20 group-hover/item:bg-brand-secondary group-hover/item:scale-125 transition-all duration-300"></div>
+                                      <span className="text-[11px] font-bold tracking-[0.1em] text-brand-primary/70 group-hover/item:text-brand-primary transition-colors uppercase">
+                                        {sub.name}
+                                      </span>
+                                    </Link>
+                                  </motion.div>
+                                ))}
+                              </motion.div>
+                            </div>
+                          </div>
                         </div>
                       </motion.div>
                     </>
@@ -187,8 +186,8 @@ export default function Header() {
                 {navigationData.map((cat) => (
                   <div key={cat.id} className="border-b border-gray-50">
                     <button onClick={() => setExpandedMobileCat(expandedMobileCat === cat.id ? null : cat.id)} className="w-full px-8 py-5 flex items-center justify-between text-[11px] font-bold tracking-[0.2em] text-brand-primary uppercase">
-                       {cat.name}
-                       <Icon icon="lucide:chevron-right" className={`w-4 h-4 transition-transform ${expandedMobileCat === cat.id ? 'rotate-90 text-brand-secondary' : 'text-brand-primary/20'}`} />
+                      {cat.name}
+                      <Icon icon="lucide:chevron-right" className={`w-4 h-4 transition-transform ${expandedMobileCat === cat.id ? 'rotate-90 text-brand-secondary' : 'text-brand-primary/20'}`} />
                     </button>
                     <AnimatePresence>
                       {expandedMobileCat === cat.id && (
@@ -220,26 +219,160 @@ export default function Header() {
         )}
       </AnimatePresence>
 
-      {/* Search */}
+      {/* Refined Minimalist Search Overlay */}
       <AnimatePresence>
         {isSearchOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-brand-primary/95 z-[200] flex flex-col items-center p-6 pt-20" >
-            <button onClick={() => setIsSearchOpen(false)} className="absolute top-6 right-6 text-white hover:text-brand-secondary transition-colors" >
-               <Icon icon="lucide:x" className="w-8 h-8" />
-            </button>
-            <div className="w-full max-w-2xl px-4">
-              <input autoFocus type="text" placeholder="Search divinity..." className="w-full bg-transparent border-b-2 border-white/20 text-white text-3xl font-serif py-3 focus:outline-none focus:border-brand-secondary mb-10" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-              <div className="space-y-4 max-h-[60vh] overflow-y-auto no-scrollbar">
-                {searchResults.map(p => (
-                  <Link key={p.id} to={`/product/${p.id}`} onClick={() => setIsSearchOpen(false)} className="flex gap-4 p-3 rounded-2xl bg-white/5 hover:bg-white/10" >
-                    <img src={p.image} className="w-12 h-12 rounded-lg object-cover" />
-                    <div className="flex flex-col justify-center">
-                      <h4 className="text-white text-sm font-bold">{p.name}</h4>
-                      <p className="text-brand-secondary text-[10px] font-bold">₹{p.price}</p>
-                    </div>
-                  </Link>
-                ))}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-white z-[200] flex flex-col items-center overflow-y-auto no-scrollbar selection:bg-brand-secondary/20"
+          >
+            {/* Top Bar Navigation */}
+            <div className="w-full flex justify-end md:justify-between items-center p-6 lg:p-12 fixed top-0 left-0 z-10 bg-white/80 backdrop-blur-md">
+              <div className="text-[16px] font-bold text-brand-primary/20 uppercase tracking-[0.4em] hidden md:block italic font-serif">
+                Shree Shyam Darshan
               </div>
+              <button
+                onClick={() => {
+                  setIsSearchOpen(false);
+                  setSearchQuery('');
+                }}
+                className="flex items-center gap-3 group"
+              >
+                <span className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em]">Close Archive</span>
+                <div className="w-6 h-6 rounded-full bg-brand-primary/5 flex items-center justify-center group-hover:bg-brand-primary transition-all duration-500">
+                  <Icon icon="lucide:x" className="w-3.5 h-3.5 text-brand-primary group-hover:text-white transition-colors" />
+                </div>
+              </button>
+            </div>
+
+            <div className="w-full max-w-5xl px-4 lg:px-6 pt-20 lg:pt-32 pb-20">
+              {/* Elegant Search Input */}
+              <motion.div
+                initial={{ y: 15, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="relative mb-8 lg:mb-16 text-center group"
+              >
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="Search Masterpiece..."
+                  className="w-full bg-transparent text-brand-primary text-3xl sm:text-4xl lg:text-7xl font-serif text-center focus:outline-none focus:ring-0 placeholder:text-brand-primary/30 lowercase transition-all"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 p-2 hover:text-brand-secondary transition-colors"
+                  >
+                    <Icon icon="lucide:x" className="w-6 h-6 lg:w-10 lg:h-10 opacity-30 group-hover:opacity-100 transition-opacity" />
+                  </button>
+                )}
+                <div className="w-28 h-[1px] bg-brand-secondary mx-auto mt-8 lg:mt-12"></div>
+              </motion.div>
+
+              <AnimatePresence mode="wait">
+                {searchQuery.length === 0 ? (
+                  <motion.div
+                    key="trending"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-20 lg:space-y-32"
+                  >
+                    {/* Trending Minimalist */}
+                    {/* <div className="text-center">
+                        <h3 className="text-[9px] font-black text-brand-secondary/40 uppercase tracking-[0.5em] mb-10">Trending Now</h3>
+                        <div className="flex flex-wrap gap-x-8 gap-y-4 justify-center items-center">
+                          {['Poshak', 'Zardosi', 'Laddu Gopal', 'Janmashtami', 'Floral', 'Velvet'].map((term, i) => (
+                            <React.Fragment key={term}>
+                               <button
+                                 onClick={() => setSearchQuery(term)}
+                                 className="text-xs lg:text-sm font-serif italic text-brand-primary/60 hover:text-brand-secondary transition-all hover:scale-110"
+                               >
+                                 {term}
+                               </button>
+                               {i < 5 && <div className="w-1 h-1 rounded-full bg-brand-primary/5 hidden lg:block"></div>}
+                            </React.Fragment>
+                          ))}
+                        </div>
+                      </div> */}
+
+                    {/* Core Collections - Simplified */}
+                    <div className="pt-0">
+                      <div className="flex flex-col items-center gap-4 mb-6">
+                        <span className="text-[9px] font-black text-brand-secondary/40 uppercase tracking-[0.5em]">Collections</span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {navigationData.slice(0, 4).map((cat) => (
+                          <Link
+                            key={cat.id}
+                            to={`/collections/${cat.id}`}
+                            onClick={() => setIsSearchOpen(false)}
+                            className="group flex flex-col items-center justify-center p-8 rounded-2xl border border-brand-primary/5 hover:border-brand-secondary/30 transition-all duration-500"
+                          >
+                            <span className="text-[10px] font-serif italic text-brand-primary/30 mb-2 group-hover:text-brand-secondary transition-colors uppercase tracking-[0.1em]">Divine</span>
+                            <span className="text-lg lg:text-lg font-serif italic font-bold text-brand-primary uppercase tracking-[0.2em]">{cat.name}</span>
+                            <div className="w-0 group-hover:w-6 h-[1px] bg-brand-secondary mt-3 transition-all duration-500"></div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="results"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="space-y-12"
+                  >
+                    <div className="flex flex-col items-center gap-4 border-b border-brand-primary/5 pb-6">
+                      <p className="text-[10px] font-bold text-brand-primary/20 uppercase tracking-[0.4em]">
+                        {searchResults.length} Selected results
+                      </p>
+                    </div>
+
+                    {searchResults.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8">
+                        {searchResults.map((p, idx) => (
+                          <motion.div
+                            key={p.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.03 }}
+                          >
+                            <Link
+                              to={`/product/${p.id}`}
+                              onClick={() => setIsSearchOpen(false)}
+                              className="group flex items-center gap-6 p-4 rounded-2xl hover:bg-brand-accent/30 transition-all duration-500"
+                            >
+                              <div className="relative w-20 h-20 lg:w-24 lg:h-24 rounded-xl overflow-hidden shrink-0 bg-brand-accent/50 p-2">
+                                <img src={p.image} className="w-full h-full object-cover rounded-lg group-hover:scale-110 transition-transform duration-1000" />
+                              </div>
+                              <div className="flex flex-col justify-center flex-grow">
+                                <div className="text-brand-secondary text-[8px] font-black uppercase tracking-[0.3em] mb-1">{p.category}</div>
+                                <h4 className="text-brand-primary text-sm lg:text-base font-bold group-hover:text-brand-secondary transition-colors line-clamp-1">{p.name}</h4>
+                                <p className="text-brand-primary/40 text-[10px] font-bold mt-1 tracking-widest uppercase">₹{p.price}</p>
+                              </div>
+                              <Icon icon="lucide:arrow-right" className="w-4 h-4 text-brand-primary/10 group-hover:text-brand-secondary group-hover:translate-x-1 transition-all" />
+                            </Link>
+                          </motion.div>
+                        ))}
+                      </div>
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="py-32 flex flex-col items-center text-center"
+                      >
+                        <h3 className="text-2xl font-serif italic text-brand-primary mb-3">No Masterpieces Found</h3>
+                        <p className="text-[9px] font-bold text-brand-primary/20 uppercase tracking-[0.3em] max-w-[200px] leading-relaxed">Try alternative terms or browse our core essence</p>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         )}
