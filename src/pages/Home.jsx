@@ -382,7 +382,7 @@ function Home() {
 
                         <div className="flex items-center gap-4 relative z-10">
                            <a
-                              href="https://maps.app.goo.gl/4fevQAM117YF6mif6"
+                              href="https://maps.app.goo.gl/JApzZ9c7UvcsunWB7"
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex-grow py-5 px-8 bg-brand-primary/90 text-white rounded-2xl text-xs font-bold uppercase tracking-[0.2em] shadow-xl hover:bg-brand-secondary hover:text-brand-primary transition-all flex items-center justify-center gap-3 active:scale-95"

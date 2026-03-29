@@ -27,12 +27,12 @@ export default function Footer() {
                <a href="https://www.instagram.com/shree.shyam.darshan_?igsh=MWx6dWVqcWZmbWkzcw%3D%3D" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group">
                   <Icon icon="mdi:instagram" className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
                </a>
+               <a href="https://wa.me/917383699199" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group">
+                  <Icon icon="mdi:whatsapp" className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
+               </a>
                <Link to="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group">
                   <Icon icon="mdi:facebook" className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
                </Link>
-               {/* <a href="https://share.google/JnMykrFgSHuIxMfmU" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group" title="Google Business">
-                  <Icon icon="mdi:google-my-business" className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
-               </a> */}
                <a href="https://www.google.com/search?sca_esv=31586a1ce1c44e63&rlz=1C1ONGR_enIN1026IN1026&cs=1&sxsrf=ANbL-n5ueFGkVUg_WowF-Y25qSPDd7m1yw:1774641146255&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOSXcqrOP25rdToCMYEBKfRtbV_HEmpUWriTrisUoklkqDVMM3phTcbbt_k43lxZyI6ooQQI_KxCuXyvg5A-zN-VKorowM2uoQX2ho-DGMWrDQRYQgIoRXVRiE9WKuNLxDnDH3tE%3D&q=New+Darshan+Lace+Laddu+Gopal+Poshak+Reviews&sa=X&ved=2ahUKEwj7_IC57cCTAxULhGMGHf5mAh8Q0bkNegQIIxAF&cshid=1774641343178766&biw=1536&bih=776" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group" title="Google Business">
                   <Icon icon="mdi:google" className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
                </a>
@@ -68,27 +68,26 @@ export default function Footer() {
                     <a href="tel:+917383699199" className="text-xs lg:text-sm font-medium hover:text-brand-secondary transition-colors text-white/80">+91 73836 99199</a>
                  </div>
               </li>
-              <li className="flex gap-4">
-                 <Icon icon="lucide:mail" className="w-5 h-5 text-brand-secondary shrink-0" />
-                 <div>
-                    <p className="text-[9px] uppercase tracking-widest text-white/30 font-bold mb-1">Email</p>
-                    <a href="mailto:shreeshyamdarshan155@gmail.com" className="text-xs lg:text-sm font-medium hover:text-brand-secondary transition-colors text-white/80">darshan@shreeshyam.com</a>
-                 </div>
-              </li>
+
             </ul>
           </div>
 
           {/* Column 4: Address */}
           <div className="text-left">
             <h3 className="text-[11px] lg:text-xs font-bold tracking-[0.4em] uppercase mb-8 lg:mb-10 text-brand-secondary">Find Us</h3>
-            <div className="flex gap-4 text-left">
-               <Icon icon="lucide:map-pin" className="w-5 h-5 text-brand-secondary shrink-0" />
-               <address className="text-xs lg:text-sm text-white/60 not-italic leading-relaxed text-left">
+            <a
+              href="https://maps.app.goo.gl/JApzZ9c7UvcsunWB7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex gap-4 text-left group/address hover:opacity-80 transition-opacity"
+            >
+               <Icon icon="lucide:map-pin" className="w-5 h-5 text-brand-secondary shrink-0 group-hover/address:scale-110 transition-transform" />
+               <address className="text-xs lg:text-sm text-white/60 not-italic leading-relaxed text-left group-hover/address:text-white transition-colors">
                  69, Shree, Darshan Industries, <br />
                  Kamrej Rd, Laskana, Kamrej, <br />
                  Gujarat 394185, India.
                </address>
-            </div>
+            </a>
             <div className="mt-8 pt-8 border-t border-white/5 text-left">
                <div className="flex items-center gap-1 mb-2">
                   {[1,2,3,4,5].map(i => (
