@@ -46,7 +46,7 @@ function Home() {
          <Header />
 
          {/* Rich & Premium Signature Text Slider */}
-         <div className="text-center mt-20 mb-0 h-[150px] lg:h-[220px] relative overflow-hidden px-4">
+         <div className="text-center mt-20 lg:mt-24 mb-0 h-[130px] lg:h-[140px] relative overflow-hidden px-4">
             <AnimatePresence mode="wait">
                <motion.div
                   key={textIndex}

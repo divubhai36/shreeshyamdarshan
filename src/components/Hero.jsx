@@ -27,7 +27,7 @@ export default function Hero() {
       <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
 
         {/* Contained Box Style */}
-        <div className="relative h-[400px] md:h-[500px] lg:h-[650px] w-full mx-auto overflow-hidden shadow-2xl rounded-3xl lg:rounded-[60px] border border-brand-primary/5 bg-brand-primary/10">
+        <div className="relative h-[400px] md:h-[500px] lg:h-[550px] xl:h-[550px] 2xl:h-[650px] w-full mx-auto overflow-hidden shadow-2xl rounded-3xl lg:rounded-[60px] border border-brand-primary/5 bg-brand-primary/10">
 
           <AnimatePresence>
             <motion.div
