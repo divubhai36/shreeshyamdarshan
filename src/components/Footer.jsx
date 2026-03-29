@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="absolute inset-0 opacity-5 bg-[url('/images/hero_2.jpg')] bg-cover bg-center mix-blend-overlay"></div>
 
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-10 text-left">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 mb-10 text-left">
 
           {/* Column 1: Brand */}
           <div className="space-y-6 lg:space-y-8">
@@ -33,7 +33,7 @@ export default function Footer() {
                <Link to="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group">
                   <Icon icon="mdi:facebook" className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
                </Link>
-               <a href="https://www.google.com/search?sca_esv=31586a1ce1c44e63&rlz=1C1ONGR_enIN1026IN1026&cs=1&sxsrf=ANbL-n5ueFGkVUg_WowF-Y25qSPDd7m1yw:1774641146255&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOSXcqrOP25rdToCMYEBKfRtbV_HEmpUWriTrisUoklkqDVMM3phTcbbt_k43lxZyI6ooQQI_KxCuXyvg5A-zN-VKorowM2uoQX2ho-DGMWrDQRYQgIoRXVRiE9WKuNLxDnDH3tE%3D&q=New+Darshan+Lace+Laddu+Gopal+Poshak+Reviews&sa=X&ved=2ahUKEwj7_IC57cCTAxULhGMGHf5mAh8Q0bkNegQIIxAF&cshid=1774641343178766&biw=1536&bih=776" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group" title="Google Business">
+               <a href="https://share.google/NnpT8DIwtX0QG6SdU" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group" title="Google Business">
                   <Icon icon="mdi:google" className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
                </a>
             </div>

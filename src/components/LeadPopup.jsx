@@ -7,19 +7,34 @@ export default function LeadPopup() {
    const [formData, setFormData] = useState({ name: '', mobile: '', product: '', pieces: '1', state: '' });
 
    useEffect(() => {
-      const isDismissed = sessionStorage.getItem('lead_popup_dismissed');
-      if (isDismissed) return;
+      // Check if user has already submitted the lead form - if yes, never show again
+      if (sessionStorage.getItem('lead_popup_submitted')) return;
 
-      const timer = setTimeout(() => {
-         setShow(true);
+      // Timer 1: 30 Seconds
+      const timer1 = setTimeout(() => {
+         if (!sessionStorage.getItem('lead_popup_shown_1')) {
+            setShow(true);
+            sessionStorage.setItem('lead_popup_shown_1', 'true');
+         }
       }, 30 * 1000);
 
-      return () => clearTimeout(timer);
+      // Timer 2: 5 Minutes (300 Seconds)
+      const timer2 = setTimeout(() => {
+         if (!sessionStorage.getItem('lead_popup_shown_2')) {
+            setShow(true);
+            sessionStorage.setItem('lead_popup_shown_2', 'true');
+         }
+      }, 5 * 60 * 1000);
+
+      return () => {
+         clearTimeout(timer1);
+         clearTimeout(timer2);
+      };
    }, []);
 
    const handleClose = () => {
       setShow(false);
-      sessionStorage.setItem('lead_popup_dismissed', 'true');
+      // We don't block the second popup here, only if they submit
    };
 
    const handleSubmit = (e) => {
@@ -29,7 +44,10 @@ export default function LeadPopup() {
 
       const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
       window.open(whatsappUrl, '_blank');
-      handleClose();
+
+      // Mark as submitted to never show the popup again in this session
+      sessionStorage.setItem('lead_popup_submitted', 'true');
+      setShow(false);
    };
 
    return (
@@ -146,9 +164,9 @@ export default function LeadPopup() {
                               />
                            </div>
                         </div>
-                        <div className="text-left group/child text-left">
+                        <div className="text-left group/child">
                            <label className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest mb-1.5 block ml-1 text-left">Pcs</label>
-                           <div className="relative text-left text-left">
+                           <div className="relative text-left">
                               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-secondary">
                                  <Icon icon="solar:box-bold" className="w-4 h-4" />
                               </span>
@@ -156,6 +174,7 @@ export default function LeadPopup() {
                                  required
                                  type="number"
                                  min="1"
+                                 max="1000000"
                                  value={formData.pieces}
                                  onChange={(e) => setFormData({ ...formData, pieces: e.target.value })}
                                  className="w-full bg-white border border-brand-primary/5 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-brand-primary placeholder:text-brand-primary/20 shadow-sm focus:ring-4 focus:ring-brand-secondary/10 outline-none transition-all text-left"
