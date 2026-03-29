@@ -160,15 +160,15 @@ function Home() {
                   Explore Divinity
                   <div className="h-[1px] w-8 lg:w-12 bg-brand-secondary/40"></div>
                </motion.div>
-                <motion.h2
-                   initial={{ opacity: 0, y: 20 }}
-                   whileInView={{ opacity: 1, y: 0 }}
-                   viewport={{ once: true }}
-                   transition={{ delay: 0.1 }}
-                   className="text-2xl sm:text-4xl lg:text-6xl font-serif font-bold text-brand-primary leading-tight uppercase text-center"
-                >
-                   Best <span className="italic font-normal">Collections</span>
-                </motion.h2>
+               <motion.h2
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="text-2xl sm:text-4xl lg:text-6xl font-serif font-bold text-brand-primary leading-tight uppercase text-center"
+               >
+                  Best <span className="italic font-normal">Collections</span>
+               </motion.h2>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
@@ -257,9 +257,9 @@ function Home() {
          <ReviewMarquee />
 
          {/* Premium Boutique & Location Section */}
-         <section className="py-0 lg:py-24 bg-white  relative overflow-hidden">
+         <section className="py-0 lg:py-12 bg-white  relative overflow-hidden">
             {/* Subtle Brand Watermark */}
-            <div className="absolute top-[-50px] lg:top-0 right-[-90px] lg:right-0 p-20 opacity-[0.03] select-none pointer-events-none">
+            <div className="absolute top-[-50px] lg:top-[-80px] right-[-90px] lg:right-[150px] p-20 opacity-[0.03] select-none pointer-events-none">
                <h2 className="text-[100px] lg:text-[200px] font-serif font-black leading-none uppercase">Surat</h2>
             </div>
 
@@ -295,7 +295,7 @@ function Home() {
                      initial={{ opacity: 0, x: -30 }}
                      whileInView={{ opacity: 1, x: 0 }}
                      viewport={{ once: true }}
-                     className="relative aspect-video lg:aspect-auto lg:h-[600px] rounded-[40px] overflow-hidden shadow-2xl group border border-brand-primary/5"
+                     className="relative aspect-video lg:aspect-auto lg:h-[650px] rounded-[40px] overflow-hidden shadow-2xl group border border-brand-primary/5"
                   >
                      <video
                         src="/videos/reel 3.mp4"
@@ -335,71 +335,98 @@ function Home() {
                            </div>
                         </div>
                      </motion.a> */}
-                     {/* Showroom Concierge Card */}
+                     {/* Ultra-Rich Luxury Showroom Concierge Card */}
                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
+                        initial={{ opacity: 0, scale: 0.98 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
-                        className="flex-grow flex flex-col justify-between p-8 lg:p-10 rounded-[40px] bg-brand-accent/20 border border-brand-primary/5 relative overflow-hidden group shadow-2xl"
+                        transition={{ duration: 0.8 }}
+                        className="flex-grow flex flex-col justify-between p-10 lg:p-10 rounded-[50px] lg:rounded-[40px] bg-gradient-to-br from-white via-brand-accent/20 to-white border border-brand-secondary/20 relative overflow-hidden group shadow-[0_60px_120px_-30px_rgba(26,67,50,0.12)] selection:bg-brand-secondary/30"
                      >
-                        <div className="relative z-10">
-                           <div className="flex items-center gap-3 mb-8">
-                              <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.6)]" />
-                              <span className="text-[10px] lg:text-xs font-bold uppercase tracking-[0.4em] text-brand-secondary">Showroom Live • Open Now</span>
-                           </div>
+                        {/* Decorative Rich Elements */}
+                        <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none select-none">
+                           <Icon icon="solar:crown-minimalistic-bold" className="w-40 h-40 text-brand-secondary rotate-12" />
+                        </div>
 
-                           <h3 className="text-3xl lg:text-5xl font-serif font-bold text-brand-primary mb-6 leading-tight">
-                              Visit Our <span className="italic font-normal text-brand-secondary">Surat</span>
+                        <div className="relative z-10">
+                           <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              whileInView={{ opacity: 1, y: 0 }}
+                              className="flex items-center gap-4 mb-10"
+                           >
+                              <div className="relative flex items-center justify-center">
+                                 <div className="w-3.5 h-3.5 bg-brand-secondary rounded-full shadow-[0_0_20px_rgba(197,160,89,0.8)]" />
+                                 <div className="absolute inset-0 w-3.5 h-3.5 bg-brand-secondary rounded-full animate-ping opacity-30" />
+                              </div>
+                              <span className="text-[10px] lg:text-[11px] font-bold uppercase tracking-[0.5em] text-brand-primary">SSD • SURAT STUDIO</span>
+                           </motion.div>
+
+                           <h3 className="text-5xl lg:text-7xl font-serif font-black text-brand-primary mb-8 leading-[1.1] tracking-tighter">
+                              Visit Our <span className="relative inline-block">
+                                 <span className="bg-gradient-to-r from-brand-secondary via-[#d4af37] to-brand-secondary bg-clip-text text-transparent italic font-normal">Surat</span>
+                                 <motion.div
+                                    initial={{ scaleX: 0 }}
+                                    whileInView={{ scaleX: 1 }}
+                                    className="absolute -bottom-2 left-0 w-full h-1 bg-brand-secondary/30 origin-left"
+                                 />
+                              </span>
                            </h3>
 
-                           <p className="text-brand-primary/50 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-10 leading-relaxed max-w-sm">
-                              Experience the art of divine craftsmanship in person at our flagship creative studio.
+                           <p className="text-brand-primary/60 text-[11px] lg:text-xs font-serif italic mb-12 leading-relaxed max-w-sm">
+                              "Step into a sanctuary of devotion where every thread is woven with soul and generations of heritage."
                            </p>
 
-                           <div className="space-y-6 mb-10">
-                              <div className="flex items-start gap-5">
-                                 <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0 border border-brand-primary/5 group-hover:bg-brand-secondary/20 group-hover:text-white transition-all duration-500">
-                                    <Icon icon="solar:shop-2-bold" className="w-6 h-6 text-brand-primary" />
+                           <div className="grid grid-cols-1 gap-6 mb-12 lg:mb-20">
+                              <div className="flex items-center gap-6 lg:gap-8 group/item">
+                                 <div className="w-16 h-16 rounded-2xl bg-white/80 backdrop-blur-xl shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] flex items-center justify-center shrink-0 border border-brand-secondary/10 group-hover/item:border-brand-secondary transition-all duration-700">
+                                    <Icon icon="solar:map-point-wave-bold" className="w-8 h-8 text-brand-primary" />
                                  </div>
                                  <div className="flex flex-col">
-                                    <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-brand-primary/30 mb-1">Our Location</span>
-                                    <span className="text-sm font-serif font-bold text-brand-primary leading-tight">69, Darshan Industries, <br />Laskana, Surat.</span>
+                                    <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-secondary mb-1.5 opacity-60">The Creative Studio</span>
+                                    <span className="text-sm lg:text-lg font-serif font-bold text-brand-primary leading-tight">69, Darshan Ind., Laskana, Surat.</span>
                                  </div>
                               </div>
 
-                              <div className="flex items-start gap-5">
-                                 <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0 border border-brand-primary/5 group-hover:bg-brand-secondary/20 group-hover:text-white transition-all duration-500">
-                                    <Icon icon="solar:clock-circle-bold" className="w-6 h-6 text-brand-primary" />
+                              <div className="flex items-center gap-6 lg:gap-8 group/item">
+                                 <div className="w-16 h-16 rounded-2xl bg-white/80 backdrop-blur-xl shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] flex items-center justify-center shrink-0 border border-brand-secondary/10 group-hover/item:border-brand-secondary transition-all duration-700">
+                                    <Icon icon="solar:history-bold" className="w-8 h-8 text-brand-primary" />
                                  </div>
                                  <div className="flex flex-col">
-                                    <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-brand-primary/30 mb-1">Experience Hours</span>
-                                    <span className="text-sm font-serif font-bold text-brand-primary">Mon - Sat | 09:00 AM - 06:00 PM</span>
+                                    <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-secondary mb-1.5 opacity-60">Boutique Timings</span>
+                                    <span className="text-sm lg:text-lg font-serif font-bold text-brand-primary">Mon - Sat | 09:00 AM - 06:00 PM</span>
                                  </div>
                               </div>
                            </div>
                         </div>
 
-                        <div className="flex items-center gap-4 relative z-10">
+                        <div className="flex items-center gap-5 relative z-10">
                            <a
                               href="https://maps.app.goo.gl/JApzZ9c7UvcsunWB7"
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-grow py-5 px-8 bg-brand-primary/90 text-white rounded-2xl text-xs font-bold uppercase tracking-[0.2em] shadow-xl hover:bg-brand-secondary hover:text-brand-primary transition-all flex items-center justify-center gap-3 active:scale-95"
+                              className="flex-grow relative overflow-hidden group/btn rounded-[20px] lg:rounded-full"
                            >
-                              <Icon icon="logos:google-maps" className="w-6 h-6 animate-bounce" />
-                              Click here for Map
+                              <div className="absolute inset-0 bg-gradient-to-r from-brand-primary via-[#2d4f41] to-brand-primary opacity-100 group-hover/btn:opacity-90 transition-opacity" />
+                              {/* Shimmer Effect */}
+                              <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-[1.5s] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                              <div className="relative py-6 lg:py-4 px-10 lg:px-12 flex items-center justify-center gap-4 text-white text-xs lg:text-sm font-bold uppercase tracking-[0.3em]">
+                                 <Icon icon="logos:google-maps" className="w-6 h-6 lg:w-7 lg:h-7 grayscale brightness-[5] group-hover/btn:grayscale-0 group-hover/btn:brightness-100 transition-all duration-500" />
+                                 Click Here For Map
+                              </div>
                            </a>
-                           <a href="tel:+917383699199">
-                              <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-brand-primary border border-brand-primary/5 shadow-lg transition-transform duration-500">
-                                 <Icon icon="solar:phone-calling-bold" className="w-8 h-8" />
+
+                           <a href="tel:+917383699199" className="shrink-0">
+                              <div className="w-16 h-16 rounded-[20px] lg:rounded-[20px] bg-brand-secondary/10 flex items-center justify-center text-brand-secondary border border-brand-secondary/20 shadow-xl hover:bg-brand-secondary hover:text-white transition-all duration-300 transform hover:-rotate-6 active:scale-95 group/call">
+                                 <Icon icon="solar:phone-calling-bold" className="w-8 h-8 lg:w-8 lg:h-8 transition-transform duration-500" />
                               </div>
                            </a>
                         </div>
 
-                        {/* Abstract Texture Background */}
-                        <div className="absolute top-[-20%] right-[-20%] w-80 h-80 bg-brand-secondary/5 rounded-full blur-[80px] pointer-events-none group-hover:scale-125 transition-transform duration-1000" />
-                        <div className="absolute bottom-[-10%] left-[-10%] w-40 h-40 bg-brand-primary/5 rounded-full blur-[40px] pointer-events-none group-hover:translate-x-10 transition-transform duration-1000" />
+                        {/* Rich Background Texturing */}
+                        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-brand-secondary/5 rounded-full blur-[120px] pointer-events-none animate-pulse" />
+                        <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-brand-primary/5 rounded-full blur-[100px] pointer-events-none" />
+                        <div className="absolute inset-0 opacity-[0.02] mix-blend-overlay pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/silk.png')]" />
                      </motion.div>
                   </div>
                </div>

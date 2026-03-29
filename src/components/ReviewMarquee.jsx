@@ -10,7 +10,7 @@ const reviews = [
     id: 1,
     name: "Priyanka Sharma",
     location: "Jaipur",
-    text: "The Laddu Gopal Poshak is absolutely divine. Intricate embroidery and premium velvet. Highly recommended!",
+    text: "The peacock design Poshak I ordered is simply stunning. The colors are so vibrant and the fabric is pure luxury. It arrived in just 3 days!",
     rating: 5,
     avatar: "solar:user-circle-bold"
   },
@@ -18,7 +18,7 @@ const reviews = [
     id: 2,
     name: "Rahul Mehra",
     location: "New Delhi",
-    text: "Handwork is even better than photos. Zardosi work is unmatched. Proud customer!",
+    text: "Best quality Ladoo Gopal dresses in India. The zardosi work is very clean and professional. Direct from Surat quality is clearly visible.",
     rating: 5,
     avatar: "solar:user-circle-bold"
   },
@@ -26,7 +26,7 @@ const reviews = [
     id: 3,
     name: "Sneha Kapur",
     location: "Mumbai",
-    text: "Excellent collection and great service. Secure packaging and fast delivery.",
+    text: "I was worried about the fitting, but it fits my Ladoo Gopal perfectly. The packaging was very safe and the service is excellent.",
     rating: 5,
     avatar: "solar:user-circle-bold"
   },
@@ -34,7 +34,7 @@ const reviews = [
     id: 4,
     name: "Amit Patel",
     location: "Ahmedabad",
-    text: "Authenticity of designs is unmatched. Truly satisfied with the Shringar items.",
+    text: "Truly authentic designs. Pricing is very reasonable compared to retail shops. I will definitely buy again for the upcoming festival.",
     rating: 5,
     avatar: "solar:user-circle-bold"
   },
@@ -42,7 +42,31 @@ const reviews = [
     id: 5,
     name: "Deepa Nair",
     location: "Bangalore",
-    text: "Most elegant collection. I've bought multiple poshaks, each a masterpiece.",
+    text: "The Shringar set is so beautiful. It feels very premium and shiny. My deity looks so divine in this new collection. Thank you team!",
+    rating: 5,
+    avatar: "solar:user-circle-bold"
+  },
+  {
+    id: 6,
+    name: "Meera Das",
+    location: "Varanasi",
+    text: "The fabric quality is outstanding. It doesn't fade after washing. Very happy with the fast delivery to UP.",
+    rating: 5,
+    avatar: "solar:user-circle-bold"
+  },
+  {
+    id: 7,
+    name: "Karan Singh",
+    location: "Chandigarh",
+    text: "Found this store on Instagram and was amazed by the variety. The product looks exactly like the video shown. 10/10 recommended.",
+    rating: 5,
+    avatar: "solar:user-circle-bold"
+  },
+  {
+    id: 8,
+    name: "Anjali Gupta",
+    location: "Lucknow",
+    text: "Superb craftsmanship! The heavy embroidery work is very fine and doesn't have any loose threads. Very premium feel.",
     rating: 5,
     avatar: "solar:user-circle-bold"
   }
@@ -104,22 +128,22 @@ export default function ReviewMarquee() {
     "/videos/customerReview/customer-review-2.mp4",
     "/videos/customerReview/customer-review-1.mp4",
     "/videos/customerReview/customer-review-2.mp4",
-    "/videos/customerReview/customer-review-1.mp4",
-    "/videos/customerReview/customer-review-2.mp4",
   ];
 
   const videoSliderSettings = {
     dots: false,
     infinite: true,
-    speed: 1000,
-    slidesToShow: 4,
+    speed: 800,
+    slidesToShow: 3,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 4000,
     pauseOnHover: true,
     arrows: false,
     responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: 3 } },
+      { breakpoint: 3000, settings: { slidesToShow: 4 } },
+      { breakpoint: 1280, settings: { slidesToShow: 3.5 } },
+      { breakpoint: 1024, settings: { slidesToShow: 3 } },
       { breakpoint: 768, settings: { slidesToShow: 3 } },
       { breakpoint: 480, settings: { slidesToShow: 3 } }
     ]
@@ -205,7 +229,7 @@ export default function ReviewMarquee() {
   const ReviewCard = ({ review, idx }) => (
     <div
       key={`${review.id}-${idx}`}
-      className={`w-[230px] md:w-[260px] p-4 lg:p-5 rounded-[20px] lg:rounded-[24px] border border-brand-primary/5 shadow-sm flex flex-col gap-2.5 group/card transition-all duration-500 text-left ${review.isUser ? 'bg-brand-secondary/10 border-brand-secondary/20 ring-2 ring-brand-secondary/5' : 'hover:bg-brand-secondary/10 border-brand-secondary/20 ring-2 ring-brand-secondary/5'}`}
+      className={`w-[230px] md:w-[260px] p-4 lg:p-5 rounded-[20px] lg:rounded-[24px] border border-brand-primary/5 shadow-sm flex flex-col gap-2.5 group/card transition-all duration-500 text-left bg-white shadow-sm`}
     >
       <div className="flex items-center gap-2.5 text-left text-left">
         <div className={`w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center shadow-sm transition-colors duration-500 text-left ${review.isUser ? 'bg-brand-secondary text-white' : 'bg-white text-brand-secondary group-hover/card:bg-brand-secondary group-hover/card:text-white'}`}>
@@ -241,9 +265,11 @@ export default function ReviewMarquee() {
     </div>
   );
 
-  const row1 = [...allVisibleReviews].sort(() => 0.5 - Math.random());
-  const row2 = [...allVisibleReviews].sort(() => 0.2 - Math.random());
-  const speed = 80 + (localReviews.length * 2);
+  // Split reviews into two unique halves to avoid repetition between rows
+  const half = Math.ceil(allVisibleReviews.length / 2);
+  const row1 = allVisibleReviews.slice(0, half);
+  const row2 = allVisibleReviews.slice(half);
+  const speed = 70 + (localReviews.length * 2);
 
   return (
     <section className="pt-8 lg:pt-12 pb-4 lg:pb-12 bg-white overflow-hidden relative border-t border-brand-primary/5 text-center">
@@ -314,7 +340,7 @@ export default function ReviewMarquee() {
         </div>
         {/* Happy Customer section  */}
         <div className="mt-6 px-4 md:px-8 max-w-7xl mx-auto w-full text-center">
-          <div className="flex flex-col items-center mb-10 text-center">
+          <div className="flex flex-col items-center mb-4 lg:mb-10 text-center">
             <div className="text-brand-secondary font-bold text-[8px] lg:text-xs tracking-[0.4em] uppercase mb-3">Community Love</div>
             <h2 className="text-2xl lg:text-4xl font-serif font-bold text-brand-primary uppercase">Happy <span className="italic font-normal">Customers</span></h2>
             <div className="w-16 h-[1px] bg-brand-primary/10 mt-4"></div>
@@ -323,7 +349,7 @@ export default function ReviewMarquee() {
           <div className="happy-customer-video-slider">
             <Slider {...videoSliderSettings}>
               {customerVideos.map((video, idx) => (
-                <div key={idx} className="px-3">
+                <div key={idx} className="px-3 mb-4">
                   <motion.div
                     whileHover={{ scale: 0.98 }}
                     className="relative aspect-[9/16] rounded-2xl overflow-hidden shadow-xl border border-brand-primary/5 cursor-pointer group bg-brand-accent/30"
@@ -343,7 +369,7 @@ export default function ReviewMarquee() {
                       </div>
                     </div>
                     <div className="absolute top-4 left-4 flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                      <div className="w-2 h-2 rounded-full bg-red-500"></div>
                       <span className="text-[8px] font-bold text-white uppercase tracking-widest bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full border border-white/10">Feedback</span>
                     </div>
                   </motion.div>

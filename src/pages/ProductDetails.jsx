@@ -167,9 +167,14 @@ export default function ProductDetails() {
                   alt={product.name}
                   className="w-full h-full object-cover transition-transform duration-1000 hover:scale-110"
                 />
-                <div className="absolute top-5 left-5 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full border border-white/20 text-[8px] font-bold uppercase tracking-[0.3em] text-white shadow-sm">
+                <motion.div
+                  animate={{ scale: [1, 1.05, 1], opacity: [1, 0.8, 1] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute top-5 left-5 px-5 py-2.5 bg-brand-primary text-white backdrop-blur-md rounded-full border border-brand-secondary/30 text-[10px] font-bold uppercase tracking-[0.3em] shadow-[0_0_20px_rgba(26,67,50,0.3)] z-50 flex items-center gap-2"
+                >
+                  <Icon icon="solar:star-bold" className="text-brand-secondary w-3 h-3" />
                   Best Seller
-                </div>
+                </motion.div>
               </motion.div>
 
               {/* Thumbnail Reel (Larger) */}
@@ -206,8 +211,8 @@ export default function ProductDetails() {
                   <span className="text-3xl lg:text-4xl font-serif font-bold text-brand-primary">₹{product.price}</span>
                   <div className="h-8 w-px bg-brand-primary/10"></div>
                   <div className="flex flex-col text-left">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary">Direct Inquiry</span>
-                    <span className="text-[8px] font-medium text-brand-primary/30 uppercase tracking-[0.2em]">Crafted to Order</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary underline decoration-brand-secondary decoration-2 underline-offset-4">Direct Inquiry</span>
+                    <span className="text-[8px] font-bold text-brand-secondary uppercase tracking-[0.2em] mt-1 italic">Best Quality at Direct Factory Price</span>
                   </div>
                 </div>
 
@@ -236,9 +241,10 @@ export default function ProductDetails() {
                 {/* Info Box - Old Version */}
                 <button
                   onClick={handleWhatsApp}
-                  className="bg-brand-primary text-white py-4 lg:py-5 px-6 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-2 shadow-xl hover:bg-brand-secondary hover:translate-y-[-4px] transition-all active:scale-[0.98] group shrink-0"
+                  className="w-full bg-brand-primary text-white py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-[0_20px_40px_-10px_rgba(26,67,50,0.3)] hover:bg-brand-secondary hover:translate-y-[-4px] transition-all active:scale-[0.98] group"
                 >
-                  <Icon icon="logos:whatsapp-icon" className="w-6 h-6 lg:w-6 lg:h-6" /> For inquiry Contact on Whatsapp
+                  <Icon icon="logos:whatsapp-icon" className="w-6 h-6" /> 
+                  <span>Direct Factory Inquiry</span>
                 </button>
 
                 {/* Integrated Accordions */}
@@ -295,48 +301,87 @@ export default function ProductDetails() {
             </div>
           </div>
 
-          {/* VIDEO SECTION - Full Width Impression */}
-          <section className="mt-0 lg:mt-32 pt-8 lg:pt-16 border-t border-brand-primary/5">
-            <div className="container mx-auto px-0 max-w-7xl">
-              <div className="flex flex-col items-center mb-5 lg:mb-20 text-center">
-                <h2 className="text-3xl lg:text-5xl font-serif font-bold text-brand-primary uppercase text-center leading-tight">Details That <span className="italic font-normal text-brand-secondary">Matter</span></h2>
-                <div className="w-20 lg:w-32 h-[1px] bg-brand-primary/10 mt-4"></div>
+          {/* VIDEO STORY MODE - Cinematic Experience */}
+          <section className="mt-16 lg:mt-40 pt-16 lg:pt-24 border-t border-brand-primary/5 px-0">
+            <div className="container mx-auto px-4 max-w-7xl">
+              <div className="flex flex-col items-center mb-10 lg:mb-24 text-center">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-0.5 bg-brand-secondary/40"></div>
+                  <span className="text-brand-secondary text-[10px] lg:text-xs font-bold uppercase tracking-[0.4em]">Cinematic Quality</span>
+                  <div className="w-12 h-0.5 bg-brand-secondary/40"></div>
+                </div>
+                <h2 className="text-4xl lg:text-7xl font-serif font-bold text-brand-primary uppercase text-center leading-tight tracking-tighter">Divine <span className="italic font-normal text-brand-secondary">Details</span></h2>
+                <p className="text-[10px] lg:text-xs text-brand-primary/40 font-bold uppercase tracking-[0.3em] mt-8 max-w-md mx-auto leading-relaxed">Experience our craft through the lens of devotion. Each thread tells a story of heritage and love.</p>
               </div>
 
-              <div className="grid grid-cols-3 gap-3 lg:gap-10">
-                {[
-                  { id: 1, url: "/videos/products/lv_0_20250325174749.mp4", title: "Intricate Handwork" },
-                  { id: 2, url: "/videos/products/lv_0_20250411143949.mp4", title: "Fabric Shine" },
-                  { id: 3, url: "/videos/products/lv_0_20250426151713.mp4", title: "Product Detail" }
-                ].map((video, idx) => (
-                  <motion.div
-                    key={video.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    viewport={{ once: true }}
-                    onClick={() => setActiveVideo(video.url)}
-                    className="group relative aspect-[9/16] overflow-hidden rounded-2xl lg:rounded-[40px] shadow-2xl cursor-pointer bg-brand-primary/5"
-                  >
-                    <video
-                      src={video.url}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                      <div className="w-10 h-10 lg:w-16 lg:h-16 rounded-full bg-white/20 backdrop-blur-xl border border-white/40 flex items-center justify-center text-white scale-90 group-hover:scale-100 transition-transform">
-                        <Icon icon="solar:play-bold" className="w-4 h-4 lg:w-6 lg:h-6 ml-1" />
-                      </div>
+              <div className="story-slider-wrapper relative -mx-4 group">
+                 {/* Arrow Hints (Visual only as Slick handles it) */}
+                 <div className="hidden lg:flex absolute top-1/2 -translate-y-1/2 left-8 z-50 w-12 h-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 items-center justify-center text-white scale-0 group-hover:scale-100 transition-all duration-500 hover:bg-brand-secondary cursor-pointer">
+                   <Icon icon="lucide:arrow-left" className="w-6 h-6" />
+                 </div>
+                 <div className="hidden lg:flex absolute top-1/2 -translate-y-1/2 right-8 z-50 w-12 h-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 items-center justify-center text-white scale-0 group-hover:scale-100 transition-all duration-500 hover:bg-brand-secondary cursor-pointer">
+                   <Icon icon="lucide:arrow-right" className="w-6 h-6" />
+                 </div>
+
+                <Slider 
+                  {...{
+                    dots: false,
+                    infinite: true,
+                    centerMode: true,
+                    centerPadding: '0',
+                    speed: 800,
+                    slidesToShow: 5,
+                    slidesToScroll: 1,
+                    autoplay: true,
+                    autoplaySpeed: 3000,
+                    arrows: false,
+                    responsive: [
+                      { breakpoint: 1280, settings: { slidesToShow: 4 } },
+                      { breakpoint: 1024, settings: { slidesToShow: 3.5 } },
+                      { breakpoint: 768, settings: { slidesToShow: 2.2 } },
+                      { breakpoint: 480, settings: { slidesToShow: 1.2 } }
+                    ]
+                  }}
+                  className="story-slider"
+                >
+                  {[
+                    { id: 1, url: "/videos/products/lv_0_20250325174749.mp4", title: "Handwork" },
+                    { id: 2, url: "/videos/products/lv_0_20250411143949.mp4", title: "Fabric Shine" },
+                    { id: 3, url: "/videos/products/lv_0_20250426151713.mp4", title: "Product Detail" },
+                    { id: 4, url: "/videos/reel 3.mp4", title: "Showroom" },
+                    { id: 5, url: "/videos/reel 6_1.mp4", title: "Craftsmanship" }
+                  ].map((video, idx) => (
+                    <div key={idx} className="px-2 md:px-4">
+                      <motion.div
+                        whileHover={{ y: -10 }}
+                        onClick={() => setActiveVideo(video.url)}
+                        className="group relative aspect-[9/16] overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5 transition-all duration-700"
+                      >
+                        <video
+                          src={video.url}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8 lg:pb-14">
+                           <div className="w-12 h-12 lg:w-20 lg:h-20 rounded-full bg-white/20 backdrop-blur-xl border border-white/40 flex items-center justify-center text-white mb-6 transform scale-50 group-hover:scale-100 transition-transform duration-500">
+                             <Icon icon="solar:play-bold" className="w-8 h-8 lg:w-10 lg:h-10 ml-1" />
+                           </div>
+                           <h3 className="text-xl lg:text-3xl font-serif text-white text-center transform translate-y-4 group-hover:translate-y-0 transition-all duration-700">
+                             Watch Story
+                           </h3>
+                        </div>
+                        {/* Static Label (Always Visible on Mobile) */}
+                        <div className="absolute top-6 left-6 flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                          <span className="text-[8px] font-bold text-white uppercase tracking-widest bg-black/30 backdrop-blur-md px-2 py-1 rounded-full">{video.title}</span>
+                        </div>
+                      </motion.div>
                     </div>
-                    <div className="absolute bottom-4 lg:bottom-10 left-0 right-0 text-center px-2 lg:px-4">
-                      <p className="hidden md:block text-[8px] lg:text-[10px] font-bold uppercase tracking-[0.3em] text-white/60 mb-2 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">{video.title}</p>
-                      <h3 className="text-[10px] md:text-xl font-serif text-white opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-700 delay-100 whitespace-nowrap overflow-hidden text-ellipsis">Watch Story</h3>
-                    </div>
-                  </motion.div>
-                ))}
+                  ))}
+                </Slider>
               </div>
             </div>
           </section>
