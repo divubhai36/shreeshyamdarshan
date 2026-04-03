@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
@@ -120,14 +121,10 @@ export default function ReviewMarquee() {
   const [popupVideo, setPopupVideo] = useState(null);
 
   const customerVideos = [
-    "/videos/customerReview/customer-review-1.mp4",
-    "/videos/customerReview/customer-review-2.mp4",
-    "/videos/customerReview/customer-review-1.mp4",
-    "/videos/customerReview/customer-review-2.mp4",
-    "/videos/customerReview/customer-review-1.mp4",
-    "/videos/customerReview/customer-review-2.mp4",
-    "/videos/customerReview/customer-review-1.mp4",
-    "/videos/customerReview/customer-review-2.mp4",
+    "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4",
+    "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244607/lv_0_20250325174749_cdcicc.mp4",
+    "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244599/lv_0_20250411143949_iwsj9d.mp4",
+    "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244599/lv_0_20250411143949_iwsj9d.mp4",
   ];
 
   const videoSliderSettings = {
@@ -150,8 +147,10 @@ export default function ReviewMarquee() {
   };
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('customer_feedbacks') || '[]');
-    setLocalReviews(saved);
+    if (typeof window !== 'undefined') {
+       const saved = JSON.parse(localStorage.getItem('customer_feedbacks') || '[]');
+       setLocalReviews(saved);
+    }
   }, []);
 
   // For this demo, we assume the first local review belongs to the current user
@@ -210,7 +209,9 @@ export default function ReviewMarquee() {
       updated = [...localReviews, newReview];
     }
 
-    localStorage.setItem('customer_feedbacks', JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+       localStorage.setItem('customer_feedbacks', JSON.stringify(updated));
+    }
     setLocalReviews(updated);
     playSuccessSound();
     setIsSuccess(true);
@@ -229,7 +230,7 @@ export default function ReviewMarquee() {
   const ReviewCard = ({ review, idx }) => (
     <div
       key={`${review.id}-${idx}`}
-      className={`w-[230px] md:w-[260px] p-4 lg:p-5 rounded-[20px] lg:rounded-[24px] border border-brand-primary/5 shadow-sm flex flex-col gap-2.5 group/card transition-all duration-500 text-left bg-white shadow-sm`}
+      className={`w-[230px] md:w-[260px] p-4 lg:p-5 rounded-[20px] lg:rounded-[24px] border border-brand-primary/5 shadow-sm flex flex-col gap-2.5 group/card transition-all duration-500 text-left bg-white`}
     >
       <div className="flex items-center gap-2.5 text-left text-left">
         <div className={`w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center shadow-sm transition-colors duration-500 text-left ${review.isUser ? 'bg-brand-secondary text-white' : 'bg-white text-brand-secondary group-hover/card:bg-brand-secondary group-hover/card:text-white'}`}>
@@ -265,10 +266,19 @@ export default function ReviewMarquee() {
     </div>
   );
 
-  // Split reviews into two unique halves to avoid repetition between rows
-  const half = Math.ceil(allVisibleReviews.length / 2);
-  const row1 = allVisibleReviews.slice(0, half);
-  const row2 = allVisibleReviews.slice(half);
+  const [hasMounted, setHasMounted] = useState(false);
+  const [row1, setRow1] = useState([]);
+  const [row2, setRow2] = useState([]);
+
+  useEffect(() => {
+     setHasMounted(true);
+     setRow1([...allVisibleReviews].sort(() => 0.5 - Math.random()));
+     setRow2([...allVisibleReviews].sort(() => 0.5 - Math.random()));
+  }, [localReviews]);
+
+  if (!hasMounted) {
+     return <div className="py-10 bg-white/50" />;
+  }
   const speed = 70 + (localReviews.length * 2);
 
   return (

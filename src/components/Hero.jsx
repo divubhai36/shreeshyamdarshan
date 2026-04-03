@@ -1,4 +1,6 @@
+"use client";
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import productData from '../data/products.json';
@@ -17,6 +19,13 @@ export default function Hero() {
 
   const nextSlide = () => setCurrent((prev) => (prev + 1) % slides.length);
   const prevSlide = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+
+  const scrollToCollections = () => {
+    const element = document.getElementById('collections-grid');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <section
@@ -39,10 +48,12 @@ export default function Hero() {
               className="absolute inset-0"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-brand-primary/80 via-brand-primary/20 to-transparent z-10" />
-              <img
+              <Image
                 src={slides[current].url}
                 alt={slides[current].title}
-                className="w-full h-full object-cover brightness-[0.85] contrast-[1.1]"
+                fill
+                priority={current === 0}
+                className="object-cover brightness-[0.85] contrast-[1.1]"
               />
 
               <div className="absolute inset-0 z-20 flex flex-col justify-center px-8 lg:px-24 max-w-md lg:max-w-3xl text-white">
@@ -77,7 +88,10 @@ export default function Hero() {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.7, duration: 0.8 }}
                 >
-                  <button className="group relative px-8 py-4 lg:px-12 lg:py-5 bg-white text-brand-primary font-bold rounded-full text-[10px] lg:text-sm uppercase tracking-widest flex items-center gap-3 overflow-hidden transition-all hover:pr-14 hover:bg-brand-secondary hover:text-white shadow-2xl">
+                  <button 
+                    onClick={scrollToCollections}
+                    className="group relative px-8 py-4 lg:px-12 lg:py-5 bg-white text-brand-primary font-bold rounded-full text-[10px] lg:text-sm uppercase tracking-widest flex items-center gap-3 overflow-hidden transition-all hover:pr-14 hover:bg-brand-secondary hover:text-white shadow-2xl"
+                  >
                     <span className="relative z-10">Explore Collection</span>
                     <Icon icon="lucide:arrow-right" className="relative z-10 transition-transform duration-500 group-hover:translate-x-2 w-5 h-5" />
                   </button>
@@ -111,6 +125,13 @@ export default function Hero() {
                 className={`transition-all duration-700 rounded-full h-1.5 ${idx === current ? 'w-10 lg:w-16 bg-brand-secondary' : 'w-2 lg:w-3 bg-white/30 hover:bg-white/50'}`}
                 onClick={() => setCurrent(idx)}
               />
+            ))}
+          </div>
+          
+          {/* Silent background preload for instant slide transitions */}
+          <div className="hidden">
+            {slides.map((slide, idx) => (
+              <Image key={`preload-${idx}`} src={slide.url} alt="preload" width={100} height={100} priority={idx === 0} />
             ))}
           </div>
         </div>

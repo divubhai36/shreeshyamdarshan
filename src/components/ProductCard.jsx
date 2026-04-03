@@ -1,7 +1,8 @@
+"use client";
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
-import { Link } from 'react-router-dom';
+import Image from 'next/image';
 
 export default function ProductCard({ product }) {
 
@@ -12,10 +13,12 @@ export default function ProductCard({ product }) {
       className="premium-card group relative flex flex-col h-full bg-white rounded-2xl lg:rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-brand-primary/5"
     >
       <div className="relative aspect-square lg:aspect-square overflow-hidden bg-brand-accent">
-        <img
+        <Image
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+          fill
+          sizes="(max-width: 768px) 50vw, 25vw"
+          className="object-cover group-hover:scale-110 transition-transform duration-1000"
         />
 
         {/* Badges */}
@@ -42,7 +45,7 @@ export default function ProductCard({ product }) {
 
         {/* View Details Button (Replaces WhatsApp for showcase) */}
         {/* <Link
-          to={`/product/${product.id}`}
+          href={`/product/${product.id}`}
           className="w-full mt-auto py-2 lg:py-3 bg-brand-accent text-brand-primary font-bold rounded-xl lg:rounded-2xl flex items-center justify-center gap-2 hover:bg-brand-primary hover:text-white transition-all text-[8px] lg:text-xs uppercase tracking-widest shadow-sm"
         >
           <Icon icon="lucide:eye" className="w-4 h-4" />

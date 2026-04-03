@@ -1,18 +1,28 @@
+"use client";
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Image from 'next/image';
+import Link from 'next/link';
 import { Icon } from '@iconify/react';
 
 export default function Footer() {
   return (
     <footer className="pt-10 pb-10 bg-brand-primary text-white overflow-hidden relative">
-      <div className="absolute inset-0 opacity-5 bg-[url('/images/hero_2.jpg')] bg-cover bg-center mix-blend-overlay"></div>
+      <div className="absolute inset-0 opacity-5 mix-blend-overlay pointer-events-none">
+        <Image
+          src="/images/hero_2.jpg"
+          alt="Shree Shyam Darshan Background"
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+      </div>
 
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 mb-10 text-left">
 
           {/* Column 1: Brand */}
           <div className="space-y-6 lg:space-y-8">
-            <Link to="/" className="flex flex-col group">
+            <Link href="/" className="flex flex-col group">
               <h2 className="text-xl lg:text-2xl font-serif font-bold tracking-widest uppercase group-hover:text-brand-secondary transition-colors text-left">
                 SHREE SHYAM <span className="text-brand-secondary italic">DARSHAN</span>
               </h2>
@@ -30,7 +40,7 @@ export default function Footer() {
               <a href="https://wa.me/917383699199" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group">
                 <Icon icon="mdi:whatsapp" className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
               </a>
-              <Link to="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group">
+              <Link href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group">
                 <Icon icon="mdi:facebook" className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
               </Link>
               <a href="https://share.google/NnpT8DIwtX0QG6SdU" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group" title="Google Business">
@@ -46,7 +56,7 @@ export default function Footer() {
               {['Home', 'Collections', 'About Us', 'Contact Us'].map((item) => (
                 <li key={item}>
                   <Link
-                    to={item === 'Home' ? '/' : `/${item.toLowerCase().replace(' ', '-')}`}
+                    href={item === 'Home' ? '/' : `/${item.toLowerCase().replace(' ', '-')}`}
                     className="text-xs lg:text-sm text-white/60 hover:text-white flex items-center gap-2 group transition-all"
                   >
                     <Icon icon="lucide:chevron-right" className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-brand-secondary" />
@@ -106,9 +116,8 @@ export default function Footer() {
             © 2026 Shree Shyam Darshan • Crafted for Devotion
           </p>
           <div className="flex gap-8 text-[8px] lg:text-[10px] font-bold tracking-widest text-white/20 uppercase">
-            <Link to="#" className="hover:text-white transition-all">Privacy</Link>
-            {/* <Link to="#" className="hover:text-white transition-all">Shipping</Link> */}
-            <Link to="#" className="hover:text-white transition-all">Terms</Link>
+            <Link href="#" className="hover:text-white transition-all">Privacy</Link>
+            <Link href="#" className="hover:text-white transition-all">Terms</Link>
           </div>
         </div>
       </div>

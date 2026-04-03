@@ -1,10 +1,12 @@
+"use client";
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const CategoryCard = ({ label, image, href, count, index }) => {
   return (
-    <Link to={href} className="block h-full">
+    <Link href={href} className="block h-full">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -12,10 +14,12 @@ const CategoryCard = ({ label, image, href, count, index }) => {
         transition={{ delay: index * 0, duration: 0.6 }}
         className="group relative overflow-hidden rounded-[24px] lg:rounded-[40px] aspect-[3/4] shadow-lg bg-white border border-brand-primary/5 h-full"
       >
-        <img
+        <Image
           src={image}
           alt={label}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms] brightness-90 group-hover:brightness-100"
+          fill
+          sizes="(max-width: 768px) 50vw, 25vw"
+          className="object-cover group-hover:scale-110 transition-transform duration-[1500ms] brightness-90 group-hover:brightness-100"
         />
         <div className="absolute inset-x-0 bottom-0 p-4 lg:p-8 bg-gradient-to-t from-brand-primary/95 via-brand-primary/40 to-transparent flex flex-col items-center justify-end text-center z-10 h-1/2">
           <h3 className="text-lg lg:text-2xl font-serif font-bold text-white mb-2 lg:mb-3 transition-transform group-hover:-translate-y-1 uppercase tracking-wider">{label}</h3>
