@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
@@ -8,11 +9,11 @@ export default function LeadPopup() {
 
    useEffect(() => {
       // Check if user has already submitted the lead form - if yes, never show again
-      if (sessionStorage.getItem('lead_popup_submitted')) return;
+      if (typeof window !== 'undefined' && sessionStorage.getItem('lead_popup_submitted')) return;
 
       // Timer 1: 30 Seconds
       const timer1 = setTimeout(() => {
-         if (!sessionStorage.getItem('lead_popup_shown_1')) {
+         if (typeof window !== 'undefined' && !sessionStorage.getItem('lead_popup_shown_1')) {
             setShow(true);
             sessionStorage.setItem('lead_popup_shown_1', 'true');
          }
@@ -20,7 +21,7 @@ export default function LeadPopup() {
 
       // Timer 2: 5 Minutes (300 Seconds)
       const timer2 = setTimeout(() => {
-         if (!sessionStorage.getItem('lead_popup_shown_2')) {
+         if (typeof window !== 'undefined' && !sessionStorage.getItem('lead_popup_shown_2')) {
             setShow(true);
             sessionStorage.setItem('lead_popup_shown_2', 'true');
          }
@@ -46,7 +47,9 @@ export default function LeadPopup() {
       window.open(whatsappUrl, '_blank');
 
       // Mark as submitted to never show the popup again in this session
-      sessionStorage.setItem('lead_popup_submitted', 'true');
+      if (typeof window !== 'undefined') {
+         sessionStorage.setItem('lead_popup_submitted', 'true');
+      }
       setShow(false);
    };
 

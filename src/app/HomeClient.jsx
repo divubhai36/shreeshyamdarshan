@@ -1,0 +1,429 @@
+"use client";
+import React, { useEffect, useState } from 'react';
+import Header from '../components/Header';
+import Hero from '../components/Hero';
+import ProductCard from '../components/ProductCard';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Icon } from '@iconify/react';
+import CategoryCard from '../components/CategoryCard';
+import Link from 'next/link';
+import Footer from '../components/Footer';
+import ReviewMarquee from '../components/ReviewMarquee';
+
+export default function HomeClient({ products, categories }) {
+   const bestSellers = products.filter(p => p.isBestSeller);
+   const [activeVideo, setActiveVideo] = useState(null);
+   const signatures = [
+      {
+         segments: [
+            { text: "India's ", className: "text-brand-primary" },
+            { text: "Biggest", className: "text-brand-secondary italic font-normal" },
+            { text: "Manufacturer", className: "text-brand-primary", newLine: true }
+         ],
+         sub: "Shree Shyam Darshan"
+      },
+      {
+         segments: [
+            { text: "World Wide", className: "text-brand-secondary" },
+            { text: "Delivery", className: "text-brand-primary italic font-normal", newLine: true }
+         ],
+         sub: "India's Finest Heritage"
+      }
+   ];
+   const [textIndex, setTextIndex] = useState(0);
+
+   useEffect(() => {
+      const timer = setInterval(() => {
+         setTextIndex((prev) => (prev + 1) % signatures.length);
+      }, 5000);
+      return () => clearInterval(timer);
+   }, []);
+
+   return (
+      <div className="min-h-screen bg-brand-accent overflow-x-hidden text-left">
+         <Header />
+
+         {/* Rich & Premium Signature Text Slider */}
+         <div className="text-center mt-20 lg:mt-24 mb-0 h-[130px] lg:h-[140px] relative overflow-hidden px-4">
+            <AnimatePresence mode="wait">
+               <motion.div
+                  key={textIndex}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="w-full"
+               >
+                  <motion.h2
+                     className="text-3xl sm:text-5xl lg:text-7xl font-serif font-bold text-brand-primary leading-tight uppercase text-center mb-4 overflow-hidden flex flex-wrap justify-center items-center"
+                  >
+                     {(() => {
+                        let charIndex = 0;
+                        return signatures[textIndex].segments.map((segment, segIdx) => (
+                           <React.Fragment key={segIdx}>
+                              {segment.newLine && <div className="basis-full h-0 sm:hidden"></div>}
+                              {segment.newLine && <span className="hidden sm:inline">&nbsp;</span>}
+                              <span className={`inline-flex ${segment.className}`}>
+                                 {segment.text.split("").map((char, i) => {
+                                    const delayIndex = charIndex++;
+                                    return (
+                                       <motion.span
+                                          key={i}
+                                          initial={{ y: "100%", opacity: 0, filter: "blur(10px)" }}
+                                          animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                                          transition={{
+                                             duration: 1,
+                                             delay: delayIndex * 0.03,
+                                             ease: [0.19, 1, 0.22, 1]
+                                          }}
+                                          className="inline-block whitespace-pre"
+                                       >
+                                          {char}
+                                       </motion.span>
+                                    );
+                                 })}
+                              </span>
+                           </React.Fragment>
+                        ));
+                     })()}
+                  </motion.h2>
+                  <motion.div
+                     initial={{ opacity: 0, letterSpacing: "1em", y: 10 }}
+                     animate={{ opacity: 1, letterSpacing: "0.4em", y: 0 }}
+                     transition={{ delay: 0.6, duration: 1.2, ease: "easeOut" }}
+                     className="text-[12px] lg:text-[18px] font-medium text-brand-primary/40 uppercase tracking-[0.4em] inline-block relative"
+                  >
+                     <span className="relative z-10">{signatures[textIndex].sub}</span>
+                     <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: "100%" }}
+                        transition={{ delay: 1, duration: 1 }}
+                        className="absolute -bottom-2 left-0 h-[1px] bg-brand-secondary/20"
+                     />
+                  </motion.div>
+               </motion.div>
+            </AnimatePresence>
+         </div>
+         <Hero />
+
+         {/* Featured Cinematic Reel Section */}
+         <section className="py-12 lg:py-10 container mx-auto px-4 max-w-7xl">
+            <div className="flex flex-col items-center mb-10 lg:mb-16 text-center">
+               <div className="text-brand-secondary font-bold text-[10px] lg:text-xs tracking-[0.4em] uppercase mb-3 text-center">Live From Surat</div>
+               <h2 className="text-2xl sm:text-4xl lg:text-6xl font-serif font-bold text-brand-primary uppercase text-center whitespace-nowrap">Experience <span className="italic font-normal">Our World</span></h2>
+               <div className="w-20 lg:w-32 h-[1px] bg-brand-primary/10 mt-6 lg:mt-8"></div>
+            </div>
+
+            <motion.div
+               initial={{ opacity: 0, scale: 0.95 }}
+               whileInView={{ opacity: 1, scale: 1 }}
+               viewport={{ once: true }}
+               transition={{ duration: 1 }}
+               onClick={() => setActiveVideo("https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4")}
+               className="relative w-full max-w-5xl mx-auto aspect-[16/9] md:aspect-[21/9] rounded-[40px] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] cursor-pointer group border border-brand-primary/5 bg-white"
+            >
+               <video
+                  src="https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+               />
+               <div className="absolute inset-0 bg-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-4 text-white">
+                     <div className="w-16 h-16 lg:w-24 lg:h-24 rounded-full bg-white/20 backdrop-blur-2xl border border-white/40 flex items-center justify-center scale-90 group-hover:scale-100 transition-transform duration-500">
+                        <Icon icon="solar:play-bold" className="w-8 h-8 lg:w-12 lg:h-12 ml-1" />
+                     </div>
+                     <span className="text-[10px] lg:text-xs uppercase font-bold tracking-[0.3em] opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-700 delay-100">Watch Full Reel</span>
+                  </div>
+               </div>
+            </motion.div>
+         </section>
+
+         <section className="py-6 lg:py-10 container mx-auto px-4 max-w-7xl">
+            <div className="text-center mb-4 lg:mb-6">
+               <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="flex items-center justify-center gap-2 lg:gap-4 mb-2 lg:mb-3 text-brand-secondary font-bold text-[8px] lg:text-xs tracking-[0.4em] lg:tracking-[0.5em] uppercase text-center"
+               >
+                  <div className="h-[1px] w-8 lg:w-12 bg-brand-secondary/40"></div>
+                  Explore Divinity
+                  <div className="h-[1px] w-8 lg:w-12 bg-brand-secondary/40"></div>
+               </motion.div>
+               <motion.h2
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="text-2xl sm:text-4xl lg:text-6xl font-serif font-bold text-brand-primary leading-tight uppercase text-center"
+               >
+                  Best <span className="italic font-normal">Collections</span>
+               </motion.h2>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+               {categories.map((cat, index) => (
+                  <CategoryCard
+                     key={cat.id}
+                     index={index}
+                     label={cat.label}
+                     image={cat.image}
+                     href={`/collections/${cat.id}`}
+                     count={cat.subCategories.length}
+                  />
+               ))}
+            </div>
+         </section>
+
+         <section className="py-6 lg:py-10 bg-white/50 backdrop-blur-sm border-y border-brand-primary/5">
+            <div className="container mx-auto px-4 max-w-7xl">
+               <div className="flex flex-col md:flex-row items-center md:items-end justify-between mb-4 lg:mb-6 gap-4 text-center md:text-left text-left">
+                  <div className="text-left">
+                     <p className="text-brand-secondary font-bold text-[10px] lg:text-xs tracking-widest uppercase mb-2 lg:mb-3 text-center md:text-left">Trending Now</p>
+                     <h2 className="text-2xl lg:text-4xl font-serif font-bold text-brand-primary leading-tight uppercase text-center md:text-left">Handpicked <br className="hidden md:block" /> <span className="italic font-normal">Best Sellers</span></h2>
+                  </div>
+                  <Link href="/collections/dresses" className="hidden md:flex btn-outline group text-xs py-2 px-5 rounded-full items-center gap-2">
+                     View All
+                     <Icon icon="lucide:arrow-right" className="group-hover:translate-x-1.5 transition-transform duration-300 w-4 h-4" />
+                  </Link>
+               </div>
+
+               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+                  {bestSellers.map((product, idx) => (
+                     <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: idx * 0.05, duration: 0.6 }}
+                     >
+                        <Link href={`/product/${product.id}`} className="h-full">
+                           <ProductCard product={product} />
+                        </Link>
+                     </motion.div>
+                  ))}
+               </div>
+            </div>
+         </section>
+
+         <section className="py-8 lg:py-12 bg-brand-primary text-white overflow-hidden relative">
+            <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 text-center relative z-10 max-w-7xl">
+               <motion.div whileHover={{ y: -5 }} className="flex flex-col items-center gap-4 lg:gap-6">
+                  <div className="w-14 h-14 lg:w-20 lg:h-20 flex items-center justify-center bg-white/5 rounded-2xl lg:rounded-[30px] border border-white/10 backdrop-blur-xl shadow-xl group hover:border-brand-secondary/50 transition-all">
+                     <Icon icon="solar:star-bold" className="text-brand-secondary group-hover:scale-110 transition-transform w-6 h-6 lg:w-10 lg:h-10" />
+                  </div>
+                  <div>
+                     <h3 className="text-base lg:text-xl font-serif font-bold tracking-wide mb-1 lg:mb-2 uppercase text-center">Premium Collection</h3>
+                     <p className="text-white/40 text-[9px] lg:text-xs leading-relaxed max-w-xs font-medium px-4 text-center">Each masterpiece is meticulously crafted to perfection by expert artisans.</p>
+                  </div>
+               </motion.div>
+
+               <motion.div whileHover={{ y: -5 }} className="flex flex-col items-center gap-4 lg:gap-6">
+                  <div className="w-14 h-14 lg:w-20 lg:h-20 flex items-center justify-center bg-white/5 rounded-2xl lg:rounded-[30px] border border-white/10 backdrop-blur-xl shadow-xl group hover:border-brand-secondary/50 transition-all">
+                     <Icon icon="lucide:shield-check" className="text-brand-secondary group-hover:scale-110 transition-transform w-6 h-6 lg:w-10 lg:h-10" />
+                  </div>
+                  <div>
+                     <h3 className="text-base lg:text-xl font-serif font-bold tracking-wide mb-1 lg:mb-2 uppercase text-center">Heritage Handwork</h3>
+                     <p className="text-white/40 text-[9px] lg:text-xs leading-relaxed max-w-xs font-medium px-4 text-center">Authentic designs featuring premium Zardosi, pearls, and traditional fabrics.</p>
+                  </div>
+               </motion.div>
+
+               <motion.div whileHover={{ y: -5 }} className="flex flex-col items-center gap-4 lg:gap-6">
+                  <div className="w-14 h-14 lg:w-20 lg:h-20 flex items-center justify-center bg-white/5 rounded-2xl lg:rounded-[30px] border border-white/10 backdrop-blur-xl shadow-xl group hover:border-brand-secondary/50 transition-all">
+                     <Icon icon="lucide:layout-grid" className="text-brand-secondary group-hover:scale-110 transition-transform w-6 h-6 lg:w-10 lg:h-10" />
+                  </div>
+                  <div>
+                     <h3 className="text-base lg:text-xl font-serif font-bold tracking-wide mb-1 lg:mb-2 uppercase text-center">Divine Curation</h3>
+                     <p className="text-white/40 text-[9px] lg:text-xs leading-relaxed max-w-xs font-medium px-4 text-center">A complete range of exclusive Poshaks, Shringar, and Furniture for your deity.</p>
+                  </div>
+               </motion.div>
+            </div>
+         </section>
+
+         <ReviewMarquee />
+
+         <section className="py-0 lg:py-12 bg-white  relative overflow-hidden">
+            <div className="absolute top-[-50px] lg:top-[-80px] right-[-90px] lg:right-[150px] p-20 opacity-[0.03] select-none pointer-events-none">
+               <h2 className="text-[100px] lg:text-[200px] font-serif font-black leading-none uppercase">Surat</h2>
+            </div>
+
+            <div className="container mx-auto px-4 mb-5 max-w-7xl relative z-10">
+               <div className="flex flex-col items-center mb-12 lg:mb-20 text-center">
+                  <motion.div
+                     initial={{ opacity: 0, y: 10 }}
+                     whileInView={{ opacity: 1, y: 0 }}
+                     viewport={{ once: true }}
+                     className="flex items-center justify-center gap-4 mb-6"
+                  >
+                     <div className="h-[1px] w-12 bg-brand-secondary/30"></div>
+                     <span className="text-brand-secondary font-bold text-[10px] lg:text-xs tracking-[0.5em] uppercase">Showroom Experience</span>
+                     <div className="h-[1px] w-12 bg-brand-secondary/30"></div>
+                  </motion.div>
+
+                  <motion.h2
+                     initial={{ opacity: 0, y: 30 }}
+                     whileInView={{ opacity: 1, y: 0 }}
+                     viewport={{ once: true }}
+                     className="text-4xl lg:text-7xl font-serif font-bold text-brand-primary leading-tight"
+                  >
+                     Locate <span className="italic font-normal text-brand-secondary">Us</span>
+                  </motion.h2>
+               </div>
+
+               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
+                  <motion.div
+                     initial={{ opacity: 0, x: -30 }}
+                     whileInView={{ opacity: 1, x: 0 }}
+                     viewport={{ once: true }}
+                     className="relative aspect-video lg:aspect-auto lg:h-[650px] rounded-[40px] overflow-hidden shadow-2xl group border border-brand-primary/5"
+                  >
+                     <video
+                        src="https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110"
+                     />
+                     <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/60 to-transparent" />
+                  </motion.div>
+
+                  <div className="flex flex-col gap-6 lg:gap-10">
+                     <motion.div
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                        className="flex-grow flex flex-col justify-between p-10 lg:p-10 rounded-[50px] lg:rounded-[40px] bg-gradient-to-br from-white via-brand-accent/20 to-white border border-brand-secondary/20 relative overflow-hidden group shadow-[0_60px_120px_-30px_rgba(26,67,50,0.12)] selection:bg-brand-secondary/30"
+                     >
+                        <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none select-none">
+                           <Icon icon="solar:crown-minimalistic-bold" className="w-40 h-40 text-brand-secondary rotate-12" />
+                        </div>
+
+                        <div className="relative z-10">
+                           <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              whileInView={{ opacity: 1, y: 0 }}
+                              className="flex items-center gap-4 mb-10"
+                           >
+                              <div className="relative flex items-center justify-center">
+                                 <div className="w-3.5 h-3.5 bg-brand-secondary rounded-full shadow-[0_0_20px_rgba(197,160,89,0.8)]" />
+                                 <div className="absolute inset-0 w-3.5 h-3.5 bg-brand-secondary rounded-full animate-ping opacity-30" />
+                              </div>
+                              <span className="text-[10px] lg:text-[11px] font-bold uppercase tracking-[0.5em] text-brand-primary">SSD • SURAT STUDIO</span>
+                           </motion.div>
+
+                           <h3 className="text-5xl lg:text-7xl font-serif font-black text-brand-primary mb-8 leading-[1.1] tracking-tighter">
+                              Visit Our <span className="relative inline-block">
+                                 <span className="bg-gradient-to-r from-brand-secondary via-[#d4af37] to-brand-secondary bg-clip-text text-transparent italic font-normal">Surat</span>
+                                 <motion.div
+                                    initial={{ scaleX: 0 }}
+                                    whileInView={{ scaleX: 1 }}
+                                    className="absolute -bottom-2 left-0 w-full h-1 bg-brand-secondary/30 origin-left"
+                                 />
+                              </span>
+                           </h3>
+
+                           <p className="text-brand-primary/60 text-[11px] lg:text-xs font-serif italic mb-12 leading-relaxed max-w-sm">
+                              "Step into a sanctuary of devotion where every thread is woven with soul and generations of heritage."
+                           </p>
+
+                           <div className="grid grid-cols-1 gap-6 mb-12 lg:mb-20">
+                              <div className="flex items-center gap-6 lg:gap-8 group/item">
+                                 <div className="w-16 h-16 rounded-2xl bg-white/80 backdrop-blur-xl shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] flex items-center justify-center shrink-0 border border-brand-secondary/10 group-hover/item:border-brand-secondary transition-all duration-700">
+                                    <Icon icon="solar:map-point-wave-bold" className="w-8 h-8 text-brand-primary" />
+                                 </div>
+                                 <div className="flex flex-col">
+                                    <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-secondary mb-1.5 opacity-60">The Creative Studio</span>
+                                    <span className="text-sm lg:text-lg font-serif font-bold text-brand-primary leading-tight">69, Darshan Ind., Laskana, Surat.</span>
+                                 </div>
+                              </div>
+
+                              <div className="flex items-center gap-6 lg:gap-8 group/item">
+                                 <div className="w-16 h-16 rounded-2xl bg-white/80 backdrop-blur-xl shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] flex items-center justify-center shrink-0 border border-brand-secondary/10 group-hover/item:border-brand-secondary transition-all duration-700">
+                                    <Icon icon="solar:history-bold" className="w-8 h-8 text-brand-primary" />
+                                 </div>
+                                 <div className="flex flex-col">
+                                    <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-secondary mb-1.5 opacity-60">Boutique Timings</span>
+                                    <span className="text-sm lg:text-lg font-serif font-bold text-brand-primary">Mon - Sat | 09:00 AM - 06:00 PM</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+
+                        <div className="flex items-center gap-5 relative z-10">
+                           <a
+                              href="https://maps.app.goo.gl/JApzZ9c7UvcsunWB7"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-grow relative overflow-hidden group/btn rounded-[20px] lg:rounded-full"
+                           >
+                              <div className="absolute inset-0 bg-gradient-to-r from-brand-primary via-[#2d4f41] to-brand-primary opacity-100 group-hover/btn:opacity-90 transition-opacity" />
+                              <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-[1.5s] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                              <div className="relative py-6 lg:py-4 px-10 lg:px-12 flex items-center justify-center gap-4 text-white text-xs lg:text-sm font-bold uppercase tracking-[0.3em]">
+                                 <Icon icon="logos:google-maps" className="w-6 h-6 lg:w-7 lg:h-7 grayscale brightness-[5] group-hover/btn:grayscale-0 group-hover/btn:brightness-100 transition-all duration-500" />
+                                 Click Here For Map
+                              </div>
+                           </a>
+
+                           <a href="tel:+917383699199" className="shrink-0">
+                              <div className="w-16 h-16 rounded-[20px] lg:rounded-[20px] bg-brand-secondary/10 flex items-center justify-center text-brand-secondary border border-brand-secondary/20 shadow-xl hover:bg-brand-secondary hover:text-white transition-all duration-300 transform hover:-rotate-6 active:scale-95 group/call">
+                                 <Icon icon="solar:phone-calling-bold" className="w-8 h-8 lg:w-8 lg:h-8 transition-transform duration-500" />
+                              </div>
+                           </a>
+                        </div>
+                        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-brand-secondary/5 rounded-full blur-[120px] pointer-events-none animate-pulse" />
+                        <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-brand-primary/5 rounded-full blur-[100px] pointer-events-none" />
+                        <div className="absolute inset-0 opacity-[0.02] mix-blend-overlay pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/silk.png')]" />
+                     </motion.div>
+                  </div>
+               </div>
+            </div>
+         </section>
+
+         <AnimatePresence>
+            {activeVideo && (
+               <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-[100] bg-brand-primary/95 flex items-center justify-center p-4 backdrop-blur-3xl"
+                  onClick={() => setActiveVideo(null)}
+               >
+                  <button
+                     onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveVideo(null);
+                     }}
+                     className="absolute top-6 right-6 lg:top-8 lg:right-8 w-12 h-12 rounded-full bg-white/10 hover:bg-brand-secondary transition-colors flex items-center justify-center text-white z-20 border border-white/10 shadow-2xl"
+                   >
+                     <Icon icon="lucide:x" className="w-6 h-6" />
+                  </button>
+
+                  <motion.div
+                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                     animate={{ scale: 1, opacity: 1, y: 0 }}
+                     exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                     className="relative w-full max-w-[450px] aspect-[9/16] max-h-[90vh] rounded-[40px] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)] border border-white/20"
+                     onClick={(e) => e.stopPropagation()}
+                  >
+                     <video
+                        src={activeVideo}
+                        autoPlay
+                        controls
+                        playsInline
+                        className="w-full h-full object-cover"
+                     />
+                  </motion.div>
+               </motion.div>
+            )}
+         </AnimatePresence>
+
+         <Footer />
+      </div>
+   );
+}

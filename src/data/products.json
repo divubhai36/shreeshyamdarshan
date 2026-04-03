@@ -85,7 +85,7 @@
       "material": "Silk"
     },
     {
-      "id": 2,
+      "id": 5,
       "name": "Pure Bandhani Print Poshak",
       "category": "LADDU GOPAL POSHAK",
       "section": "BANDHANI",
@@ -104,7 +104,7 @@
       "material": "Cotton"
     },
     {
-      "id": 3,
+      "id": 6,
       "name": "Premium 3 Pcs Velvet Set",
       "category": "LADDU GOPAL POSHAK",
       "section": "PREMIUM (3 PCS SET)",
@@ -135,7 +135,7 @@
       "material": "Heavy Handwork"
     },
     {
-      "id": 4,
+      "id": 8,
       "name": "Royal Paghadi with Moti",
       "category": "PAGHADI",
       "section": "HANDWORK BEADS",
@@ -145,7 +145,7 @@
       "isBestSeller": true
     },
     {
-      "id": 5,
+      "id": 9,
       "name": "Heavily Embroidered Durga Poshak",
       "category": "MAA DURGA JI",
       "section": "EXCLUSIVE",
@@ -155,7 +155,7 @@
       "isBestSeller": true
     },
     {
-      "id": 6,
+      "id": 20,
       "name": "Premium Golden Sihasan",
       "category": "SIHASAN",
       "price": 2499,
@@ -164,7 +164,7 @@
       "isBestSeller": true
     },
     {
-      "id": 7,
+      "id": 11,
       "name": "Designer Velvet Aasan",
       "category": "AASAN",
       "price": 450,
