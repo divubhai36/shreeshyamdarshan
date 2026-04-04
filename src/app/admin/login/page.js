@@ -14,11 +14,12 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true);
     const res = await signIn("credentials", { email, password, redirect: false });
-    
+
     if (res?.ok) {
         router.push("/admin");
     } else {
-        alert("Invalid admin credentials. Please check .env settings if logging in for the first time.");
+        console.error("🚨 NextAuth Login Failed. Full Response:", res);
+        alert(`Login failed: ${res?.error || "Unknown Error"}. Please check console for details.`);
         setLoading(false);
     }
   };
@@ -29,10 +30,10 @@ export default function AdminLogin() {
         <div className="absolute top-0 right-0 p-8 opacity-5">
             <Icon icon="solar:crown-minimalistic-bold" className="w-40 h-40 text-brand-primary" />
         </div>
-        
+
         <h1 className="text-3xl font-bold font-serif text-brand-primary mb-2 text-center">Admin Portal</h1>
         <p className="text-xs uppercase tracking-widest text-brand-secondary font-bold text-center mb-8">Secure Access Only</p>
-        
+
         <form onSubmit={handleSubmit} className="space-y-5 text-left relative z-10">
           <div>
               <label className="text-[10px] font-bold text-brand-primary/50 uppercase tracking-widest pl-2 mb-1 block">Admin Email</label>
