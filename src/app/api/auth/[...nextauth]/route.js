@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
 export const authOptions = {
+  secret: process.env.NEXTAUTH_SECRET || "1234567890abcdef-super-secret-fallback-key-shreeshyam",
   providers: [
     CredentialsProvider({
       name: "Admin DB Login",
@@ -18,8 +19,11 @@ export const authOptions = {
 
         // Auto-seed the first admin from env if DB is empty
         if (!user) {
-          if (credentials.email === process.env.ADMIN_EMAIL) {
-             const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+          const adminEmail = process.env.ADMIN_EMAIL || "admin@shreeshyamdarshan.com";
+          const adminPassword = process.env.ADMIN_PASSWORD || "securepassword123";
+          
+          if (credentials.email === adminEmail) {
+             const hashedPassword = await bcrypt.hash(adminPassword, 10);
              user = await prisma.adminUser.create({
                 data: {
                    email: credentials.email,
@@ -41,6 +45,7 @@ export const authOptions = {
   ],
   session: { strategy: "jwt" },
   pages: { signIn: "/admin/login" },
+  trustHost: true,
 };
 
 const handler = NextAuth(authOptions);
