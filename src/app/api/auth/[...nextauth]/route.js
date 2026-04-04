@@ -20,7 +20,7 @@ export const authOptions = {
         // Auto-seed the first admin from env if DB is empty
         if (!user) {
           const adminEmail = process.env.ADMIN_EMAIL || "admin@shreeshyamdarshan.com";
-          const adminPassword = process.env.ADMIN_PASSWORD || "securepassword123";
+          const adminPassword = process.env.ADMIN_PASSWORD || "admin@ssd@123";
           
           if (credentials.email === adminEmail) {
              const hashedPassword = await bcrypt.hash(adminPassword, 10);
