@@ -1,5 +1,5 @@
 "use client";
-import { signIn } from "next-auth/react";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
@@ -13,14 +13,26 @@ export default function AdminLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const res = await signIn("credentials", { email, password, redirect: false });
-
-    if (res?.ok) {
+    
+    try {
+      const resp = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      const res = await resp.json();
+      
+      if (resp.ok) {
         router.push("/admin");
-    } else {
-        console.error("🚨 NextAuth Login Failed. Full Response:", res);
-        alert(`Login failed: ${res?.error || "Unknown Error"}. Please check console for details.`);
+        router.refresh();
+      } else {
+        console.error("🚨 Login Failed:", res.error);
+        alert(`Login failed: ${res.error}`);
         setLoading(false);
+      }
+    } catch (e) {
+      alert("Network or Server error");
+      setLoading(false);
     }
   };
 
