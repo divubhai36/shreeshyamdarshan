@@ -17,8 +17,9 @@ export async function POST(request) {
     }
 
     let user = await prisma.adminUser.findUnique({ where: { email } });
+    console.log(`🔍 Checking user for email: ${email}. Found in DB? ${!!user}`);
 
-    // Auto-seed first admin
+    // Auto-seed first admin from env if DB is empty
     if (!user) {
       if (email === adminEmail) {
         const hashedPassword = await bcrypt.hash(adminPassword, 10);
@@ -36,8 +37,10 @@ export async function POST(request) {
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      console.log(`❌ Password mismatch for user: ${email}`);
       return NextResponse.json({ error: "Invalid admin password." }, { status: 401 });
     }
+    console.log(`✅ Auth Successful for: ${email}`);
 
     // Assign JWT Token to cookies
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
