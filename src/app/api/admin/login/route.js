@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
+  console.log("🚀 Custom Login API called - Version 2.0");
   try {
     const { email, password } = await request.json();
 
@@ -42,7 +43,8 @@ export async function POST(request) {
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const sessionToken = await encrypt({ id: user.id, email: user.email });
 
-    cookies().set("admin_session", sessionToken, {
+    const cookieStore = await cookies();
+    cookieStore.set("admin_session", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       expires: expires,

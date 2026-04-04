@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { decrypt } from "@/lib/session";
 
-export async function middleware(req) {
+export default async function proxy(req) {
   const path = req.nextUrl.pathname;
   
   if (path.startsWith("/admin") && path !== "/admin/login") {
@@ -20,6 +20,8 @@ export async function middleware(req) {
   
   return NextResponse.next();
 }
+
+export { proxy as middleware };
 
 export const config = {
   matcher: ["/admin/:path*"],
