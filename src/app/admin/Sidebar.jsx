@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
-import { signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 
 export default function AdminSidebar() {
@@ -45,7 +44,10 @@ export default function AdminSidebar() {
       </div>
 
       <button
-        onClick={() => signOut({ callbackUrl: '/admin/login' })}
+        onClick={async () => {
+          await fetch("/api/admin/logout", { method: "POST" });
+          window.location.href = "/admin/login";
+        }}
         className="flex items-center gap-3 p-3 text-red-400 hover:bg-red-400/10 rounded-xl transition-all font-bold text-xs uppercase text-left mt-auto"
       >
         <Icon icon="lucide:log-out" className="w-5 h-5 mb-0.5" />
