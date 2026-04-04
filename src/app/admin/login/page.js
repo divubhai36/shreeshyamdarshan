@@ -18,7 +18,8 @@ export default function AdminLogin() {
     if (res?.ok) {
         router.push("/admin");
     } else {
-        alert("Invalid admin credentials. Please check .env settings if logging in for the first time.");
+        console.error("🚨 NextAuth Login Failed. Full Response:", res);
+        alert(`Login failed: ${res?.error || "Unknown Error"}. Please check console for details.`);
         setLoading(false);
     }
   };
