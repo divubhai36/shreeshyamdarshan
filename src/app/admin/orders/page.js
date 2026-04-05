@@ -51,15 +51,15 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-brand-primary/5 overflow-hidden">
+      <div className="bg-white rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-brand-primary/5">
         <table className="w-full text-left text-sm">
           <thead className="bg-brand-primary/5 text-[10px] uppercase font-bold text-brand-primary/60 tracking-widest border-b border-brand-primary/5">
             <tr>
-              <th className="p-6">Order ID</th>
+              <th className="p-6 rounded-tl-[40px]">Order ID</th>
               <th className="p-6">Wholesaler</th>
               <th className="p-6">Valuation</th>
               <th className="p-6">Fulfillment State</th>
-              <th className="p-6 text-right">Fulfillment Control</th>
+              <th className="p-6 text-right rounded-tr-[40px]">Fulfillment Control</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-brand-primary/5">

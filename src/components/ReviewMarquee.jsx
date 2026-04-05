@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import Slider from "react-slick";
@@ -112,7 +112,7 @@ const Celebration = () => (
   </div>
 );
 
-export default function ReviewMarquee({ reviews: dbReviews = [] }) {
+const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [localReviews, setLocalReviews] = useState([]);
@@ -121,15 +121,17 @@ export default function ReviewMarquee({ reviews: dbReviews = [] }) {
   const [popupVideo, setPopupVideo] = useState(null);
 
   // Map db reviews to local format if they exist
-  const displayReviews = dbReviews.length > 0 ? dbReviews.map(r => ({
-    id: r.id,
-    name: r.name,
-    location: r.company || "Verified Wholesaler",
-    text: r.comment,
-    rating: r.rating,
-    avatar: "solar:user-circle-bold",
-    status: 'verified'
-  })) : reviews;
+  const displayReviews = useMemo(() => {
+    return dbReviews.length > 0 ? dbReviews.map(r => ({
+      id: r.id,
+      name: r.name,
+      location: r.company || "Verified Wholesaler",
+      text: r.comment,
+      rating: r.rating,
+      avatar: "solar:user-circle-bold",
+      status: 'verified'
+    })) : reviews;
+  }, [dbReviews]);
 
   const customerVideos = [
     "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4",
@@ -282,9 +284,13 @@ export default function ReviewMarquee({ reviews: dbReviews = [] }) {
   const [row2, setRow2] = useState([]);
 
   useEffect(() => {
-     setHasMounted(true);
-     setRow1([...displayReviews].sort(() => 0.5 - Math.random()));
-     setRow2([...displayReviews].sort(() => 0.5 - Math.random()));
+     if (displayReviews.length > 0) {
+       setHasMounted(true);
+       const shuffled = [...displayReviews].sort(() => 0.5 - Math.random());
+       const half = Math.ceil(shuffled.length / 2);
+       setRow1(shuffled.slice(0, half));
+       setRow2(shuffled.slice(half));
+     }
   }, [dbReviews]);
 
   if (!hasMounted) {
@@ -293,7 +299,7 @@ export default function ReviewMarquee({ reviews: dbReviews = [] }) {
   const speed = 70 + (localReviews.length * 2);
 
   return (
-    <section className="pt-8 lg:pt-12 pb-4 lg:pb-12 bg-white overflow-hidden relative border-t border-brand-primary/5 text-center">
+    <section className="pt-8 lg:pt-12 pb-4 lg:pb-12 bg-white overflow-hidden relative border-t border-brand-primary/5 text-center select-none">
       <div className="container mx-auto px-4 mb-4 flex flex-col items-center gap-4 text-center">
         <div className="flex items-center justify-center gap-2 lg:gap-4 overflow-x-auto no-scrollbar pb-1 text-center">
           <div className="inline-flex items-center shrink-0 gap-2 px-3 py-1 lg:px-4 lg:py-1.5 rounded-full bg-brand-secondary/10 border border-brand-secondary/20 text-center">
@@ -542,4 +548,6 @@ export default function ReviewMarquee({ reviews: dbReviews = [] }) {
 
     </section>
   );
-}
+});
+
+export default ReviewMarquee;

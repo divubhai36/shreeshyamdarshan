@@ -45,7 +45,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-primary p-4 overflow-hidden">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-brand-primary p-4 overflow-hidden">
       <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-secondary/10 blur-[120px] rounded-full" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-brand-secondary/5 blur-[120px] rounded-full" />
 
