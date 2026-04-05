@@ -14,7 +14,6 @@ export default function AboutUsClient() {
 
   return (
     <div className="min-h-screen bg-brand-accent pb-12 lg:pb-20 text-left">
-      <Header />
 
       <section className="pt-24 lg:pt-32 pb-12 lg:pb-20 bg-brand-primary text-white relative overflow-hidden text-center">
         <div className="absolute inset-0 opacity-15 bg-[url('/images/hero_2.jpg')] bg-cover bg-center mix-blend-overlay scale-110"></div>

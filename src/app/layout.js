@@ -2,6 +2,8 @@ import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import siteConfig from "@/config/site";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const playfair = Playfair_Display({
   variable: "--font-serif",
@@ -124,7 +126,9 @@ export default function RootLayout({ children }) {
           }}
         />
         <Providers>
+          <Header />
           {children}
+          <Footer />
         </Providers>
       </body>
     </html>

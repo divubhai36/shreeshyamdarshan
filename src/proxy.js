@@ -6,15 +6,16 @@ export default async function proxy(req) {
   
   if (path.startsWith("/admin") && path !== "/admin/login") {
     const token = req.cookies.get("admin_session")?.value;
-    
-    if (!token) {
+    if (!token || !(await decrypt(token))) {
       return NextResponse.redirect(new URL("/admin/login", req.url));
     }
-    
-    const parsed = await decrypt(token);
-    
-    if (!parsed) {
-      return NextResponse.redirect(new URL("/admin/login", req.url));
+  }
+
+  const userProtectedPaths = ["/my-account", "/saved-products", "/checkout", "/orders"];
+  if (userProtectedPaths.some(p => path.startsWith(p))) {
+    const token = req.cookies.get("user_session")?.value;
+    if (!token || !(await decrypt(token))) {
+      return NextResponse.redirect(new URL("/login", req.url));
     }
   }
   
@@ -24,5 +25,5 @@ export default async function proxy(req) {
 export { proxy as middleware };
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/my-account/:path*", "/saved-products/:path*", "/checkout/:path*", "/orders/:path*"],
 };

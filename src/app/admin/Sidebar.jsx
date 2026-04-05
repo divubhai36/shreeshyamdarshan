@@ -14,6 +14,9 @@ export default function AdminSidebar() {
     { name: "Sub-Categories", path: "/admin/subcategories", icon: "solar:layers-bold-duotone" },
     { name: "Inner Categories", path: "/admin/inner-subcategories", icon: "solar:box-bold-duotone" },
     { name: "Products", path: "/admin/products", icon: "solar:bag-bold-duotone" },
+    { name: "Wholesalers", path: "/admin/wholesalers", icon: "solar:users-group-rounded-bold-duotone" },
+    { name: "Orders", path: "/admin/orders", icon: "solar:bill-list-bold-duotone" },
+    { name: "Reviews", path: "/admin/reviews", icon: "solar:star-fall-bold-duotone" },
     { name: "Settings", path: "/admin/settings", icon: "solar:settings-minimalistic-bold-duotone" },
     { name: "Return to Site", path: "/", icon: "solar:globus-bold-duotone" },
   ];
@@ -28,7 +31,7 @@ export default function AdminSidebar() {
         <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/40 mt-2">Administrative Portal</p>
       </div>
 
-      <div className="flex-1 space-y-1">
+      <div className="flex-1 space-y-1 overflow-y-auto pr-2 sidebar-scrollbar">
         {links.map((link) => {
           const isActive = pathname === link.path || (link.name !== "Dashboard" && link.name !== "Return to Site" && pathname.includes(link.path));
           return (
@@ -51,7 +54,7 @@ export default function AdminSidebar() {
         })}
       </div>
 
-      <div className="pt-6 border-t border-white/10 mt-auto">
+      <div className="pt-6 border-t border-white/10 shrink-0">
         <button
           onClick={async () => {
             await fetch("/api/admin/logout", { method: "POST" });

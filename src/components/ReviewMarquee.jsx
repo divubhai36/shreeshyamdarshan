@@ -112,13 +112,24 @@ const Celebration = () => (
   </div>
 );
 
-export default function ReviewMarquee() {
+export default function ReviewMarquee({ reviews: dbReviews = [] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [localReviews, setLocalReviews] = useState([]);
   const [formData, setFormData] = useState({ name: '', location: '', text: '', rating: 5 });
   const [editingId, setEditingId] = useState(null);
   const [popupVideo, setPopupVideo] = useState(null);
+
+  // Map db reviews to local format if they exist
+  const displayReviews = dbReviews.length > 0 ? dbReviews.map(r => ({
+    id: r.id,
+    name: r.name,
+    location: r.company || "Verified Wholesaler",
+    text: r.comment,
+    rating: r.rating,
+    avatar: "solar:user-circle-bold",
+    status: 'verified'
+  })) : reviews;
 
   const customerVideos = [
     "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4",
@@ -272,9 +283,9 @@ export default function ReviewMarquee() {
 
   useEffect(() => {
      setHasMounted(true);
-     setRow1([...allVisibleReviews].sort(() => 0.5 - Math.random()));
-     setRow2([...allVisibleReviews].sort(() => 0.5 - Math.random()));
-  }, [localReviews]);
+     setRow1([...displayReviews].sort(() => 0.5 - Math.random()));
+     setRow2([...displayReviews].sort(() => 0.5 - Math.random()));
+  }, [dbReviews]);
 
   if (!hasMounted) {
      return <div className="py-10 bg-white/50" />;
@@ -284,29 +295,11 @@ export default function ReviewMarquee() {
   return (
     <section className="pt-8 lg:pt-12 pb-4 lg:pb-12 bg-white overflow-hidden relative border-t border-brand-primary/5 text-center">
       <div className="container mx-auto px-4 mb-4 flex flex-col items-center gap-4 text-center">
-        <div className="flex items-center gap-2 lg:gap-4 overflow-x-auto no-scrollbar pb-1 text-center">
-          <div className="inline-flex items-center shrink-0 gap-2 px-3 py-1 lg:px-4 lg:py-1.5 rounded-full bg-brand-secondary/10 border border-brand-secondary/20 shadow-sm text-center">
+        <div className="flex items-center justify-center gap-2 lg:gap-4 overflow-x-auto no-scrollbar pb-1 text-center">
+          <div className="inline-flex items-center shrink-0 gap-2 px-3 py-1 lg:px-4 lg:py-1.5 rounded-full bg-brand-secondary/10 border border-brand-secondary/20 text-center">
             <Icon icon="solar:star-bold" className="text-brand-secondary w-3 h-3 lg:w-4 lg:h-4 text-center" />
             <span className="text-brand-secondary font-bold text-[8px] lg:text-[10px] tracking-[0.2em] uppercase whitespace-nowrap text-center">Trusted by 5000+ Devotees</span>
           </div>
-
-          {userReview ? (
-            <button
-              onClick={openForEdit}
-              className="inline-flex items-center shrink-0 gap-2 px-3 py-1 lg:px-4 lg:py-1.5 rounded-full bg-brand-secondary text-white border border-brand-secondary shadow-lg hover:bg-brand-primary transition-all group scale-95 md:scale-100 text-center"
-            >
-              <Icon icon="solar:pen-bold" className="w-3 h-3 lg:w-4 lg:h-4 group-hover:rotate-12 transition-transform text-center" />
-              <span className="font-bold text-[8px] lg:text-[10px] tracking-[0.2em] uppercase whitespace-nowrap text-center">Edit My Review</span>
-            </button>
-          ) : (
-            <button
-              onClick={openForWrite}
-              className="inline-flex items-center shrink-0 gap-2 px-3 py-1 lg:px-4 lg:py-1.5 rounded-full bg-brand-primary text-white border border-brand-primary shadow-lg hover:bg-brand-secondary hover:border-brand-secondary transition-all group scale-95 md:scale-100 text-center"
-            >
-              <Icon icon="solar:pen-new-square-bold" className="w-3 h-3 lg:w-4 lg:h-4 group-hover:rotate-12 transition-transform text-center" />
-              <span className="font-bold text-[8px] lg:text-[10px] tracking-[0.2em] uppercase whitespace-nowrap text-center">Write a Review</span>
-            </button>
-          )}
         </div>
       </div>
 

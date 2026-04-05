@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
@@ -8,15 +8,51 @@ import { usePathname } from 'next/navigation';
 import productData from '../data/products.json';
 import navigationData from '../data/navigation.json';
 
+import { useCart } from '@/context/CartContext';
+
 export default function Header() {
+  const pathname = usePathname();
+  const { cartCount, saved = [] } = useCart();
+
+  // Hide on Admin, Login and Dashboard pages to prevent layout conflicts
+  const isExcluded = pathname.startsWith('/admin') || pathname === '/login'
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
   const [expandedMobileCat, setExpandedMobileCat] = useState(null);
-  const pathname = usePathname();
+  const [isLogged, setIsLogged] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const accountRef = useRef(null);
+
+  // Close account menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (accountRef.current && !accountRef.current.contains(event.target)) {
+        setIsAccountMenuOpen(false);
+      }
+    };
+    if (isAccountMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isAccountMenuOpen]);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsAccountMenuOpen(false);
     setActiveCategory(null);
+
+    const cookies = document.cookie.split(';');
+    // Check for the UI visibility cookie (since user_session is httpOnly)
+    const hasUserSession = cookies.some((item) => item.trim().startsWith('ssd_wholesale_logged=true'));
+    const hasAdminSession = cookies.some((item) => item.trim().startsWith('admin_session='));
+
+    // Check localStorage fallback for users
+    const storedUser = localStorage.getItem('ssd_user');
+
+    setIsLogged(hasUserSession || hasAdminSession || !!storedUser);
+    setIsAdmin(hasAdminSession);
   }, [pathname]);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -25,10 +61,12 @@ export default function Header() {
     ? productData.products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
     : [];
 
+  if (isExcluded) return null;
+
   return (
     <>
-      <header className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-brand-primary/5">
-        <div className="container mx-auto px-4 lg:px-4 h-16 lg:h-20 flex items-center justify-between max-w-7xl">
+      <header className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-brand-primary/5">
+        <div className="w-full px-2 lg:px-8 h-16 lg:h-20 flex items-center justify-between mx-auto">
 
           {/* Mobile Menu Button */}
           <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 text-brand-primary">
@@ -47,7 +85,7 @@ export default function Header() {
 
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1 lg:space-x-2 text-[9px] uppercase tracking-widest font-bold text-brand-primary/70">
+          <nav className="hidden lg:flex items-center space-x-1 lg:space-x-3 text-[9px] uppercase tracking-widest font-bold text-brand-primary/70 scale-95 origin-center">
             {navigationData.map((cat) => (
               <div
                 key={cat.id}
@@ -155,17 +193,93 @@ export default function Header() {
                 </AnimatePresence>
               </div>
             ))}
-            <Link href="/contact-us" className="px-3 py-2 hover:text-brand-secondary transition-colors relative group">
+            <Link href="/contact-us" className="px-1.5 py-2 hover:text-brand-secondary transition-colors relative group whitespace-nowrap">
               Contact us
               <span className="absolute -bottom-1 left-3 right-3 h-0.5 bg-brand-secondary scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300 rounded-full"></span>
             </Link>
           </nav>
 
-          {/* Right Search Button */}
-          <div className="flex items-center space-x-1 lg:space-x-4 text-brand-primary lg:order-last">
+          {/* Right Actions */}
+          <div className="flex items-center space-x-1 lg:space-x-3 text-brand-primary lg:order-last">
             <button onClick={() => setIsSearchOpen(true)} className="p-2 hover:text-brand-secondary transition-colors">
-              <Icon icon="lucide:search" className="w-6 h-6" />
+              <Icon icon="solar:magnifer-linear" className="w-5 h-5 lg:w-6 lg:h-6" />
             </button>
+
+            <div className="relative group/acc" ref={accountRef}>
+              {isLogged ? (
+                <div className="flex items-center">
+                  <button
+                    onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+                    className={`p-2 transition-all duration-300 rounded-full hover:text-brand-secondary hover:bg-brand-primary/5 ${isAccountMenuOpen ? 'text-brand-secondary bg-brand-primary/5' : 'text-brand-primary'}`}
+                  >
+                    <Icon icon="solar:user-circle-linear" className="w-5 h-5 lg:w-6 lg:h-6" />
+                  </button>
+                </div>
+              ) : (
+                <Link href="/login" className="p-2 hover:text-brand-secondary transition-colors">
+                  <Icon icon="solar:user-circle-linear" className="w-5 h-5 lg:w-6 lg:h-6" />
+                </Link>
+              )}
+              <AnimatePresence>
+                {isAccountMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -15, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -15, scale: 0.95 }}
+                    className="absolute right-0 mt-4 w-72 bg-white border border-brand-primary/5 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-3xl z-50 overflow-hidden text-left"
+                  >
+                    <div className="p-6 border-b border-brand-primary/5 bg-brand-primary/2">
+                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-secondary mb-1">Account Control</p>
+                        <h4 className="text-sm font-serif font-bold text-brand-primary uppercase leading-1.5 tracking-wider">Wholseler Dashboard</h4>
+                      </div>
+
+                      <div className="p-2">
+                        <Link href="/wholesalers/dashboard" className="flex items-center gap-4 p-4 hover:bg-brand-accent rounded-2xl transition-all group">
+                          <div className="w-10 h-10 rounded-xl bg-brand-primary/5 flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
+                            <Icon icon="solar:widget-bold-duotone" className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-brand-primary font-serif">Dashboard</p>
+                            <p className="text-[8px] text-brand-primary/40 font-medium"> Management</p>
+                          </div>
+                        </Link>
+
+                        <Link href="/wholesalers/dashboard/saved" className="flex items-center justify-between p-4 hover:bg-brand-accent rounded-2xl transition-all group">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-brand-primary/5 flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
+                              <Icon icon="solar:heart-bold-duotone" className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-brand-primary font-serif">Favourites</p>
+                              <p className="text-[8px] text-brand-primary/40 font-medium">Saved Products</p>
+                            </div>
+                          </div>
+                          {saved.length > 0 && (
+                            <span className="w-6 h-6 bg-brand-accent text-brand-secondary text-[10px] font-bold rounded-full flex items-center justify-center border border-brand-secondary/20 font-serif">
+                              {saved.length}
+                            </span>
+                          )}
+                        </Link>
+                      </div>
+
+                      <div className="p-2 bg-brand-primary/2">
+                        <button
+                          onClick={async () => {
+                            await fetch(isAdmin ? '/api/admin/logout' : '/api/user/logout', { method: 'POST' });
+                            document.cookie = "ssd_wholesale_logged=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                            localStorage.removeItem('ssd_user');
+                            window.location.href = '/';
+                          }}
+                          className="w-full flex items-center gap-4 p-4 hover:bg-red-50 rounded-2xl transition-all group text-red-500/60 hover:text-red-600"
+                        >
+                          <Icon icon="solar:logout-3-linear" className="w-5 h-5" />
+                          <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Sign Out</span>
+                        </button>
+                      </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </header>
@@ -204,6 +318,41 @@ export default function Header() {
                     </AnimatePresence>
                   </div>
                 ))}
+
+                {isLogged && (
+                  <div className="border-t border-brand-primary/5 mt-4 bg-brand-primary/2">
+                    <div className="px-8 py-6">
+                      <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-secondary mb-4 italic font-serif">Partner Central</p>
+
+                      <div className="space-y-4">
+                        <Link href="/wholesalers/dashboard/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between group">
+                          <div className="flex items-center gap-4">
+                            <Icon icon="solar:cart-large-2-bold-duotone" className="w-5 h-5 text-brand-primary" />
+                            <span className="text-[10px] font-bold tracking-widest text-brand-primary uppercase">Procurement Registry</span>
+                          </div>
+                          {cartCount > 0 && (
+                            <span className="w-5 h-5 bg-brand-secondary text-white text-[9px] font-bold rounded-full flex items-center justify-center font-serif">
+                              {cartCount}
+                            </span>
+                          )}
+                        </Link>
+
+                        <button
+                          onClick={async () => {
+                            const res = await fetch(isAdmin ? '/api/admin/logout' : '/api/user/logout', { method: 'POST' });
+                            document.cookie = "ssd_wholesale_logged=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                            localStorage.removeItem('ssd_user');
+                            if (res.ok) window.location.href = '/';
+                          }}
+                          className="w-full flex items-center gap-4 py-3 text-red-500/60"
+                        >
+                          <Icon icon="solar:logout-3-linear" className="w-5 h-5" />
+                          <span className="text-[10px] font-bold tracking-widest uppercase">Sign Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="pt-4 mt-4 border-t border-gray-50 mb-10">
                   <Link href="/contact-us" onClick={() => setIsMobileMenuOpen(false)} className="block px-8 py-4 text-[11px] font-bold tracking-[0.2em] text-brand-primary uppercase hover:text-brand-secondary transition-colors">

@@ -61,6 +61,8 @@ model Product {
   
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
+  orderItems        OrderItem[]
+  savedBy           SavedProduct[]
 }
 
 model AdminUser {
@@ -69,4 +71,81 @@ model AdminUser {
   password  String
   name      String?
   createdAt DateTime @default(now())
+}
+
+model Wholesaler {
+  id            String         @id @default(cuid())
+  name          String
+  email         String?        @unique
+  password      String
+  plainPassword String?
+  companyName   String?
+  phone         String         @unique
+  address       String?
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  orders        Order[]
+  savedProducts SavedProduct[]
+  review        Review?
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  DISPATCHED
+  COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  orderNumber  String      @unique
+  wholesalerId String
+  wholesaler   Wholesaler  @relation(fields: [wholesalerId], references: [id])
+  totalAmount  Float
+  status       OrderStatus @default(PENDING)
+  items        OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+}
+
+model SavedProduct {
+  id           String     @id @default(cuid())
+  wholesalerId String
+  wholesaler   Wholesaler @relation(fields: [wholesalerId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([wholesalerId, productId])
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Review {
+  id           String       @id @default(cuid())
+  wholesalerId String?      @unique
+  wholesaler   Wholesaler?  @relation(fields: [wholesalerId], references: [id], onDelete: Cascade)
+  rating       Int          @default(5)
+  comment      String
+  status       ReviewStatus @default(PENDING)
+  dummyName    String?      // For admin dummy reviews
+  dummyCompany String?      // For admin dummy reviews
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }

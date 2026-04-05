@@ -41,6 +41,10 @@ export default async function SubCategoryPage({ params }) {
          where: { subCategoryId: dbSub.id }, 
          include: { category: true } 
      });
+
+     const dbInnerCats = await prisma.innerSubCategory.findMany({
+         where: { subCategoryId: dbSub.id }
+     });
      
      const mappedProducts = dbProducts.map(p => ({
        id: p.id, 
@@ -49,12 +53,23 @@ export default async function SubCategoryPage({ params }) {
        price: p.price,
        description: p.description, 
        image: p.images[0] || "/hero.png", 
-       isBestSeller: p.isBestSeller
+       isBestSeller: p.isBestSeller,
+       innerSubId: p.innerSubId
      }));
      
      return <SubCategoryClient 
        category={{ id: dbCat.slug, name: dbCat.name, image: dbCat.imageUrl }}
-       subCategory={{ id: dbSub.slug, name: dbSub.name, image: dbSub.imageUrl }}
+       subCategory={{ 
+         id: dbSub.slug, 
+         name: dbSub.name, 
+         image: dbSub.imageUrl,
+         sections: dbInnerCats.map(ic => ({
+            id: ic.slug,
+            dbId: ic.id,
+            name: ic.name,
+            image: ic.imageUrl || dbSub.imageUrl // Fallback to subcat image
+         }))
+       }}
        products={mappedProducts}
        categoryId={dbCat.slug}
        subCategoryId={dbSub.slug}

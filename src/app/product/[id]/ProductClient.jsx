@@ -1,16 +1,17 @@
 "use client";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Header from "../../../components/Header";
-import Footer from "../../../components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/context/CartContext";
 import { Icon } from "@iconify/react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 export default function ProductClient({ product, navCategory, subCategory, relatedProducts }) {
+  const { addToCart, toggleSave, isProductSaved, isAuthenticated } = useCart();
+  const saved = isProductSaved(product.id);
   // State Management
   const [quantity, setQuantity] = useState(1);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
@@ -25,12 +26,12 @@ export default function ProductClient({ product, navCategory, subCategory, relat
   const productImages = (product.images && product.images.length > 0)
     ? product.images
     : [
-        product.image,
-        product.image,
-        product.image,
-        product.image,
-        product.image,
-      ];
+      product.image,
+      product.image,
+      product.image,
+      product.image,
+      product.image,
+    ];
 
   const relatedSliderSettings = {
     dots: false,
@@ -71,19 +72,17 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                 icon={icon}
                 width="20"
                 height="20"
-                className={`transition-colors ${
-                  isOpen
-                    ? "text-brand-secondary"
-                    : "text-brand-primary/40 group-hover:text-brand-primary"
-                }`}
+                className={`transition-colors ${isOpen
+                  ? "text-brand-secondary"
+                  : "text-brand-primary/40 group-hover:text-brand-primary"
+                  }`}
               />
             </div>
             <span
-              className={`text-[12px] lg:text-[14px] font-bold uppercase tracking-[0.2em] transition-colors ${
-                isOpen
-                  ? "text-brand-primary"
-                  : "text-brand-primary/50 group-hover:text-brand-primary"
-              }`}
+              className={`text-[12px] lg:text-[14px] font-bold uppercase tracking-[0.2em] transition-colors ${isOpen
+                ? "text-brand-primary"
+                : "text-brand-primary/50 group-hover:text-brand-primary"
+                }`}
             >
               {title}
             </span>
@@ -93,9 +92,8 @@ export default function ProductClient({ product, navCategory, subCategory, relat
               icon="lucide:chevron-down"
               width="16"
               height="16"
-              className={`transition-transform duration-500 ${
-                isOpen ? "rotate-180 text-brand-secondary" : "text-brand-primary/20"
-              }`}
+              className={`transition-transform duration-500 ${isOpen ? "rotate-180 text-brand-secondary" : "text-brand-primary/20"
+                }`}
             />
           </div>
         </button>
@@ -182,9 +180,7 @@ export default function ProductClient({ product, navCategory, subCategory, relat
           })
         }}
       />
-      <div className="min-h-screen bg-brand-accent relative w-full flex flex-col text-left overflow-x-hidden">
-        <Header />
-
+      <div className="min-h-screen bg-brand-accent/30 overflow-x-hidden text-left">
         <main className="flex-grow">
           <div className="container mx-auto px-4 pt-20 lg:pt-28 mb-5 max-w-7xl">
             <div className="flex flex-wrap items-center gap-2 lg:gap-3 text-[10px] items-start mb-4 lg:mb-12 text-brand-primary/20 font-bold uppercase tracking-[0.2em] w-full">
@@ -213,7 +209,7 @@ export default function ProductClient({ product, navCategory, subCategory, relat
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-start">
               <div className="space-y-6 lg:sticky lg:top-24">
-                <div className="relative aspect-square md:aspect-[4/5] overflow-hidden rounded-[40px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5">
+                <div className="relative aspect-square md:aspect-[4/5] overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5">
                   <Image
                     src={productImages[activeImageIdx]}
                     alt={product.name}
@@ -222,14 +218,58 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover transition-transform duration-1000 hover:scale-110"
                   />
-                  <motion.div
-                    animate={{ scale: [1, 1.05, 1], opacity: [1, 0.8, 1] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-5 left-5 px-5 py-2.5 bg-brand-primary text-white backdrop-blur-md rounded-full border border-brand-secondary/30 text-[10px] font-bold uppercase tracking-[0.3em] shadow-[0_0_20px_rgba(26,67,50,0.3)] z-50 flex items-center gap-2"
-                  >
-                    <Icon icon="solar:star-bold" className="text-brand-secondary w-3 h-3" />
-                    Best Seller
-                  </motion.div>
+                  {/* Brand Best Seller Aura Badge */}
+                  {product.isBestSeller && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="absolute top-5 left-5 z-20 flex items-center gap-3 bg-brand-primary backdrop-blur-xl px-4 py-2 rounded-full border border-white/20 shadow-[0_20px_50px_rgba(26,67,50,0.4)]"
+                    >
+                      <div className="relative">
+                        <Icon icon="solar:star-bold" className="text-brand-secondary w-4 h-4 shadow-lg" />
+                        <div className="absolute inset-0 bg-brand-secondary/30 blur-md rounded-full scale-150 animate-pulse" />
+                      </div>
+                      <span className="text-white text-[9px] font-bold uppercase tracking-[0.3em] drop-shadow-md">
+                        Best Seller
+                      </span>
+                    </motion.div>
+                  )}
+
+                  {/* Cinema Floating Like Button */}
+                  {isAuthenticated && (
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="absolute top-1 right-1 z-30"
+                    >
+                      <motion.button
+                        whileHover={{ scale: 1.1, y: -4 }}
+                        whileTap={{ scale: 0.85 }}
+                        onClick={() => toggleSave(product)}
+                        className={`w-16 h-16 rounded-[24px] flex items-center justify-center transition-all duration-300 relative overflow-hidden ${saved ? "text-rose-500" : "text-white"
+                          }`}
+                      >
+                        {/* ✅ Single element (NO re-mount) */}
+                        <motion.div
+                          animate={{
+                            scale: saved ? [1, 1.25, 1] : 1,
+                          }}
+                          transition={{
+                            duration: 0.25,
+                            ease: "easeOut",
+                          }}
+                        >
+                          <Icon
+                            icon={saved ? "solar:heart-bold" : "solar:heart-linear"}
+                            className={`w-8 h-8 ${saved
+                                ? "drop-shadow-[0_0_15px_rgba(244,63,94,0.6)]"
+                                : "drop-shadow-[0_0_15px_rgba(26,67,50,0.4)]"
+                              }`}
+                          />
+                        </motion.div>
+                      </motion.button>
+                    </motion.div>
+                  )}
                 </div>
 
                 {productImages.length > 1 && (
@@ -238,11 +278,10 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                       <button
                         key={idx}
                         onClick={() => setActiveImageIdx(idx)}
-                        className={`relative cursor-pointer shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 ease-in-out hover:border-brand-secondary/50 ${
-                          activeImageIdx === idx
-                            ? "border-brand-secondary shadow-md"
-                            : "border-transparent"
-                        }`}
+                        className={`relative cursor-pointer shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 ease-in-out hover:border-brand-secondary/50 ${activeImageIdx === idx
+                          ? "border-brand-secondary shadow-md"
+                          : "border-transparent"
+                          }`}
                       >
                         <Image
                           src={img}
@@ -316,7 +355,7 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                     className="w-full bg-brand-primary text-white py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-[0_20px_40px_-10px_rgba(26,67,50,0.3)] hover:bg-brand-secondary hover:translate-y-[-4px] transition-all active:scale-[0.98] group"
                   >
                     <Icon icon="logos:whatsapp-icon" className="w-6 h-6" />
-                    <span>Direct Factory Inquiry</span>
+                    <span>Order On Whatsapp</span>
                   </button>
 
                   <div className="mt-8 space-y-0 text-left">
@@ -371,47 +410,83 @@ export default function ProductClient({ product, navCategory, subCategory, relat
               </div>
             </div>
 
-            <section className="pt-10 lg:pt-24 border-t border-brand-primary/5 px-0">
-               <div className="container mx-auto px-4 max-w-7xl text-center">
-                 <div className="flex flex-col items-center mb-10 lg:mb-24">
-                   <div className="flex items-center gap-4 mb-4">
-                     <div className="w-12 h-0.5 bg-brand-secondary/40"></div>
-                     <span className="text-brand-secondary text-[10px] lg:text-xs font-bold uppercase tracking-[0.4em]">Cinematic Quality</span>
-                     <div className="w-12 h-0.5 bg-brand-secondary/40"></div>
-                   </div>
-                   <h2 className="text-4xl lg:text-7xl font-serif font-bold text-brand-primary uppercase leading-tight tracking-tighter">
-                     Divine <span className="italic font-normal text-brand-secondary">Details</span>
-                   </h2>
-                   <p className="text-[10px] lg:text-xs text-brand-primary/40 font-bold uppercase tracking-[0.3em] mt-8 max-w-md mx-auto leading-relaxed">
-                     Experience our craft through the lens of devotion. Each thread tells a story of heritage and love.
-                   </p>
-                 </div>
+            <section className="pt-10 lg:pt-20 border-t border-brand-primary/5 px-0">
+              <div className="container mx-auto px-4 max-w-7xl text-center">
+                <div className="flex flex-col items-center mb-0 lg:mb-8">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-0.5 bg-brand-secondary/40"></div>
+                    <span className="text-brand-secondary text-[10px] lg:text-xs font-bold uppercase tracking-[0.4em]">Cinematic Quality</span>
+                    <div className="w-12 h-0.5 bg-brand-secondary/40"></div>
+                  </div>
+                  <h2 className="text-4xl lg:text-7xl font-serif font-bold text-brand-primary uppercase leading-tight tracking-tighter">
+                    Divine <span className="italic font-normal text-brand-secondary">Details</span>
+                  </h2>
+                  <p className="text-[10px] lg:text-xs text-brand-primary/40 font-bold uppercase tracking-[0.3em] mt-8 max-w-md mx-auto leading-relaxed">
+                    Experience our craft through the lens of devotion. Each thread tells a story of heritage and love.
+                  </p>
+                </div>
 
-                 <div className="story-slider-wrapper relative -mx-4 group">
-                   <Slider {...{ dots: false, infinite: true, centerMode: true, centerPadding: "0", speed: 800, slidesToShow: 5, slidesToScroll: 1, autoplay: true, autoplaySpeed: 3000, arrows: false, responsive: [
-                       { breakpoint: 1280, settings: { slidesToShow: 4 } },
-                       { breakpoint: 1024, settings: { slidesToShow: 3.5 } },
-                       { breakpoint: 768, settings: { slidesToShow: 1.5 } },
-                       { breakpoint: 480, settings: { slidesToShow: 1.5 } },
-                     ], }} className="story-slider">
-                     {[ { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244607/lv_0_20250325174749_cdcicc.mp4", title: "Handwork" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244604/lv_0_20250426151713_exrd5i.mp4", title: "Fabric Shine" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244599/lv_0_20250411143949_iwsj9d.mp4"}, ].map((video, idx) => (
-                       <div key={idx} className="px-2 md:px-4 py-8 pb-10">
-                         <motion.div whileHover={{ y: -10 }} onClick={() => setActiveVideo(video.url)} className="group relative aspect-[9/16] overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5">
-                           <video src={video.url} autoPlay muted loop playsInline className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                           <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
-                             <h3 className="text-xl lg:text-xl font-serif text-white">Watch Story</h3>
-                           </div>
-                         </motion.div>
-                       </div>
-                     ))}
-                   </Slider>
-                 </div>
-               </div>
+                <div className="story-slider-wrapper relative -mx-4 group">
+                  <Slider
+                    {...{
+                      dots: false,
+                      infinite: true,
+                      speed: 800,
+                      slidesToScroll: 1,
+                      autoplay: true,
+                      autoplaySpeed: 3000,
+                      arrows: false,
+
+                      // Desktop first
+                      slidesToShow: 5,
+
+                      responsive: [
+                        {
+                          breakpoint: 1280, // below 1280px
+                          settings: {
+                            slidesToShow: 4,
+                          },
+                        },
+                        {
+                          breakpoint: 1024, // below 1024px
+                          settings: {
+                            slidesToShow: 3,
+                          },
+                        },
+                        {
+                          breakpoint: 768, // below 768px
+                          settings: {
+                            slidesToShow: 2.5,
+                          },
+                        },
+                        {
+                          breakpoint: 480, // small mobile
+                          settings: {
+                            slidesToShow: 2.2,
+                          },
+                        },
+                      ],
+                    }}
+                    className="story-slider"
+                  >
+                    {[{ url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244607/lv_0_20250325174749_cdcicc.mp4", title: "Handwork" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244604/lv_0_20250426151713_exrd5i.mp4", title: "Fabric Shine" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244599/lv_0_20250411143949_iwsj9d.mp4" },].map((video, idx) => (
+                      <div key={idx} className="px-2 md:px-4 py-8 pb-10">
+                        <motion.div whileHover={{ y: -10 }} onClick={() => setActiveVideo(video.url)} className="group relative aspect-[9/16] overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5">
+                          <video src={video.url} autoPlay muted loop playsInline className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
+                            <h3 className="text-xl lg:text-xl font-serif text-white">Watch Story</h3>
+                          </div>
+                        </motion.div>
+                      </div>
+                    ))}
+                  </Slider>
+                </div>
+              </div>
             </section>
 
             {relatedProducts.length > 0 && (
-              <div className="mt-0 lg:mt-32 pt-12 lg:pt-16 border-t border-brand-primary/5">
-                <div className="flex flex-col items-center mb-5 lg:mb-16 text-center">
+              <div className="pt-12 lg:pt-16">
+                <div className="flex flex-col items-center mb-5 lg:mb-10 text-center">
                   <div className="text-brand-secondary font-bold text-[8px] lg:text-xs tracking-[0.4em] uppercase mb-3">You May Also Like</div>
                   <h2 className="text-2xl lg:text-4xl font-serif font-bold text-brand-primary uppercase">Elite <span className="italic font-normal">Masterpieces</span></h2>
                 </div>
@@ -462,8 +537,6 @@ export default function ProductClient({ product, navCategory, subCategory, relat
             </motion.div>
           )}
         </AnimatePresence>
-
-        <Footer />
       </div>
     </>
   );

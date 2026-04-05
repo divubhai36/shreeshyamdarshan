@@ -1,16 +1,14 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import Header from '../components/Header';
-import Hero from '../components/Hero';
-import ProductCard from '../components/ProductCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
+import Hero from '../components/Hero';
+import ProductCard from '../components/ProductCard';
 import CategoryCard from '../components/CategoryCard';
 import Link from 'next/link';
-import Footer from '../components/Footer';
 import ReviewMarquee from '../components/ReviewMarquee';
 
-export default function HomeClient({ products, categories }) {
+export default function HomeClient({ products, categories, reviews }) {
    const bestSellers = products.filter(p => p.isBestSeller);
    const [activeVideo, setActiveVideo] = useState(null);
    const signatures = [
@@ -41,7 +39,6 @@ export default function HomeClient({ products, categories }) {
 
    return (
       <div className="min-h-screen bg-brand-accent overflow-x-hidden text-left">
-         <Header />
 
          {/* Rich & Premium Signature Text Slider */}
          <div className="text-center mt-20 lg:mt-24 mb-0 h-[130px] lg:h-[140px] relative overflow-hidden px-4">
@@ -200,9 +197,7 @@ export default function HomeClient({ products, categories }) {
                         viewport={{ once: true }}
                         transition={{ delay: idx * 0.05, duration: 0.6 }}
                      >
-                        <Link href={`/product/${product.id}`} className="h-full">
-                           <ProductCard product={product} />
-                        </Link>
+                        <ProductCard product={product} />
                      </motion.div>
                   ))}
                </div>
@@ -243,7 +238,7 @@ export default function HomeClient({ products, categories }) {
             </div>
          </section>
 
-         <ReviewMarquee />
+         <ReviewMarquee reviews={reviews} />
 
          <section className="py-0 lg:py-12 bg-white  relative overflow-hidden">
             <div className="absolute top-[-50px] lg:top-[-80px] right-[-90px] lg:right-[150px] p-20 opacity-[0.03] select-none pointer-events-none">
@@ -422,8 +417,6 @@ export default function HomeClient({ products, categories }) {
                </motion.div>
             )}
          </AnimatePresence>
-
-         <Footer />
       </div>
    );
 }
