@@ -103,15 +103,15 @@ export default function ReviewsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-brand-primary/5 overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-brand-primary/5">
         <table className="w-full text-left text-sm">
           <thead className="bg-brand-primary/5 text-[10px] uppercase font-bold text-brand-primary/60 tracking-widest border-b border-brand-primary/5">
             <tr>
-              <th className="p-6">Wholesaler</th>
+              <th className="p-6 rounded-tl-3xl">Wholesaler</th>
               <th className="p-6">Feedback</th>
               <th className="p-6">Rating</th>
               <th className="p-6">Status</th>
-              <th className="p-6 text-right">Moderation</th>
+              <th className="p-6 text-right rounded-tr-3xl">Moderation</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-brand-primary/5">
@@ -128,10 +128,16 @@ export default function ReviewsPage() {
             ) : filteredData.map((r) => (
               <tr key={r.id} className="hover:bg-brand-primary/[0.02] transition-colors group">
                 <td className="p-6">
-                  <p className="font-bold text-brand-primary">{r.wholesaler?.name || r.dummyName}</p>
+                  <div className="flex  items-center gap-2 mb-1">
+                    <p className="font-bold text-brand-primary">{r.wholesaler?.name || r.dummyName}</p>
+                    {!r.dummyName && (
+                      <span className="flex items-center gap-1 bg-green-50 text-green-600 p-1 rounded-full text-[7px] font-black uppercase tracking-widest border border-green-100">
+                        <Icon icon="solar:verified-check-bold" className="w-3 h-3" />
+                      </span>
+                    )}
+                  </div>
                   <p className="text-[10px] text-brand-primary/40 font-medium uppercase tracking-widest leading-normal">
                     {r.wholesaler?.companyName || r.dummyCompany || 'Independant Buyer'}
-                    {r.dummyName && <span className="ml-2 bg-brand-secondary/10 text-brand-secondary px-2 rounded-md text-[8px]">Dummy</span>}
                   </p>
                 </td>
                 <td className="p-6 max-w-md">
@@ -139,6 +145,11 @@ export default function ReviewsPage() {
                   <p className="text-[9px] text-brand-primary/30 mt-1">{new Date(r.createdAt).toLocaleDateString()}</p>
                 </td>
                 <td className="p-6">
+                  {!r.dummyName && (
+                    <span className="flex items-center gap-1 bg-green-50 text-green-600 px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest border border-green-100 mb-2">
+                      <Icon icon="solar:verified-check-bold" className="w-2.5 h-2.5" /> Original
+                    </span>
+                  )}
                   <div className="flex gap-0.5 text-brand-secondary">
                     {[...Array(5)].map((_, i) => (
                       <Icon key={i} icon="solar:star-bold" className={`w-3 h-3 ${i < r.rating ? 'text-amber-400' : 'text-gray-200'}`} />
@@ -150,6 +161,11 @@ export default function ReviewsPage() {
                     {r.status}
                   </div>
                 </td>
+                {/* <td className="p-6">
+                  <div className={`inline-flex items-center px-4 py-1.5 rounded-full border text-[9px] font-bold uppercase tracking-widest ${STATUS_COLORS[r.status]}`}>
+                    {r.status}
+                  </div>
+                </td> */}
                 <td className="p-6 text-right">
                   <div className="flex justify-end gap-3 items-center">
                     <CustomSelect
@@ -217,7 +233,7 @@ export default function ReviewsPage() {
                     <input
                       type="text"
                       className="w-full bg-brand-primary/2 border border-brand-primary/5 rounded-2xl p-4 text-xs font-bold text-brand-primary outline-none focus:ring-4 focus:ring-brand-secondary/5 transition-all"
-                      placeholder="e.g. Rahul Sharma"
+                      placeholder="Enter Customer Name"
                       value={newReview.dummyName}
                       onChange={(e) => setNewReview({ ...newReview, dummyName: e.target.value })}
                       required
@@ -228,7 +244,7 @@ export default function ReviewsPage() {
                     <input
                       type="text"
                       className="w-full bg-brand-primary/2 border border-brand-primary/5 rounded-2xl p-4 text-xs font-bold text-brand-primary outline-none focus:ring-4 focus:ring-brand-secondary/5 transition-all"
-                      placeholder="e.g. Surat, Gujarat"
+                      placeholder="Enter City/Company"
                       value={newReview.dummyCompany}
                       onChange={(e) => setNewReview({ ...newReview, dummyCompany: e.target.value })}
                     />

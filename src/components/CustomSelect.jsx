@@ -55,7 +55,7 @@ const CustomSelect = ({
       </button>
 
       {isOpen && !disabled && (
-        <div className="fixed sm:absolute z-110 left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl border border-brand-primary/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] overflow-hidden animate-in fade-in zoom-in duration-300 min-w-full origin-top transform-gpu">
+        <div className="fixed sm:absolute z-[1000] left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl border border-brand-primary/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] overflow-hidden animate-in fade-in zoom-in duration-300 min-w-full origin-top transform-gpu">
           {isSearchable && (
             <div className="p-3 border-b border-brand-primary/5 relative bg-white">
               <Icon icon="solar:magnifer-linear" className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-secondary w-3.5 h-3.5" />
