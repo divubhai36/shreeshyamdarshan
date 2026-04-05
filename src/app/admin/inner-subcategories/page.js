@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { getInnerSubCategories, createInnerSubCategory, updateInnerSubCategory, deleteInnerSubCategory, getSubCategories } from "../actions";
-import CustomSelect from "@/components/admin/CustomSelect";
+import CustomSelect from "@/components/CustomSelect";
 
 export default function InnerSubcategoryPage() {
   const [data, setData] = useState([]);

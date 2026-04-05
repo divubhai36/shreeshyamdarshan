@@ -46,7 +46,7 @@ const CustomSelect = ({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between bg-brand-primary/2 border border-brand-primary/5 rounded-2xl p-4 text-[11px] font-bold text-brand-primary outline-none focus:ring-4 focus:ring-brand-secondary/5 transition-all text-left ${disabled ? 'opacity-50 cursor-not-allowed bg-brand-primary/[0.01]' : 'cursor-pointer hover:bg-brand-primary/5 shadow-sm hover:shadow-md'}`}
+        className={`w-full flex items-center justify-between bg-brand-primary/2 border border-brand-primary/5 rounded-2xl p-4 text-[11px] font-bold text-brand-primary outline-none focus:ring-4 focus:ring-brand-secondary/5 transition-all text-left ${disabled ? 'opacity-50 cursor-not-allowed bg-brand-primary/1' : 'cursor-pointer hover:bg-brand-primary/5 shadow-sm hover:shadow-md'}`}
       >
         <span className={!selectedOption ? "opacity-30 italic font-serif" : "tracking-wider uppercase"}>
           {selectedOption ? selectedOption.label : placeholder}
@@ -55,7 +55,7 @@ const CustomSelect = ({
       </button>
 
       {isOpen && !disabled && (
-        <div className="fixed sm:absolute z-[110] left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl border border-brand-primary/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] overflow-hidden animate-in fade-in zoom-in duration-300 min-w-full origin-top transform-gpu">
+        <div className="fixed sm:absolute z-110 left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl border border-brand-primary/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] overflow-hidden animate-in fade-in zoom-in duration-300 min-w-full origin-top transform-gpu">
           {isSearchable && (
             <div className="p-3 border-b border-brand-primary/5 relative bg-white">
               <Icon icon="solar:magnifer-linear" className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-secondary w-3.5 h-3.5" />
@@ -83,7 +83,7 @@ const CustomSelect = ({
                     setIsOpen(false);
                     setSearch("");
                   }}
-                  className={`w-full text-left p-4 text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-brand-secondary/5 flex items-center justify-between ${value === opt.value ? 'text-brand-secondary bg-brand-secondary/[0.03] border-l-2 border-brand-secondary pl-3' : 'text-brand-primary/60 border-l-2 border-transparent'}`}
+                  className={`w-full text-left p-4 text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-brand-secondary/5 flex items-center justify-between ${value === opt.value ? 'text-brand-secondary bg-brand-secondary/3 border-l-2 border-brand-secondary pl-3' : 'text-brand-primary/60 border-l-2 border-transparent'}`}
                 >
                   <span>{opt.label}</span>
                   {value === opt.value && <Icon icon="solar:check-read-linear" className="w-4 h-4 text-brand-secondary" />}

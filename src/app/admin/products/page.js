@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { getProducts, createProduct, updateProduct, deleteProduct, getCategories, getSubCategories, getInnerSubCategories } from "../actions";
-import CustomSelect from "@/components/admin/CustomSelect";
+import CustomSelect from "@/components/CustomSelect";
 
 export default function ProductsPage() {
   const [data, setData] = useState([]);

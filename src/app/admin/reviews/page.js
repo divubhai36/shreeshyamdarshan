@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { getReviews, updateReviewStatus, deleteReview, createReview, getWholesalers } from "../actions";
-import CustomSelect from "@/components/admin/CustomSelect";
+import CustomSelect from "@/components/CustomSelect";
 
 const STATUS_COLORS = {
   PENDING: "bg-amber-50 text-amber-600 border-amber-200",
@@ -175,7 +175,7 @@ export default function ReviewsPage() {
 
       {/* Add Review Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-primary/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-brand-primary/60 backdrop-blur-sm">
           <div className="bg-white w-full max-w-lg rounded-[32px] p-8 shadow-2xl relative overflow-hidden">
             <button onClick={() => setShowAddModal(false)} className="absolute top-6 right-6 text-brand-primary/20 hover:text-brand-primary transition-colors z-10">
               <Icon icon="lucide:x" className="w-6 h-6" />

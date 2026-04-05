@@ -1,9 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Icon } from "@iconify/react";
 
-export default function UserLogin() {
+function LoginForm() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -11,7 +11,6 @@ export default function UserLogin() {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -141,5 +140,17 @@ export default function UserLogin() {
 
       </div>
     </div>
+  );
+}
+
+export default function UserLogin() {
+  return (
+    <Suspense fallback={
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-primary">
+        <Icon icon="line-md:loading-loop" className="w-12 h-12 text-brand-secondary" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

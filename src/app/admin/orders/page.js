@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { getOrders, updateOrderStatus } from "../actions";
-import CustomSelect from "@/components/admin/CustomSelect";
+import CustomSelect from "@/components/CustomSelect";
 
 const STATUS_COLORS = {
   PENDING: "bg-amber-50 text-amber-600 border-amber-200",

@@ -95,7 +95,7 @@ export default function HomeClient({ products, categories, reviews }) {
                         initial={{ width: 0 }}
                         animate={{ width: "100%" }}
                         transition={{ delay: 1, duration: 1 }}
-                        className="absolute -bottom-2 left-0 h-[1px] bg-brand-secondary/20"
+                        className="absolute -bottom-2 left-0 h-px bg-brand-secondary/20"
                      />
                   </motion.div>
                </motion.div>
