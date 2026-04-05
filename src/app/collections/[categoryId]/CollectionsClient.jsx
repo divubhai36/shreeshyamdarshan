@@ -1,8 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Header from "../../../components/Header";
-import Footer from "../../../components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 import CategoryCard from "../../../components/CategoryCard";
@@ -17,8 +15,6 @@ export default function CollectionsClient({ category, categoryId, subCategories 
 
   return (
     <div className="min-h-screen bg-brand-accent/30 overflow-x-hidden text-left">
-      <Header />
-
       {/* Category Header Banner */}
       <div className="relative h-[250px] lg:h-[450px] overflow-hidden bg-brand-primary">
         <motion.div
@@ -186,8 +182,6 @@ export default function CollectionsClient({ category, categoryId, subCategories 
           </motion.div>
         )}
       </AnimatePresence>
-
-      <Footer />
     </div>
   );
 }

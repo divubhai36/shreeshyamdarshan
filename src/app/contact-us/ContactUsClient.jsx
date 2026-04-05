@@ -14,7 +14,6 @@ export default function ContactUsClient() {
 
   return (
     <div className="min-h-screen bg-brand-accent text-left">
-      <Header />
 
       {/* Modern Split Hero */}
       <section className="pt-20 lg:pt-0 min-h-[60vh] lg:h-screen flex flex-col lg:flex-row bg-white">

@@ -1,8 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Header from "../../../../components/Header";
-import Footer from "../../../../components/Footer";
 import ProductCard from "../../../../components/ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
@@ -14,6 +12,10 @@ export default function SubCategoryClient({ category, subCategory, products, cat
   const [showSticky, setShowSticky] = useState(false);
   const [lastY, setLastY] = useState(0);
   const [activeSection, setActiveSection] = useState("");
+
+  const getFiltered = (group) => {
+    return [...group].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -124,7 +126,6 @@ export default function SubCategoryClient({ category, subCategory, products, cat
 
   return (
     <div className="min-h-screen bg-brand-accent/30 relative text-left">
-      <Header />
 
       <AnimatePresence>
         {showSticky && (
@@ -145,16 +146,17 @@ export default function SubCategoryClient({ category, subCategory, products, cat
           <span className="text-brand-secondary truncate text-left">{subCategory.name}</span>
         </div>
 
-        <motion.h1 initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-brand-primary mb-4 lg:mb-8 uppercase text-left">
+        <motion.h1 initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-brand-primary mb-4 lg:mb-6 uppercase text-left">
           {subCategory.name}
         </motion.h1>
+
 
         {sections.length > 0 && renderSectionSlider(false)}
 
         <div className="space-y-6 lg:space-y-12 text-left">
           {sections.length > 0 ? (
             sections.map((section) => {
-              const sectionProducts = products.filter((p) => !p.section || p.section.toUpperCase() === section.name.toUpperCase());
+              const sectionProducts = getFiltered(products.filter((p) => !p.innerSubId || p.innerSubId === section.dbId));
               return (
                 <section key={section.name} id={section.name} ref={(el) => (sectionRefs.current[section.name] = el)} className="scroll-mt-24 text-left">
                   <div className="flex items-center gap-4 mb-4 lg:mb-6 text-left">
@@ -166,12 +168,12 @@ export default function SubCategoryClient({ category, subCategory, products, cat
                     {sectionProducts.length > 0 ? (
                       sectionProducts.map((product) => (
                         <div key={`${section.name}-${product.id}`} className="h-full text-left">
-                          <Link href={`/product/${product.id}`} className="h-full text-left"><ProductCard product={product} /></Link>
+                          <ProductCard product={product} />
                         </div>
                       ))
                     ) : (
                       <div className="col-span-full py-10 lg:py-16 bg-white/50 rounded-3xl border border-dashed border-brand-primary/10 flex items-center justify-center text-left">
-                        <p className="text-brand-primary/30 text-[10px] lg:text-xs font-serif italic text-left">New arrivals in {section.name} coming soon...</p>
+                        <p className="text-brand-primary/30 text-[10px] lg:text-xs font-serif italic text-left">No masterpieces matching your criteria in {section.name}...</p>
                       </div>
                     )}
                   </div>
@@ -181,16 +183,15 @@ export default function SubCategoryClient({ category, subCategory, products, cat
           ) : (
             <section className="mt-8 lg:mt-16 text-left">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-10 text-left">
-                {products.length > 0 ? (
-                  products.map((product) => (
+                {getFiltered(products).length > 0 ? (
+                  getFiltered(products).map((product) => (
                     <div key={product.id} className="h-full text-left">
-                      <Link href={`/product/${product.id}`} className="h-full"><ProductCard product={product} /></Link>
+                      <ProductCard product={product} />
                     </div>
                   ))
                 ) : (
                   <div className="col-span-full py-20 text-center text-left">
-                    <p className="text-sm font-serif text-brand-primary/30 italic mb-8 uppercase tracking-widest text-center text-left">No divinity found.</p>
-                    <Link href="/" className="inline-block px-8 py-3 bg-brand-primary text-white rounded-full text-[9px] font-bold uppercase tracking-widest hover:bg-brand-secondary transition-all shadow-xl text-left">Explore Other</Link>
+                    <p className="text-sm font-serif text-brand-primary/30 italic mb-8 uppercase tracking-widest text-center text-left">No masterpieces matching your criteria.</p>
                   </div>
                 )}
               </div>
@@ -199,7 +200,6 @@ export default function SubCategoryClient({ category, subCategory, products, cat
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

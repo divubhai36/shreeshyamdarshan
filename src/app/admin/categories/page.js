@@ -11,6 +11,7 @@ export default function CategoryPage() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ name: "", slug: "", imageUrl: "" });
   const [uploading, setUploading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => { loadData(); }, []);
 
@@ -73,21 +74,36 @@ export default function CategoryPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
         <div>
           <h1 className="text-3xl font-serif font-bold text-brand-primary">Category Management</h1>
           <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase">Manage main collections</p>
         </div>
-        <button onClick={openNew} className="bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-brand-secondary transition-all flex items-center gap-2">
-          <Icon icon="lucide:plus" className="w-4 h-4" /> Add Category
-        </button>
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto items-center">
+          <div className="relative group w-full sm:w-64">
+            <Icon icon="solar:magnifer-linear" className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/20 w-4 h-4 group-focus-within:text-brand-secondary transition-colors" />
+            <input
+              type="text"
+              placeholder="Search category..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-white border border-brand-primary/5 rounded-xl p-3 pl-11 text-[11px] font-bold text-brand-primary focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider"
+            />
+          </div>
+          <button onClick={openNew} className="bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-brand-secondary transition-all flex items-center gap-2 h-fit whitespace-nowrap shadow-lg">
+            <Icon icon="lucide:plus" className="w-4 h-4" /> Add Category
+          </button>
+        </div>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center h-40"><Icon icon="line-md:loading-loop" className="w-8 h-8 text-brand-secondary" /></div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {data.map((cat) => (
+          {data.filter(cat =>
+            cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            cat.slug.toLowerCase().includes(searchTerm.toLowerCase())
+          ).map((cat) => (
             <div key={cat.id} className="bg-white rounded-2xl shadow-sm border border-brand-primary/5 overflow-hidden group">
               <div className="h-40 relative bg-brand-primary/5">
                 {cat.imageUrl ? (
@@ -122,11 +138,7 @@ export default function CategoryPage() {
                 <input type="text" value={form.name} onChange={handleNameChange} className="w-full p-3 border rounded-xl mt-1 focus:border-brand-secondary outline-none" required />
               </div>
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-widest text-brand-primary/60">Slug (URL Route)</label>
-                <input type="text" value={form.slug} onChange={(e)=>setForm({...form, slug: e.target.value})} className="w-full p-3 border rounded-xl mt-1 font-mono text-sm bg-gray-50 outline-none" required />
-              </div>
-              <div>
-                <label className="text-[10px] uppercase font-bold tracking-widest text-brand-primary/60 block mb-1">Image cover (Optimized by Cloudinary)</label>
+                <label className="text-[10px] uppercase font-bold tracking-widest text-brand-primary/40 block mb-1">Image cover (Optimized by Cloudinary)</label>
                 {form.imageUrl && <div className="mb-2"><img src={form.imageUrl} className="w-32 h-32 object-cover rounded-xl border" /></div>}
                 <div className="relative border-2 border-dashed border-brand-primary/20 rounded-xl p-4 text-center hover:bg-brand-primary/5 transition-colors cursor-pointer">
                   {uploading ? <Icon icon="line-md:loading-loop" className="w-6 h-6 mx-auto text-brand-secondary" /> : (

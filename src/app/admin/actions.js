@@ -1,6 +1,7 @@
 "use server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
 
 // Category Actions
 export async function getCategories() { return await prisma.category.findMany({ orderBy: { createdAt: 'desc' } }); }
@@ -20,8 +21,115 @@ export async function createInnerSubCategory(data) { await prisma.innerSubCatego
 export async function updateInnerSubCategory(id, data) { await prisma.innerSubCategory.update({ where: { id }, data }); revalidatePath('/admin/inner-subcategories'); }
 export async function deleteInnerSubCategory(id) { await prisma.innerSubCategory.delete({ where: { id } }); revalidatePath('/admin/inner-subcategories'); }
 
+// Wholesaler Actions
+export async function getWholesalers() { return await prisma.wholesaler.findMany({ orderBy: { createdAt: 'desc' } }); }
+
+export async function createWholesaler(data) {
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+  await prisma.wholesaler.create({ 
+    data: { 
+      ...data, 
+      password: hashedPassword,
+      plainPassword: data.password // Store plain for admin
+    } 
+  });
+  revalidatePath('/admin/wholesalers');
+}
+
+export async function updateWholesaler(id, data) {
+  let updateData = { ...data };
+  if (data.password) {
+    updateData.password = await bcrypt.hash(data.password, 10);
+    updateData.plainPassword = data.password; // Update plain for admin
+  } else {
+    delete updateData.password;
+    delete updateData.plainPassword;
+  }
+  await prisma.wholesaler.update({ where: { id }, data: updateData });
+  revalidatePath('/admin/wholesalers');
+}
+
+export async function deleteWholesaler(id) { await prisma.wholesaler.delete({ where: { id } }); revalidatePath('/admin/wholesalers'); }
+
+// Order Actions
+export async function getOrders() { 
+  return await prisma.order.findMany({ 
+    include: { wholesaler: true, items: { include: { product: true } } },
+    orderBy: { createdAt: 'desc' } 
+  }); 
+}
+
+export async function updateOrderStatus(id, status) {
+  await prisma.order.update({ where: { id }, data: { status } });
+  revalidatePath('/admin/orders');
+}
+
 // Product Actions
 export async function getProducts() { return await prisma.product.findMany({ include: { category: true, subCategory: true, innerSubCategory: true }, orderBy: { createdAt: 'desc' } }); }
-export async function createProduct(data) { await prisma.product.create({ data }); revalidatePath('/admin/products'); }
-export async function updateProduct(id, data) { await prisma.product.update({ where: { id }, data }); revalidatePath('/admin/products'); }
+
+export async function createProduct(data) { 
+  // Clean up data to remove all relational and read-only fields
+  const { 
+    category, subCategory, innerSubCategory, 
+    orderItems, savedBy,
+    id, createdAt, updatedAt, 
+    ...cleanData 
+  } = data;
+  await prisma.product.create({ data: cleanData }); 
+  revalidatePath('/admin/products'); 
+}
+
+export async function updateProduct(id, data) { 
+  // Clean up data to remove all relational and read-only fields
+  const { 
+    category, subCategory, innerSubCategory, 
+    orderItems, savedBy,
+    id: _, createdAt, updatedAt, 
+    ...cleanData 
+  } = data;
+  await prisma.product.update({ where: { id }, data: cleanData }); 
+  revalidatePath('/admin/products'); 
+}
+
 export async function deleteProduct(id) { await prisma.product.delete({ where: { id } }); revalidatePath('/admin/products'); }
+
+// Review Actions
+export async function getReviews() {
+  return await prisma.review.findMany({
+    include: { wholesaler: true },
+    orderBy: { createdAt: 'desc' }
+  });
+}
+
+export async function updateReviewStatus(id, status) {
+  await prisma.review.update({
+    where: { id },
+    data: { status }
+  });
+  revalidatePath('/admin/reviews');
+}
+
+export async function createReview(data) {
+  // If wholesalerId is null/empty string, remove it from data to avoid prisma errors
+  const { wholesalerId, ...rest } = data;
+  const createData = {
+    ...rest,
+    status: 'APPROVED',
+  };
+  
+  if (wholesalerId && wholesalerId !== "") {
+    createData.wholesalerId = wholesalerId;
+  }
+
+  await prisma.review.create({
+    data: createData
+  });
+  revalidatePath('/admin/reviews');
+}
+
+export async function deleteReview(id) {
+  await prisma.review.delete({
+    where: { id }
+  });
+  revalidatePath('/admin/reviews');
+}

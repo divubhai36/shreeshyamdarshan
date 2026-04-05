@@ -2,12 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
+import { usePathname } from 'next/navigation';
 
 export default function LeadPopup() {
    const [show, setShow] = useState(false);
    const [formData, setFormData] = useState({ name: '', mobile: '', product: '', pieces: '1', state: '' });
+   const pathname = usePathname();
 
    useEffect(() => {
+      // Disable popups on admin and professional B2B routes
+      const businessRoutes = ['/admin', '/my-account', '/cart', '/saved-products', '/checkout', '/login'];
+      if (businessRoutes.some(route => pathname?.startsWith(route))) return;
+
       // Check if user has already submitted the lead form - if yes, never show again
       if (typeof window !== 'undefined' && sessionStorage.getItem('lead_popup_submitted')) return;
 

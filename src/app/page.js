@@ -34,12 +34,23 @@ export default async function Home() {
      subCategories: c.subCategories || []
    }));
 
-   // 3. Graceful Fallback Strategy (Keeps old flow alive until Admin adds products)
-   // --- FALLBACK SUSPENDED BY USER ---
-   /*
-   if (products.length === 0) products = productData.products;
-   if (categories.length === 0) categories = productData.categories;
-   */
-   
-   return <HomeClient products={products} categories={categories} />;
+    // 4. Fetch Approved Reviews
+    let reviews = [];
+    if (prisma.review) {
+      const dbReviews = await prisma.review.findMany({
+        where: { status: 'APPROVED' },
+        include: { wholesaler: true },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      reviews = dbReviews.map(r => ({
+        id: r.id,
+        name: r.wholesaler?.name || r.dummyName || "Customer",
+        company: r.wholesaler?.companyName || r.dummyCompany || "Verified Buyer",
+        comment: r.comment,
+        rating: r.rating
+      }));
+    }
+    
+    return <HomeClient products={products} categories={categories} reviews={reviews} />;
 }

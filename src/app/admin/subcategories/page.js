@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { getSubCategories, createSubCategory, updateSubCategory, deleteSubCategory, getCategories } from "../actions";
+import CustomSelect from "@/components/CustomSelect";
 
 export default function SubcategoryPage() {
   const [data, setData] = useState([]);
@@ -11,6 +12,7 @@ export default function SubcategoryPage() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ name: "", slug: "", imageUrl: "", categoryId: "" });
   const [uploading, setUploading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => { loadData(); }, []);
 
@@ -59,18 +61,34 @@ export default function SubcategoryPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
         <div>
           <h1 className="text-3xl font-serif font-bold text-brand-primary">Sub-categories</h1>
+          <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase mt-1">Manage intermediate collections</p>
         </div>
-        <button onClick={() => { setEditingId(null); setForm({ name: "", slug: "", imageUrl: "", categoryId: categories[0]?.id || "" }); setIsOpen(true); }} className="bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-brand-secondary transition-all">
-          + Add New
-        </button>
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto items-center">
+          <div className="relative group w-full sm:w-64">
+            <Icon icon="solar:magnifer-linear" className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/20 w-4 h-4 group-focus-within:text-brand-secondary transition-colors" />
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-white border border-brand-primary/5 rounded-xl p-3 pl-11 text-[11px] font-bold text-brand-primary focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider"
+            />
+          </div>
+          <button onClick={() => { setEditingId(null); setForm({ name: "", slug: "", imageUrl: "", categoryId: categories[0]?.id || "" }); setIsOpen(true); }} className="bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-brand-secondary transition-all whitespace-nowrap shadow-lg flex items-center gap-2">
+            <Icon icon="lucide:plus" className="w-4 h-4" /> Add
+          </button>
+        </div>
       </div>
 
       {loading ? <div className="text-center py-20"><Icon icon="line-md:loading-loop" className="w-8 h-8 text-brand-secondary mx-auto" /></div> : (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {data.map((sub) => (
+          {data.filter(sub =>
+             sub.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+             sub.category.name.toLowerCase().includes(searchTerm.toLowerCase())
+          ).map((sub) => (
             <div key={sub.id} className="bg-white p-4 rounded-2xl shadow-sm border border-brand-primary/5 relative group">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-brand-primary/5">
@@ -78,7 +96,7 @@ export default function SubcategoryPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-sm text-brand-primary truncate">{sub.name}</h3>
-                  <p className="text-[9px] text-brand-secondary uppercase tracking-widest font-bold">in {sub.category.name}</p>
+                  <p className="text-[9px] text-brand-secondary uppercase tracking-widest font-bold">Category: {sub.category.name}</p>
                 </div>
               </div>
               <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all bg-white shadow-lg p-1 rounded-full">
@@ -96,11 +114,14 @@ export default function SubcategoryPage() {
             <h2 className="text-xl font-bold font-serif mb-6">{editingId ? 'Edit' : 'Create'} Sub-category</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-widest">Parent Category</label>
-                <select value={form.categoryId} onChange={e=>setForm({...form, categoryId: e.target.value})} className="w-full p-3 border rounded-xl mt-1" required>
-                  <option value="" disabled>Select Master Category...</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
+                <label className="text-[10px] uppercase font-bold tracking-widest mb-1 block ml-1 text-brand-primary/40">Parent Category</label>
+                <CustomSelect
+                  placeholder="Select Master Category..."
+                  options={categories.map(c => ({ value: c.id, label: c.name }))}
+                  value={form.categoryId}
+                  onChange={(val) => setForm({ ...form, categoryId: val })}
+                  isSearchable={true}
+                />
               </div>
               <div>
                 <label className="text-[10px] uppercase font-bold tracking-widest">Name</label>

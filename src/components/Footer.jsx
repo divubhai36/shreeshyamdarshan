@@ -4,7 +4,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
 
+import { usePathname } from 'next/navigation';
+
 export default function Footer() {
+  const pathname = usePathname();
+  const isExcluded = pathname.startsWith('/admin') || pathname === '/login'
+
+  if (isExcluded) return null;
+
   return (
     <footer className="pt-10 pb-10 bg-brand-primary text-white overflow-hidden relative">
       <div className="absolute inset-0 opacity-5 mix-blend-overlay pointer-events-none">
