@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
+import toast from "react-hot-toast";
+
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -35,13 +37,14 @@ export default function AdminLogin() {
         router.refresh();
       } else {
         console.error("🚨 Login Failed:", res.error);
-        alert(`Login failed: ${res.error}`);
+        toast.error(`Login failed: ${res.error}`);
         setLoading(false);
       }
     } catch (e) {
-      alert("Network or Server error");
+      toast.error("Network or Server error");
       setLoading(false);
     }
+
   };
 
   return (

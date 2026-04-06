@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { getWholesalers, createWholesaler, updateWholesaler, deleteWholesaler } from "../actions";
+import toast from "react-hot-toast";
+
 
 export default function WholesalersPage() {
   const [data, setData] = useState([]);
@@ -28,15 +30,18 @@ export default function WholesalersPage() {
     e.preventDefault();
     if (editingId) {
       await updateWholesaler(editingId, form);
+      toast.success("Identity Refined");
     } else {
       if (!form.password) {
-        alert("Password is required for new accounts");
+        toast.error("Security violation: Password required");
         return;
       }
       await createWholesaler(form);
+      toast.success("Account Provisioned");
     }
     setIsOpen(false);
     loadData();
+
   };
 
   return (
@@ -50,17 +55,21 @@ export default function WholesalersPage() {
           <div className="relative group w-full sm:w-80">
             <Icon icon="solar:magnifer-linear" className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/20 w-4 h-4 group-focus-within:text-brand-secondary transition-colors" />
             <input
+              suppressHydrationWarning
               type="text"
               placeholder="Search by name, shop or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-white border border-brand-primary/5 rounded-xl p-3 pl-11 text-[11px] font-bold text-brand-primary focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider"
             />
+
           </div>
           <button
+            suppressHydrationWarning
             onClick={() => { setEditingId(null); setForm(initForm); setIsOpen(true); }}
             className="bg-brand-primary text-white px-6 py-3 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:shadow-2xl transition-all shadow-xl whitespace-nowrap flex items-center gap-2"
           >
+
              <Icon icon="lucide:plus" className="w-4 h-4" /> Add
           </button>
         </div>
@@ -132,9 +141,11 @@ export default function WholesalersPage() {
                             {showPasswords[w.id] ? (w.plainPassword || 'N/A') : '••••••••'}
                         </p>
                         <button
+                          suppressHydrationWarning
                           onClick={() => setShowPasswords(prev => ({...prev, [w.id]: !prev[w.id]}))}
                           className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-brand-secondary hover:scale-110 transition-transform"
                         >
+
                           <Icon icon={showPasswords[w.id] ? "solar:eye-bold-duotone" : "solar:eye-closed-bold-duotone"} className="w-4 h-4" />
                         </button>
                     </div>
@@ -148,17 +159,22 @@ export default function WholesalersPage() {
                 <td className="p-6 text-right">
                   <div className="flex justify-end gap-2">
                     <button
+                      suppressHydrationWarning
                       onClick={() => { setEditingId(w.id); setForm({ ...w, password: "" }); setIsOpen(true); }}
                       className="p-3 text-brand-primary/40 hover:text-brand-secondary hover:bg-brand-secondary/5 rounded-xl transition-all"
                     >
+
                       <Icon icon="solar:pen-new-square-bold-duotone" className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={async () => { if(confirm("Terminate this account? All associated data will be frozen.")) { await deleteWholesaler(w.id); loadData(); } }}
+                      suppressHydrationWarning
+                      onClick={async () => { if(confirm("Terminate this account? All associated data will be frozen.")) { await deleteWholesaler(w.id); toast.success("Access Terminated"); loadData(); } }}
                       className="p-3 text-brand-primary/40 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                     >
+
                       <Icon icon="solar:trash-bin-trash-bold-duotone" className="w-5 h-5" />
                     </button>
+
                   </div>
                 </td>
               </tr>
@@ -184,11 +200,13 @@ export default function WholesalersPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 ml-2">Full Name</label>
-                  <input type="text" value={form.name} onChange={e=>setForm({...form, name: e.target.value})} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" required />
+                  <input suppressHydrationWarning type="text" value={form.name} onChange={e=>setForm({...form, name: e.target.value})} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" required />
+
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 ml-2">WhatsApp Number</label>
-                  <input type="tel" value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary placeholder:text-brand-primary/10" placeholder="Required for Login" required />
+                  <input suppressHydrationWarning type="tel" value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary placeholder:text-brand-primary/10" placeholder="Required for Login" required />
+
                 </div>
               </div>
 

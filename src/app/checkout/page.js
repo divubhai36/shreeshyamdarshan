@@ -7,6 +7,8 @@ import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
+
 
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
@@ -39,11 +41,12 @@ export default function CheckoutPage() {
         setOrderSuccess(true);
         clearCart();
       } else {
-        alert(`Registry failed: ${res.error}`);
+        toast.error(`Registry failed: ${res.error}`);
       }
     } catch (e) {
-      alert("Network Error");
+      toast.error("Network Error");
     }
+
     setLoading(false);
   };
 

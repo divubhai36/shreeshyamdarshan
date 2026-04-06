@@ -2,6 +2,8 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Icon } from "@iconify/react";
+import toast from "react-hot-toast";
+
 
 function LoginForm() {
   const [phone, setPhone] = useState("");
@@ -35,13 +37,14 @@ function LoginForm() {
         router.push(searchParams.get("callbackUrl") || "/wholesalers/dashboard");
         router.refresh();
       } else {
-        alert(`Authentication failed: ${res.error}`);
+        toast.error(`Authentication failed: ${res.error}`);
         setLoading(false);
       }
     } catch (e) {
-      alert("Network or Server error");
+      toast.error("Network or Server error");
       setLoading(false);
     }
+
   };
 
   return (

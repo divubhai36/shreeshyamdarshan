@@ -58,8 +58,10 @@ export default async function CollectionsPage({ params }) {
        id: dbCategory.slug, 
        name: dbCategory.name, 
        label: dbCategory.name, 
-       image: dbCategory.imageUrl 
+       image: dbCategory.imageUrl,
+       videos: dbCategory.videos 
      };
+
 
      return <CollectionsClient category={proxyCategory} categoryId={dbCategory.slug} subCategories={subCategoriesData} />;
   }

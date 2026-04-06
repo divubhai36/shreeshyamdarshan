@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { getReviews, updateReviewStatus, deleteReview, createReview, getWholesalers } from "../actions";
 import CustomSelect from "@/components/CustomSelect";
+import toast from "react-hot-toast";
+
 
 const STATUS_COLORS = {
   PENDING: "bg-amber-50 text-amber-600 border-amber-200",
@@ -38,10 +40,11 @@ export default function ReviewsPage() {
     e.preventDefault();
 
     if (isDummy) {
-      if (!newReview.dummyName || !newReview.comment) return alert("Please enter a name and comment.");
+      if (!newReview.dummyName || !newReview.comment) return toast.error("Please enter a name and comment.");
     } else {
-      if (!newReview.wholesalerId || !newReview.comment) return alert("Please select a wholesaler and write a comment.");
+      if (!newReview.wholesalerId || !newReview.comment) return toast.error("Please select a wholesaler and write a comment.");
     }
+
 
     setSubmitting(true);
     const submissionData = isDummy
@@ -49,7 +52,9 @@ export default function ReviewsPage() {
       : { rating: newReview.rating, comment: newReview.comment, wholesalerId: newReview.wholesalerId };
 
     await createReview(submissionData);
+    toast.success("Feedback Published");
     setSubmitting(false);
+
     setShowAddModal(false);
     setNewReview({ wholesalerId: "", rating: 5, comment: "", dummyName: "", dummyCompany: "" });
     setIsDummy(false);
@@ -58,14 +63,18 @@ export default function ReviewsPage() {
 
   const handleStatusUpdate = async (id, status) => {
     await updateReviewStatus(id, status);
+    toast.success(`Review ${status.toLowerCase()}`);
     loadData();
   };
+
 
   const handleDelete = async (id) => {
     if (confirm("Permanently delete this feedback?")) {
       await deleteReview(id);
+      toast.success("Feedback Removed");
       loadData();
     }
+
   };
 
   const filteredData = data.filter(r =>

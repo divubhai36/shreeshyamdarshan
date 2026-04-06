@@ -4,6 +4,8 @@ import Providers from "@/components/Providers";
 import siteConfig from "@/config/site";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Toaster } from "react-hot-toast";
+
 
 const playfair = Playfair_Display({
   variable: "--font-serif",
@@ -129,7 +131,40 @@ export default function RootLayout({ children }) {
           <Header />
           {children}
           <Footer />
+          <Toaster 
+            position="top-center"
+            toastOptions={{
+
+              duration: 4000,
+              style: {
+                background: '#0a192f',
+                color: '#fff',
+                borderRadius: '16px',
+                fontSize: '11px',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                border: '1px solid rgba(255,184,0,0.1)',
+                padding: '12px 20px',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+                backdropFilter: 'blur(10px)',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#ffb800',
+                  secondary: '#0a192f',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#ff4d4d',
+                  secondary: '#0a192f',
+                },
+              },
+            }}
+          />
         </Providers>
+
       </body>
     </html>
   );

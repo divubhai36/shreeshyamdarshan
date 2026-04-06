@@ -56,10 +56,12 @@ export default function AdminSidebar() {
 
       <div className="pt-6 border-t border-white/10 shrink-0">
         <button
+          suppressHydrationWarning
           onClick={async () => {
             await fetch("/api/admin/logout", { method: "POST" });
             window.location.href = "/admin/login";
           }}
+
           className="w-full flex items-center gap-4 px-5 py-4 text-red-400/70 hover:text-red-400 hover:bg-red-400/10 rounded-2xl transition-all duration-300 font-bold text-[11px] uppercase tracking-widest"
         >
           <div className="w-10 h-10 rounded-full bg-red-400/10 flex items-center justify-center">
