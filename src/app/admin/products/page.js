@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { getProducts, createProduct, updateProduct, deleteProduct, getCategories, getSubCategories, getInnerSubCategories } from "../actions";
 import CustomSelect from "@/components/CustomSelect";
+import toast from "react-hot-toast";
+
 
 export default function ProductsPage() {
   const [data, setData] = useState([]);
@@ -15,7 +17,9 @@ export default function ProductsPage() {
 
   const initForm = { name:"", slug:"", description:"", mrp:0, price:0, categoryId:"", subCategoryId:"", innerSubId:null, images:[], videos:[], isBestSeller:false, isOfferProduct:false };
   const [form, setForm] = useState(initForm);
-  const [uploading, setUploading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => { loadData(); }, []);
@@ -29,7 +33,9 @@ export default function ProductsPage() {
   const handleUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
-    setUploading(true);
+    if (type === 'image') setUploadingImage(true);
+    else setUploadingVideo(true);
+    
     const fd = new FormData(); fd.append("file", file);
     try {
       const res = await fetch("/api/upload", { method: "POST", body: fd });
@@ -37,10 +43,15 @@ export default function ProductsPage() {
       if(dt.url) {
          if(type === 'image') setForm({...form, images: [...form.images, dt.url]});
          if(type === 'video') setForm({...form, videos: [...form.videos, dt.url]});
+         toast.success("Asset Linked");
       }
-    } catch(err) { alert("Upload failed"); }
-    setUploading(false);
+    } catch(err) { toast.error("Upload failed"); }
+
+    
+    if (type === 'image') setUploadingImage(false);
+    else setUploadingVideo(false);
   };
+
 
   const slugify = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
@@ -48,10 +59,16 @@ export default function ProductsPage() {
     e.preventDefault();
     const payload = { ...form, mrp: parseFloat(form.mrp), price: parseFloat(form.price) };
     if(!payload.innerSubId) payload.innerSubId = null; // Fix optional DB field strictness
-    if(editingId) await updateProduct(editingId, payload);
-    else await createProduct(payload);
+    if(editingId) {
+      await updateProduct(editingId, payload);
+      toast.success("Masterpiece Refined");
+    } else {
+      await createProduct(payload);
+      toast.success("New Masterpiece Injected");
+    }
     setIsOpen(false);
     loadData();
+
   };
 
   // Filter subs based on selected category
@@ -122,7 +139,8 @@ export default function ProductsPage() {
                             </td>
                             <td className="p-5 text-right">
                                 <button onClick={() => { setEditingId(p.id); setForm({...p, innerSubId: p.innerSubId || ""}); setIsOpen(true); }} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg mr-2"><Icon icon="lucide:edit-2" /></button>
-                                <button onClick={async () => { if(confirm("Delete this masterpiece?")) { await deleteProduct(p.id); loadData(); } }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Icon icon="lucide:trash-2" /></button>
+                                <button onClick={async () => { if(confirm("Delete this masterpiece?")) { await deleteProduct(p.id); toast.success("Masterpiece Removed"); loadData(); } }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Icon icon="lucide:trash-2" /></button>
+
                             </td>
                         </tr>
                     ))}
@@ -200,26 +218,29 @@ export default function ProductsPage() {
                         <div className="flex gap-2 overflow-x-auto pb-2">
                             {form.images.map((img, i) => <div key={i} className="w-16 h-16 shrink-0 rounded-xl overflow-hidden border relative group"><img src={img} className="w-full h-full object-cover" /><button type="button" onClick={()=>setForm({...form, images: form.images.filter((_, idx)=>idx!==i)})} className="absolute inset-0 bg-red-500/50 flex items-center justify-center opacity-0 group-hover:opacity-100"><Icon icon="lucide:x" className="text-white" /></button></div>)}
                             <div className="w-16 h-16 shrink-0 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center relative hover:bg-gray-50 cursor-pointer">
-                                {uploading ? <Icon icon="line-md:loading-loop" /> : <Icon icon="lucide:image-plus" className="text-gray-400" />}
-                                <input type="file" disabled={uploading} onChange={(e)=>handleUpload(e, 'image')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                                {uploadingImage ? <Icon icon="line-md:loading-loop" /> : <Icon icon="lucide:image-plus" className="text-gray-400" />}
+                                <input type="file" disabled={uploadingImage} onChange={(e)=>handleUpload(e, 'image')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
                             </div>
+
                         </div>
 
                         <div className="flex gap-2 overflow-x-auto pt-2">
                             {form.videos.map((vid, i) => <div key={i} className="w-24 h-16 shrink-0 rounded-xl overflow-hidden border bg-black relative group"><video src={vid} className="w-full h-full object-cover" /><button type="button" onClick={()=>setForm({...form, videos: form.videos.filter((_, idx)=>idx!==i)})} className="absolute inset-0 bg-red-500/50 flex items-center justify-center opacity-0 group-hover:opacity-100"><Icon icon="lucide:x" className="text-white" /></button></div>)}
                             <div className="w-24 h-16 shrink-0 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center relative hover:bg-gray-50 cursor-pointer">
-                                {uploading ? <Icon icon="line-md:loading-loop" /> : <><Icon icon="lucide:video" className="text-gray-400 mr-2 w-4 h-4" /><span className="text-[9px] font-bold uppercase text-gray-400">Add Video</span></>}
-                                <input type="file" disabled={uploading} onChange={(e)=>handleUpload(e, 'video')} className="absolute inset-0 opacity-0 cursor-pointer" accept="video/*" />
+                                {uploadingVideo ? <Icon icon="line-md:loading-loop" /> : <><Icon icon="lucide:video" className="text-gray-400 mr-2 w-4 h-4" /><span className="text-[9px] font-bold uppercase text-gray-400">Add Video</span></>}
+                                <input type="file" disabled={uploadingVideo} onChange={(e)=>handleUpload(e, 'video')} className="absolute inset-0 opacity-0 cursor-pointer" accept="video/*" />
                             </div>
+
                         </div>
                     </div>
                 </div>
 
                 <div className="col-span-1 md:col-span-2 pt-6 border-t border-black/5 flex justify-end gap-4">
                     <button type="button" onClick={()=>setIsOpen(false)} className="px-8 py-4 rounded-2xl font-bold uppercase tracking-widest bg-gray-100 hover:bg-gray-200 transition-all text-xs">Discard</button>
-                    <button type="submit" disabled={uploading} className="px-10 py-4 rounded-2xl font-bold uppercase tracking-widest bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl text-xs flex items-center gap-2">
+                    <button type="submit" disabled={uploadingImage || uploadingVideo} className="px-10 py-4 rounded-2xl font-bold uppercase tracking-widest bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl text-xs flex items-center gap-2">
                         <Icon icon="lucide:save" className="w-4 h-4" /> Save Masterpiece
                     </button>
+
                 </div>
             </form>
           </div>

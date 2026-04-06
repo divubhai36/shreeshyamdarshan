@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { getSubCategories, createSubCategory, updateSubCategory, deleteSubCategory, getCategories } from "../actions";
 import CustomSelect from "@/components/CustomSelect";
+import toast from "react-hot-toast";
+
 
 export default function SubcategoryPage() {
   const [data, setData] = useState([]);
@@ -32,8 +34,12 @@ export default function SubcategoryPage() {
     try {
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const upData = await res.json();
-      if(upData.url) setForm({ ...form, imageUrl: upData.url });
-    } catch(err) { alert("Upload failed"); }
+      if(upData.url) {
+        setForm({ ...form, imageUrl: upData.url });
+        toast.success("Asset Ready");
+      }
+    } catch(err) { toast.error("Upload failed"); }
+
     setUploading(false);
   };
 
@@ -46,17 +52,25 @@ export default function SubcategoryPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(editingId) await updateSubCategory(editingId, form);
-    else await createSubCategory(form);
+    if(editingId) {
+      await updateSubCategory(editingId, form);
+      toast.success("Sub-category Refined");
+    } else {
+      await createSubCategory(form);
+      toast.success("Sub-category Created");
+    }
     setIsOpen(false);
     loadData();
+
   };
 
   const handleDelete = async (id) => {
     if(confirm("Delete this Sub-category? Products inside may be broken.")) {
       await deleteSubCategory(id);
+      toast.success("Sub-category Removed");
       loadData();
     }
+
   };
 
   return (
@@ -70,14 +84,17 @@ export default function SubcategoryPage() {
           <div className="relative group w-full sm:w-64">
             <Icon icon="solar:magnifer-linear" className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/20 w-4 h-4 group-focus-within:text-brand-secondary transition-colors" />
             <input
+              suppressHydrationWarning
               type="text"
               placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-white border border-brand-primary/5 rounded-xl p-3 pl-11 text-[11px] font-bold text-brand-primary focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider"
             />
+
           </div>
-          <button onClick={() => { setEditingId(null); setForm({ name: "", slug: "", imageUrl: "", categoryId: categories[0]?.id || "" }); setIsOpen(true); }} className="bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-brand-secondary transition-all whitespace-nowrap shadow-lg flex items-center gap-2">
+          <button suppressHydrationWarning onClick={() => { setEditingId(null); setForm({ name: "", slug: "", imageUrl: "", categoryId: categories[0]?.id || "" }); setIsOpen(true); }} className="bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-brand-secondary transition-all whitespace-nowrap shadow-lg flex items-center gap-2">
+
             <Icon icon="lucide:plus" className="w-4 h-4" /> Add
           </button>
         </div>

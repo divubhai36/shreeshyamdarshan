@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { getInnerSubCategories, createInnerSubCategory, updateInnerSubCategory, deleteInnerSubCategory, getSubCategories } from "../actions";
 import CustomSelect from "@/components/CustomSelect";
+import toast from "react-hot-toast";
+
 
 export default function InnerSubcategoryPage() {
   const [data, setData] = useState([]);
@@ -32,8 +34,12 @@ export default function InnerSubcategoryPage() {
     try {
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const upData = await res.json();
-      if(upData.url) setForm({ ...form, imageUrl: upData.url });
-    } catch(err) { alert("Upload failed"); }
+      if(upData.url) {
+        setForm({ ...form, imageUrl: upData.url });
+        toast.success("Asset Ready");
+      }
+    } catch(err) { toast.error("Upload failed"); }
+
     setUploading(false);
   };
 
@@ -46,10 +52,16 @@ export default function InnerSubcategoryPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(editingId) await updateInnerSubCategory(editingId, form);
-    else await createInnerSubCategory(form);
+    if(editingId) {
+      await updateInnerSubCategory(editingId, form);
+      toast.success("Inner Category Refined");
+    } else {
+      await createInnerSubCategory(form);
+      toast.success("Inner Category Created");
+    }
     setIsOpen(false);
     loadData();
+
   };
 
   return (
@@ -63,14 +75,17 @@ export default function InnerSubcategoryPage() {
           <div className="relative group w-full sm:w-64">
             <Icon icon="solar:magnifer-linear" className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/20 w-4 h-4 group-focus-within:text-brand-secondary transition-colors" />
             <input
+              suppressHydrationWarning
               type="text"
               placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-white border border-brand-primary/5 rounded-xl p-3 pl-11 text-[11px] font-bold text-brand-primary focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider"
             />
+
           </div>
-          <button onClick={() => { setEditingId(null); setForm({ name: "", slug: "", imageUrl: "", subCategoryId: subs[0]?.id || "" }); setIsOpen(true); }} className="bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-brand-secondary transition-all whitespace-nowrap shadow-lg flex items-center gap-2">
+          <button suppressHydrationWarning onClick={() => { setEditingId(null); setForm({ name: "", slug: "", imageUrl: "", subCategoryId: subs[0]?.id || "" }); setIsOpen(true); }} className="bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-brand-secondary transition-all whitespace-nowrap shadow-lg flex items-center gap-2">
+
             <Icon icon="lucide:plus" className="w-4 h-4" /> Add
           </button>
         </div>
@@ -89,7 +104,8 @@ export default function InnerSubcategoryPage() {
 
               <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all bg-white shadow-lg p-1 rounded-full">
                 <button onClick={() => { setEditingId(inner.id); setForm({name: inner.name, slug: inner.slug, imageUrl: inner.imageUrl, subCategoryId: inner.subCategoryId}); setIsOpen(true); }} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-full"><Icon icon="lucide:edit" className="w-3.5 h-3.5" /></button>
-                <button onClick={async () => { if(confirm("Delete this?")) { await deleteInnerSubCategory(inner.id); loadData(); } }} className="p-1.5 text-red-500 hover:bg-red-50 rounded-full"><Icon icon="lucide:trash" className="w-3.5 h-3.5" /></button>
+                <button onClick={async () => { if(confirm("Delete this?")) { await deleteInnerSubCategory(inner.id); toast.success("Removed"); loadData(); } }} className="p-1.5 text-red-500 hover:bg-red-50 rounded-full"><Icon icon="lucide:trash" className="w-3.5 h-3.5" /></button>
+
               </div>
             </div>
           ))}

@@ -42,12 +42,14 @@ export default function OrdersPage() {
         <div className="relative group w-full md:w-80">
           <Icon icon="solar:magnifer-linear" className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/20 w-4 h-4 group-focus-within:text-brand-secondary transition-colors" />
           <input
+            suppressHydrationWarning
             type="text"
             placeholder="Search by ID, wholesaler or status..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-white border border-brand-primary/5 rounded-xl p-3 pl-11 text-[11px] font-bold text-brand-primary focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider"
           />
+
         </div>
       </div>
 
@@ -126,7 +128,8 @@ export default function OrdersPage() {
       {viewOrder && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-primary/80 backdrop-blur-md p-4 overflow-y-auto pt-20 pb-10">
           <div className="bg-white max-w-4xl w-full rounded-[40px] p-8 lg:p-12 shadow-2xl relative my-auto border border-white/20">
-            <button onClick={()=>setViewOrder(null)} className="absolute top-8 right-8 w-10 h-10 bg-brand-primary/5 rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
+            <button suppressHydrationWarning onClick={()=>setViewOrder(null)} className="absolute top-8 right-8 w-10 h-10 bg-brand-primary/5 rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
+
               <Icon icon="lucide:x" className="w-5 h-5" />
             </button>
             

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
@@ -8,10 +8,22 @@ import Image from "next/image";
 
 export default function CollectionsClient({ category, categoryId, subCategories }) {
   const [activeVideo, setActiveVideo] = useState(null);
+  const [randomVideos, setRandomVideos] = useState([]);
+
+  useEffect(() => {
+    if (category.videos && category.videos.length > 0) {
+      const shuffled = [...category.videos]
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 3);
+      setRandomVideos(shuffled);
+    }
+  }, [category.videos]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [categoryId]);
+
+
 
   return (
     <div className="min-h-screen bg-brand-accent/30 overflow-x-hidden text-left">
@@ -21,8 +33,9 @@ export default function CollectionsClient({ category, categoryId, subCategories 
           initial={{ scale: 1.1, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1.5 }}
-          className="w-full h-full"
+          className="w-full h-full relative"
         >
+
           <Image
             src={category.image}
             alt={category.name || category.label}
@@ -62,54 +75,57 @@ export default function CollectionsClient({ category, categoryId, subCategories 
         </div>
       </div>
 
-      <section className="bg-white py-10 lg:py-24 border-b border-brand-primary/5">
-        <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
-          <div className="flex flex-col items-center mb-2 lg:mb-16 text-center">
-            <div className="text-brand-secondary font-bold text-[8px] lg:text-xs tracking-[0.4em] uppercase mb-3 text-center">
-              Brand Cinema
-            </div>
-            <h2 className="text-2xl lg:text-5xl font-serif font-bold text-brand-primary uppercase text-center">
-              The Art of <span className="italic font-normal">Craftsmanship</span>
-            </h2>
-            <div className="w-20 lg:w-32 h-[1px] bg-brand-primary/10 mt-6 lg:mt-8"></div>
-          </div>
+      {randomVideos.length > 0 && (
 
-          <div className="grid grid-cols-3 gap-3 lg:gap-10">
-            {[
-              { id: 1, url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4", title: "Royal Collection" },
-              { id: 2, url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4", title: "Artisan Work" },
-              { id: 3, url: "review", title: "Handwoven Silk" },
-            ].map((video, idx) => (
-              <motion.div
-                key={video.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                onClick={() => setActiveVideo(video.url)}
-                className="group relative aspect-[9/16] overflow-hidden rounded-2xl lg:rounded-[40px] shadow-2xl cursor-pointer bg-brand-primary/5"
-              >
-                <video
-                  src={video.url}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                  <div className="w-10 h-10 lg:w-16 lg:h-16 rounded-full bg-white/20 backdrop-blur-xl border border-white/40 flex items-center justify-center text-white scale-90 group-hover:scale-100 transition-transform">
-                    <Icon
-                      icon="solar:play-bold"
-                      className="w-4 h-4 lg:w-6 lg:h-6 ml-1"
-                    />
+
+        <section className="bg-white py-10 lg:py-24 border-b border-brand-primary/5">
+          <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
+            <div className="flex flex-col items-center mb-2 lg:mb-16 text-center">
+              <div className="text-brand-secondary font-bold text-[8px] lg:text-xs tracking-[0.4em] uppercase mb-3 text-center">
+                Brand Cinema
+              </div>
+              <h2 className="text-2xl lg:text-5xl font-serif font-bold text-brand-primary uppercase text-center">
+                The Art of <span className="italic font-normal">Craftsmanship</span>
+              </h2>
+              <div className="w-20 lg:w-32 h-[1px] bg-brand-primary/10 mt-6 lg:mt-8"></div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 lg:gap-10">
+              {randomVideos.map((videoUrl, idx) => (
+
+
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  viewport={{ once: true }}
+                  onClick={() => setActiveVideo(videoUrl)}
+                  className="group relative aspect-[9/16] overflow-hidden rounded-2xl lg:rounded-[40px] shadow-2xl cursor-pointer bg-brand-primary/5"
+                >
+                  <video
+                    src={videoUrl}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                    <div className="w-10 h-10 lg:w-16 lg:h-16 rounded-full bg-white/20 backdrop-blur-xl border border-white/40 flex items-center justify-center text-white scale-90 group-hover:scale-100 transition-transform">
+                      <Icon
+                        icon="solar:play-bold"
+                        className="w-4 h-4 lg:w-6 lg:h-6 ml-1"
+                      />
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
 
       <main className="container mx-auto px-4 lg:px-8 py-10 lg:py-20 max-w-7xl">
         <div className="flex flex-col items-center mb-2 lg:mb-16 text-center">
