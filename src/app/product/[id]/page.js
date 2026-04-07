@@ -38,7 +38,7 @@ export default async function ProductPage({ params }) {
   try {
       const dbProduct = await prisma.product.findUnique({
           where: { id },
-          include: { category: true, subCategory: true }
+          include: { category: true, subCategory: true, innerSubCategory: true }
       });
 
       if (dbProduct) {
@@ -53,6 +53,8 @@ export default async function ProductPage({ params }) {
              name: dbProduct.name,
              productId: dbProduct.productId,
              category: dbProduct.category?.name || "Unknown",
+             subCategory: dbProduct.subCategory?.name || "Unknown",
+             innerCategory: dbProduct.innerSubCategory?.name || null,
              price: dbProduct.price,
              description: dbProduct.description,
              image: dbProduct.images[0] || "/hero.png", // Hero image map
@@ -60,7 +62,10 @@ export default async function ProductPage({ params }) {
              videos: dbProduct.videos, // Full array map
              isBestSeller: dbProduct.isBestSeller,
              isOfferProduct: dbProduct.isOfferProduct,
-             offerPrice: dbProduct.offerPrice
+             offerPrice: dbProduct.offerPrice,
+             showSizeGuide: dbProduct.showSizeGuide,
+             showWashCare: dbProduct.showWashCare,
+             details: dbProduct.details
          };
 
          const mappedRelated = relatedDb.map(p => ({
@@ -72,8 +77,9 @@ export default async function ProductPage({ params }) {
 
          const navCat = { id: dbProduct.category.slug, name: dbProduct.category.name };
          const subCat = { id: dbProduct.subCategory.slug, name: dbProduct.subCategory.name };
+         const innerSubCat = dbProduct.innerSubCategory ? { id: dbProduct.innerSubCategory.slug, name: dbProduct.innerSubCategory.name } : null;
 
-         return <ProductClient product={mappedProduct} navCategory={navCat} subCategory={subCat} relatedProducts={mappedRelated} />;
+         return <ProductClient product={mappedProduct} navCategory={navCat} subCategory={subCat} innerSubCategory={innerSubCat} relatedProducts={mappedRelated} />;
       }
   // eslint-disable-next-line no-empty
   } catch(err) {}

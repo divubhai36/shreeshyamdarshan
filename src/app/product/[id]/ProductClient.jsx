@@ -9,7 +9,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-export default function ProductClient({ product, navCategory, subCategory, relatedProducts }) {
+export default function ProductClient({ product, navCategory, subCategory, innerSubCategory, relatedProducts }) {
   const { addToCart, toggleSave, isProductSaved, isAuthenticated } = useCart();
   const saved = isProductSaved(product.id);
   // State Management
@@ -218,21 +218,13 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover transition-transform duration-1000 hover:scale-110"
                   />
-                  {/* Brand Best Seller Aura Badge */}
+                  {/* Brand Best Seller Ribbon Sash */}
                   {product.isBestSeller && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="absolute top-5 left-5 z-20 flex items-center gap-3 bg-brand-primary backdrop-blur-xl px-4 py-2 rounded-full border border-white/20 shadow-[0_20px_50px_rgba(26,67,50,0.4)]"
-                    >
-                      <div className="relative">
-                        <Icon icon="solar:star-bold" className="text-brand-secondary w-4 h-4 shadow-lg" />
-                        <div className="absolute inset-0 bg-brand-secondary/30 blur-md rounded-full scale-150 animate-pulse" />
-                      </div>
-                      <span className="text-white text-[9px] font-bold uppercase tracking-[0.3em] drop-shadow-md">
+                    <div className="absolute top-0 left-0 w-40 h-40 overflow-hidden z-20 pointer-events-none">
+                      <div className="bg-linear-to-r from-red-600 to-rose-700 text-white text-[10px] font-black uppercase tracking-[0.25em] py-2 w-[160%] absolute top-8 -left-16 -rotate-45 shadow-[0_5px_15px_rgba(0,0,0,0.3)] border-y border-white/10 flex justify-center text-center">
                         Best Seller
-                      </span>
-                    </motion.div>
+                      </div>
+                    </div>
                   )}
 
                   {/* Cinema Floating Like Button */}
@@ -262,8 +254,8 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                           <Icon
                             icon={saved ? "solar:heart-bold" : "solar:heart-linear"}
                             className={`w-8 h-8 ${saved
-                                ? "drop-shadow-[0_0_15px_rgba(244,63,94,0.6)]"
-                                : "drop-shadow-[0_0_15px_rgba(26,67,50,0.4)]"
+                              ? "drop-shadow-[0_0_15px_rgba(244,63,94,0.6)]"
+                              : "drop-shadow-[0_0_15px_rgba(26,67,50,0.4)]"
                               }`}
                           />
                         </motion.div>
@@ -273,14 +265,14 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                 </div>
 
                 {productImages.length > 1 && (
-                  <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-2 px-1">
+                  <div className="flex items-center justify-center gap-4 overflow-x-auto no-scrollbar py-2 px-1 mx-auto w-full">
                     {productImages.map((img, idx) => (
                       <button
                         key={idx}
                         onClick={() => setActiveImageIdx(idx)}
                         className={`relative cursor-pointer shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 ease-in-out hover:border-brand-secondary/50 ${activeImageIdx === idx
-                          ? "border-brand-secondary shadow-md"
-                          : "border-transparent"
+                          ? "border-brand-secondary shadow-md scale-105"
+                          : "border-transparent opacity-60 hover:opacity-100"
                           }`}
                       >
                         <Image
@@ -301,7 +293,7 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                   <div className="flex items-center gap-2 mb-4">
                     <div className="h-px w-6 bg-brand-secondary"></div>
                     <span className="text-brand-secondary text-[10px] font-bold uppercase tracking-[0.3em]">
-                      {product.category} {product.productId && ` • ${product.productId}`}
+                      {product.category}  {product.productId && ` • ${product.productId}`}
                     </span>
                   </div>
 
@@ -309,21 +301,21 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                     {product.name}
                   </h1>
 
-                   <div className="flex items-center gap-6 mb-8 lg:mb-12 text-left">
-                     {product.isOfferProduct && product.offerPrice ? (
-                       <div className="flex flex-col">
-                         <span className="text-3xl lg:text-4xl font-serif font-bold text-red-600">
-                           ₹{product.offerPrice}
-                         </span>
-                         <span className="text-sm font-bold text-brand-primary/40 line-through">
-                           ₹{product.price}
-                         </span>
-                       </div>
-                     ) : (
-                       <span className="text-3xl lg:text-4xl font-serif font-bold text-brand-primary">
-                         ₹{product.price}
-                       </span>
-                     )}
+                  <div className="flex items-center gap-6 mb-8 lg:mb-12 text-left">
+                    {product.isOfferProduct && product.offerPrice ? (
+                      <div className="flex flex-col">
+                        <span className="text-3xl lg:text-4xl font-serif font-bold text-red-600">
+                          ₹{product.offerPrice}
+                        </span>
+                        <span className="text-sm font-bold text-brand-primary/40 line-through">
+                          ₹{product.price}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-3xl lg:text-4xl font-serif font-bold text-brand-primary">
+                        ₹{product.price}
+                      </span>
+                    )}
                     <div className="h-8 w-px bg-brand-primary/10"></div>
                     <div className="flex flex-col text-left">
                       <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary underline decoration-brand-secondary decoration-2 underline-offset-4">
@@ -342,23 +334,56 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                       using only the finest threads for true divinity."
                     </p>
 
-                    <div className="grid grid-cols-2 gap-y-8 gap-x-6 py-4 border-y border-brand-primary/5 text-left">
-                      {[
-                        { label: "Fabric", value: product.material || "Premium Art Silk" },
-                        { label: "Embroidery", value: "Traditional Zardosi" },
-                        { label: "Colour", value: product.color || "Vibrant Festive" },
-                        { label: "Included", value: "Full Poshak Set" },
-                      ].map((info, i) => (
-                        <div key={i} className="space-y-1 text-left">
+                    {((Array.isArray(product.details) && product.details.length > 0) || product.category) && (
+                      <div className="grid grid-cols-2 gap-y-8 gap-x-6 py-4 border-y border-brand-primary/5 text-left">
+                        <div className="space-y-1 text-left">
                           <p className="text-[9px] font-bold text-brand-primary/20 uppercase tracking-[0.2em]">
-                            {info.label}
+                            Category
                           </p>
                           <p className="text-[11px] font-bold text-brand-primary uppercase tracking-[0.05em]">
-                            {info.value}
+                            {product.category}
                           </p>
                         </div>
-                      ))}
-                    </div>
+                        <div className="space-y-1 text-left">
+                          <p className="text-[9px] font-bold text-brand-primary/20 uppercase tracking-[0.2em]">
+                            Sub-category
+                          </p>
+                          <p className="text-[11px] font-bold text-brand-primary uppercase tracking-[0.05em]">
+                            {product.subCategory}
+                          </p>
+                        </div>
+                        {product.innerCategory && (
+                          <div className="space-y-1 text-left">
+                            <p className="text-[9px] font-bold text-brand-primary/20 uppercase tracking-[0.2em]">
+                              Type
+                            </p>
+                            <p className="text-[11px] font-bold text-brand-primary uppercase tracking-[0.05em]">
+                              {product.innerCategory}
+                            </p>
+                          </div>
+                        )}
+                        {product.productId && (
+                          <div className="space-y-1 text-left">
+                            <p className="text-[9px] font-bold text-brand-primary/20 uppercase tracking-[0.2em]">
+                              Product ID
+                            </p>
+                            <p className="text-[11px] font-bold text-brand-primary uppercase tracking-[0.05em]">
+                              {product.productId}
+                            </p>
+                          </div>
+                        )}
+                        {Array.isArray(product.details) && product.details.map((info, i) => (
+                          <div key={i} className="space-y-1 text-left">
+                            <p className="text-[9px] font-bold text-brand-primary/20 uppercase tracking-[0.2em]">
+                              {info.label}
+                            </p>
+                            <p className="text-[11px] font-bold text-brand-primary uppercase tracking-[0.05em]">
+                              {info.value}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <button
@@ -370,52 +395,56 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                   </button>
 
                   <div className="mt-8 space-y-0 text-left">
-                    <AccordionItem id="size" title="Size Guide" icon="lucide:ruler">
-                      <div className="bg-white/50 p-6 rounded-2xl border border-brand-primary/5 mt-0 overflow-x-auto">
-                        <table className="w-full text-left text-[10px] lg:text-[12px]">
-                          <thead>
-                            <tr className="border-b border-brand-primary/10">
-                              <th className="py-3 pr-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">No.</th>
-                              <th className="py-3 px-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">Height</th>
-                              <th className="py-3 pl-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">Dress</th>
-                            </tr>
-                          </thead>
-                          <tbody className="text-brand-primary/80">
-                            {[
-                              { n: "0", h: '1.75"', d: '4"' },
-                              { n: "1", h: '2.20"', d: '6"' },
-                              { n: "2", h: '2.75"', d: '6"' },
-                              { n: "3", h: '3.15"', d: '8"' },
-                              { n: "4", h: '3.40"', d: '8"' },
-                              { n: "5", h: '3.80"', d: '10"' },
-                              { n: "6", h: '4.40"', d: '12"' },
-                            ].map((row, i) => (
-                              <tr key={i} className="border-b border-brand-primary/5 last:border-0 hover:bg-brand-secondary/[0.01]">
-                                <td className="py-3 pr-4 font-bold text-brand-secondary">{row.n} No.</td>
-                                <td className="py-3 px-4">{row.h}</td>
-                                <td className="py-3 pl-4 font-medium">{row.d}</td>
+                    {product.showSizeGuide && (
+                      <AccordionItem id="size" title="Size Guide" icon="lucide:ruler">
+                        <div className="bg-white/50 p-6 rounded-2xl border border-brand-primary/5 mt-0 overflow-x-auto">
+                          <table className="w-full text-left text-[10px] lg:text-[12px]">
+                            <thead>
+                              <tr className="border-b border-brand-primary/10">
+                                <th className="py-3 pr-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">No.</th>
+                                <th className="py-3 px-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">Height</th>
+                                <th className="py-3 pl-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">Dress</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </AccordionItem>
-                    <AccordionItem id="wash" title="Wash & Care" icon="lucide:droplets">
-                      <div className="space-y-4 px-2 py-4 text-left">
-                        {[
-                          "Dry clean only recommended.",
-                          "Store in a breathable cloth cover.",
-                          "Dust off lightly with a soft brush.",
-                          "Avoid direct spray of perfumes.",
-                          "Air every 3-4 months.",
-                        ].map((item, i) => (
-                          <div key={i} className="flex gap-4 items-start text-left">
-                            <span className="w-5 h-5 rounded-full bg-brand-secondary/5 flex items-center justify-center text-brand-secondary font-bold text-[9px] shrink-0">{i + 1}</span>
-                            <p className="text-[11px] lg:text-[12px] font-serif text-brand-primary/70 leading-relaxed text-left">{item}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionItem>
+                            </thead>
+                            <tbody className="text-brand-primary/80">
+                              {[
+                                { n: "0", h: '1.75"', d: '4"' },
+                                { n: "1", h: '2.20"', d: '6"' },
+                                { n: "2", h: '2.75"', d: '6"' },
+                                { n: "3", h: '3.15"', d: '8"' },
+                                { n: "4", h: '3.40"', d: '8"' },
+                                { n: "5", h: '3.80"', d: '10"' },
+                                { n: "6", h: '4.40"', d: '12"' },
+                              ].map((row, i) => (
+                                <tr key={i} className="border-b border-brand-primary/5 last:border-0 hover:bg-brand-secondary/[0.01]">
+                                  <td className="py-3 pr-4 font-bold text-brand-secondary">{row.n} No.</td>
+                                  <td className="py-3 px-4">{row.h}</td>
+                                  <td className="py-3 pl-4 font-medium">{row.d}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </AccordionItem>
+                    )}
+                    {product.showWashCare && (
+                      <AccordionItem id="wash" title="Wash & Care" icon="lucide:droplets">
+                        <div className="space-y-4 px-2 py-4 text-left">
+                          {[
+                            "Dry clean only recommended.",
+                            "Store in a breathable cloth cover.",
+                            "Dust off lightly with a soft brush.",
+                            "Avoid direct spray of perfumes.",
+                            "Air every 3-4 months.",
+                          ].map((item, i) => (
+                            <div key={i} className="flex gap-4 items-start text-left">
+                              <span className="w-5 h-5 rounded-full bg-brand-secondary/5 flex items-center justify-center text-brand-secondary font-bold text-[9px] shrink-0">{i + 1}</span>
+                              <p className="text-[11px] lg:text-[12px] font-serif text-brand-primary/70 leading-relaxed text-left">{item}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionItem>
+                    )}
                   </div>
                 </div>
               </div>

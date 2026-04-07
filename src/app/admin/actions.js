@@ -77,13 +77,19 @@ export async function createProduct(data) {
     } = data;
 
     // Extra safety: ensure no relation objects leak into scalar fields
-    delete cleanData.category;
-    delete cleanData.subCategory;
-    delete cleanData.innerSubCategory;
-    delete cleanData.orderItems;
-    delete cleanData.savedBy;
+    const { categoryId, subCategoryId, innerSubId, ...scalars } = cleanData;
+    
+    const prismaData = {
+      ...scalars,
+      category: { connect: { id: categoryId } },
+      subCategory: { connect: { id: subCategoryId } }
+    };
+    
+    if (innerSubId) {
+      prismaData.innerSubCategory = { connect: { id: innerSubId } };
+    }
 
-    return await prisma.product.create({ data: cleanData }); 
+    return await prisma.product.create({ data: prismaData }); 
   } catch (error) {
     if (error.code === 'P1001' || error.code === 'P1003') {
       throw new Error("Inventory database is currently warming up. Please try again in a few seconds.");
@@ -112,8 +118,21 @@ export async function updateProduct(id, data) {
     delete cleanData.innerSubCategory;
     delete cleanData.orderItems;
     delete cleanData.savedBy;
+    const { categoryId, subCategoryId, innerSubId, ...scalars } = cleanData;
+    
+    const prismaData = {
+      ...scalars,
+      category: { connect: { id: categoryId } },
+      subCategory: { connect: { id: subCategoryId } }
+    };
+    
+    if (innerSubId) {
+      prismaData.innerSubCategory = { connect: { id: innerSubId } };
+    } else {
+      prismaData.innerSubCategory = { disconnect: true };
+    }
 
-    return await prisma.product.update({ where: { id }, data: cleanData }); 
+    return await prisma.product.update({ where: { id }, data: prismaData }); 
   } catch (error) {
     if (error.code === 'P1001' || error.code === 'P1003') {
       throw new Error("Inventory database is currently warming up. Please try again in a few seconds.");
