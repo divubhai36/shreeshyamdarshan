@@ -9,18 +9,35 @@ export default function ProductCard({ product }) {
 
   return (
     <motion.div
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.5 }}
-      className="premium-card group relative flex flex-col h-full bg-white rounded-2xl lg:rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-brand-primary/5"
+      whileHover={{ y: -8, scale: 1.01 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className="premium-card group relative flex flex-col h-full bg-white rounded-2xl lg:rounded-3xl shadow-sm hover:shadow-[0_40px_80px_-15px_rgba(26,67,50,0.2)] transition-all duration-500 overflow-hidden border border-brand-primary/5"
     >
-      <Link href={`/product/${product.id}`} className="relative aspect-square lg:aspect-square overflow-hidden bg-brand-accent block m-2 lg:m-3 rounded-xl lg:rounded-2xl shadow-inner">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-cover group-hover:scale-110 transition-transform duration-1000"
-        />
+      <Link href={`/product/${product.id}`} className="relative aspect-square lg:aspect-square overflow-hidden bg-brand-accent block m-2 lg:m-3 rounded-xl lg:rounded-2xl shadow-inner group/image">
+        {/* Boutique Cinematic Reflective Shine Effect - TL to BR */}
+        <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_0%,rgba(255,255,255,0.02)_40%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.02)_60%,transparent_100%)] -translate-x-[150%] -translate-y-[150%] group-hover:translate-x-[150%] group-hover:translate-y-[150%] transition-transform duration-3000 ease-in-out backdrop-blur-[1px]" />
+        </div>
+        
+        <div className="relative w-full h-full">
+          <Image
+            src={product.images?.[0] || product.image}
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className={`object-cover transition-all duration-1000 ease-in-out group-hover:scale-110 ${product.images?.length > 1 ? 'group-hover:opacity-0' : ''}`}
+          />
+          
+          {product.images?.length > 1 && (
+            <Image
+              src={product.images[1]}
+              alt={product.name}
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              className="absolute inset-0 object-cover scale-125 group-hover:scale-110 opacity-0 group-hover:opacity-100 transition-all duration-1000 ease-in-out"
+            />
+          )}
+        </div>
 
         {/* Classic Diagonal Best Seller Sash - High-Impact Red */}
         {product.isBestSeller && (

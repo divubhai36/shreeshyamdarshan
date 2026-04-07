@@ -22,6 +22,9 @@ export default function ProductsPage() {
     const [form, setForm] = useState(initForm);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [uploadingVideo, setUploadingVideo] = useState(false);
+    const [isDraggingImage, setIsDraggingImage] = useState(false);
+    const [isDraggingVideo, setIsDraggingVideo] = useState(false);
+    const [pendingUploads, setPendingUploads] = useState([]); // [{id, previewUrl, type}]
 
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -33,26 +36,49 @@ export default function ProductsPage() {
         setLoading(false);
     };
 
-    const handleUpload = async (e, type) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    const handleUpload = async (e, type, droppedFiles = null) => {
+        const files = droppedFiles || Array.from(e.target.files);
+        if (!files || files.length === 0) return;
+
         if (type === 'image') setUploadingImage(true);
         else setUploadingVideo(true);
 
-        const fd = new FormData(); fd.append("file", file);
+        const newPending = files.map(file => ({
+            id: Math.random().toString(36).substr(2, 9),
+            previewUrl: URL.createObjectURL(file),
+            type: type
+        }));
+
+        setPendingUploads(prev => [...prev, ...newPending]);
+
         try {
-            const res = await fetch("/api/upload", { method: "POST", body: fd });
-            const dt = await res.json();
-            if (dt.url) {
-                if (type === 'image') setForm({ ...form, images: [...form.images, dt.url] });
-                if (type === 'video') setForm({ ...form, videos: [...form.videos, dt.url] });
-                toast.success("Asset Linked");
-            }
-        } catch (err) { toast.error("Upload failed"); }
+            await Promise.all(files.map(async (file, idx) => {
+                try {
+                    const fd = new FormData();
+                    fd.append("file", file);
+                    const res = await fetch("/api/upload", { method: "POST", body: fd });
+                    const dt = await res.json();
 
+                    if (dt.url) {
+                        setForm(prev => ({
+                            ...prev,
+                            [type === 'image' ? 'images' : 'videos']: [...prev[type === 'image' ? 'images' : 'videos'], dt.url]
+                        }));
+                    }
+                } catch (err) {
+                    toast.error(`One ${type} failed to upload`);
+                } finally {
+                    setPendingUploads(prev => prev.filter(p => p.id !== newPending[idx].id));
+                }
+            }));
 
-        if (type === 'image') setUploadingImage(false);
-        else setUploadingVideo(false);
+            toast.success("Media Uploaded Successfully");
+        } catch (err) {
+            toast.error("Media batch failed. System check required.");
+        } finally {
+            if (type === 'image') setUploadingImage(false);
+            else setUploadingVideo(false);
+        }
     };
 
 
@@ -70,6 +96,18 @@ export default function ProductsPage() {
         if (!form.categoryId || !form.subCategoryId) {
             toast.error("Category and Sub-category are required");
             setStep(1);
+            return;
+        }
+
+        if (form.isOfferProduct && parseFloat(form.offerPrice) > parseFloat(form.mrp)) {
+            toast.error("Discount Price cannot exceed MRP");
+            setStep(2);
+            return;
+        }
+
+        if (parseFloat(form.price) > parseFloat(form.mrp)) {
+            toast.error("Sale Price cannot exceed MRP");
+            setStep(2);
             return;
         }
 
@@ -295,14 +333,14 @@ export default function ProductsPage() {
                                             <div className="space-y-6">
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-2">
-                                                        <label className="text-[9px] uppercase tracking-widest font-bold text-brand-primary/40 ml-1">MRP (Gross)</label>
+                                                        <label className="text-[9px] uppercase tracking-widest font-bold text-brand-primary/40 ml-1">MRP</label>
                                                         <div className="relative">
                                                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/30 font-serif text-sm">₹</span>
                                                             <input type="number" value={form.mrp} onChange={e => setForm({ ...form, mrp: e.target.value })} className="w-full p-4 pl-10 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 font-serif font-bold text-brand-primary transition-all focus:ring-4 focus:ring-brand-secondary/5 outline-none" placeholder="0" required />
                                                         </div>
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <label className="text-[9px] uppercase tracking-widest font-bold text-brand-secondary ml-1">B2B Price</label>
+                                                        <label className="text-[9px] uppercase tracking-widest font-bold text-brand-secondary ml-1">Sell Price</label>
                                                         <div className="relative">
                                                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-secondary/40 font-serif text-sm">₹</span>
                                                             <input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value, offerPrice: form.isOfferProduct && offerType === 'percentage' ? (e.target.value * (1 - form.discountPercent / 100)).toFixed(2) : form.offerPrice })} className="w-full p-4 pl-10 border border-brand-secondary/20 rounded-2xl bg-brand-secondary/3 font-serif font-bold text-brand-secondary transition-all focus:ring-4 focus:ring-brand-secondary/10 outline-none" placeholder="0" required />
@@ -381,11 +419,10 @@ export default function ProductsPage() {
                                                 ].map((item) => (
                                                     <label
                                                         key={item.id}
-                                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full cursor-pointer border transition-all duration-300 ${
-                                                            form[item.id]
-                                                            ? 'bg-brand-primary border-brand-primary shadow-lg shadow-brand-primary/20 -translate-y-px'
-                                                            : 'bg-white border-brand-primary/10 hover:border-brand-primary/30'
-                                                        }`}
+                                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full cursor-pointer border transition-all duration-300 ${form[item.id]
+                                                                ? 'bg-brand-primary border-brand-primary shadow-lg shadow-brand-primary/20 -translate-y-px'
+                                                                : 'bg-white border-brand-primary/10 hover:border-brand-primary/30'
+                                                            }`}
                                                     >
                                                         <input
                                                             type="checkbox"
@@ -397,9 +434,8 @@ export default function ProductsPage() {
                                                             icon={item.icon}
                                                             className={`w-2.5 h-2.5 ${form[item.id] ? 'text-brand-secondary' : 'text-brand-primary/30'}`}
                                                         />
-                                                        <span className={`text-[8px] font-bold uppercase tracking-widest transition-colors ${
-                                                            form[item.id] ? 'text-white' : 'text-brand-primary/40'
-                                                        }`}>
+                                                        <span className={`text-[8px] font-bold uppercase tracking-widest transition-colors ${form[item.id] ? 'text-white' : 'text-brand-primary/40'
+                                                            }`}>
                                                             {item.label}
                                                         </span>
                                                     </label>
@@ -476,23 +512,47 @@ export default function ProductsPage() {
                                     </div>
                                     <div className="space-y-5">
                                         <label className="text-[10px] uppercase tracking-widest font-bold block mb-2">Cloudinary Media Payload</label>
-                                        <div className="grid grid-cols-4 gap-3">
-                                            {form.images.map((img, i) => <div key={i} className="aspect-square rounded-2xl overflow-hidden border relative group"><img src={img} className="w-full h-full object-cover" /><button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/50 flex items-center justify-center opacity-0 group-hover:opacity-100"><Icon icon="lucide:x" className="text-white" /></button></div>)}
-                                            <div className="aspect-square rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center relative hover:bg-gray-50 cursor-pointer">
-                                                {uploadingImage ? <Icon icon="line-md:loading-loop" /> : <Icon icon="lucide:image-plus" className="text-gray-400" />}
-                                                <input type="file" disabled={uploadingImage} onChange={(e) => handleUpload(e, 'image')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                                        <div
+                                            onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
+                                            onDragLeave={() => setIsDraggingImage(false)}
+                                            onDrop={(e) => { e.preventDefault(); setIsDraggingImage(false); handleUpload(null, 'image', Array.from(e.dataTransfer.files)); }}
+                                            className={`grid grid-cols-4 gap-3 p-2 rounded-3xl border-2 border-dashed transition-all ${isDraggingImage ? 'border-brand-secondary bg-brand-secondary/5 rotate-1' : 'border-transparent'}`}
+                                        >
+                                            {form.images.map((img, i) => <div key={i} className="aspect-square rounded-2xl overflow-hidden border border-black/5 relative group shadow-sm"><img src={img} className="w-full h-full object-cover" /><button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="lucide:x" className="text-white" /></button></div>)}
+                                            {pendingUploads.filter(p => p.type === 'image').map(p => (
+                                                <div key={p.id} className="aspect-square rounded-2xl overflow-hidden border border-brand-secondary/20 relative group shadow-sm opacity-60">
+                                                    <img src={p.previewUrl} className="w-full h-full object-cover grayscale" />
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-[2px]">
+                                                        <Icon icon="line-md:loading-loop" className="w-6 h-6 text-brand-secondary" />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <div className={`aspect-square rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingImage ? 'border-brand-secondary' : 'border-gray-200'}`}>
+                                                {uploadingImage ? <Icon icon="line-md:loading-loop" className="text-brand-secondary w-6 h-6" /> : <><Icon icon="lucide:image-plus" className={isDraggingImage ? 'text-brand-secondary' : 'text-gray-400'} /><span className="text-[7px] font-bold uppercase mt-1 text-gray-300">Add Image</span></>}
+                                                <input type="file" multiple disabled={uploadingImage} onChange={(e) => handleUpload(e, 'image')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
                                             </div>
                                         </div>
 
-                                        <div className="flex gap-3 overflow-x-auto pt-2 no-scrollbar">
+                                        <div
+                                            onDragOver={(e) => { e.preventDefault(); setIsDraggingVideo(true); }}
+                                            onDragLeave={() => setIsDraggingVideo(false)}
+                                            onDrop={(e) => { e.preventDefault(); setIsDraggingVideo(false); handleUpload(null, 'video', Array.from(e.dataTransfer.files)); }}
+                                            className={`flex gap-3 overflow-x-auto pt-2 no-scrollbar p-2 rounded-3xl border-2 border-dashed transition-all ${isDraggingVideo ? 'border-brand-secondary bg-brand-secondary/5 rotate-1' : 'border-transparent'}`}
+                                        >
                                             {form.videos.map((vid, i) => <div key={i} className="w-32 h-20 shrink-0 rounded-2xl overflow-hidden border bg-black relative group"><video src={vid} className="w-full h-full object-cover" /><button type="button" onClick={() => setForm({ ...form, videos: form.videos.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/50 flex items-center justify-center opacity-0 group-hover:opacity-100"><Icon icon="lucide:x" className="text-white" /></button></div>)}
-                                            <div className="w-32 h-20 shrink-0 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center relative hover:bg-gray-50 cursor-pointer">
-                                                {uploadingVideo ? <Icon icon="line-md:loading-loop" /> : <><Icon icon="lucide:video" className="text-gray-400 mr-2 w-4 h-4" /><span className="text-[9px] font-bold uppercase text-gray-400">Add Video</span></>}
-                                                <input type="file" disabled={uploadingVideo} onChange={(e) => handleUpload(e, 'video')} className="absolute inset-0 opacity-0 cursor-pointer" accept="video/*" />
+                                            {pendingUploads.filter(p => p.type === 'video').map(p => (
+                                                <div key={p.id} className="w-32 h-20 shrink-0 rounded-2xl overflow-hidden border bg-black relative shadow-sm opacity-60">
+                                                    <video src={p.previewUrl} className="w-full h-full object-cover grayscale" />
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
+                                                        <Icon icon="line-md:loading-loop" className="w-6 h-6 text-brand-secondary" />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <div className={`w-32 h-20 shrink-0 rounded-2xl border-2 border-dashed flex items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingVideo ? 'border-brand-secondary' : 'border-gray-200'}`}>
+                                                {uploadingVideo ? <Icon icon="line-md:loading-loop" /> : <><Icon icon="lucide:video" className={isDraggingVideo ? 'text-brand-secondary' : 'text-gray-400 mr-2 w-4 h-4'} /><span className={`text-[9px] font-bold uppercase ${isDraggingVideo ? 'text-brand-secondary' : 'text-gray-400'}`}>Add Video</span></>}
+                                                <input type="file" multiple disabled={uploadingVideo} onChange={(e) => handleUpload(e, 'video')} className="absolute inset-0 opacity-0 cursor-pointer" accept="video/*" />
                                             </div>
                                         </div>
-
-
                                     </div>
                                 </motion.div>
                             )}
