@@ -68,27 +68,63 @@ export async function updateOrderStatus(id, status) {
 export async function getProducts() { return await prisma.product.findMany({ include: { category: true, subCategory: true, innerSubCategory: true }, orderBy: { createdAt: 'desc' } }); }
 
 export async function createProduct(data) { 
-  // Clean up data to remove all relational and read-only fields
-  const { 
-    category, subCategory, innerSubCategory, 
-    orderItems, savedBy,
-    id, createdAt, updatedAt, 
-    ...cleanData 
-  } = data;
-  await prisma.product.create({ data: cleanData }); 
-  revalidatePath('/admin/products'); 
+  try {
+    const { 
+      category, subCategory, innerSubCategory, 
+      orderItems, savedBy,
+      id, createdAt, updatedAt, 
+      ...cleanData 
+    } = data;
+
+    // Extra safety: ensure no relation objects leak into scalar fields
+    delete cleanData.category;
+    delete cleanData.subCategory;
+    delete cleanData.innerSubCategory;
+    delete cleanData.orderItems;
+    delete cleanData.savedBy;
+
+    return await prisma.product.create({ data: cleanData }); 
+  } catch (error) {
+    if (error.code === 'P1001' || error.code === 'P1003') {
+      throw new Error("Inventory database is currently warming up. Please try again in a few seconds.");
+    }
+    if (error.code === 'P2002') {
+      throw new Error(`Duplicate Product ID: ${data.productId} already exists.`);
+    }
+    throw error;
+  } finally {
+    revalidatePath('/admin/products'); 
+  }
 }
 
 export async function updateProduct(id, data) { 
-  // Clean up data to remove all relational and read-only fields
-  const { 
-    category, subCategory, innerSubCategory, 
-    orderItems, savedBy,
-    id: _, createdAt, updatedAt, 
-    ...cleanData 
-  } = data;
-  await prisma.product.update({ where: { id }, data: cleanData }); 
-  revalidatePath('/admin/products'); 
+  try {
+    const { 
+      category, subCategory, innerSubCategory, 
+      orderItems, savedBy,
+      id: _, createdAt, updatedAt, 
+      ...cleanData 
+    } = data;
+
+    // Extra safety: ensure no relation objects leak into scalar fields
+    delete cleanData.category;
+    delete cleanData.subCategory;
+    delete cleanData.innerSubCategory;
+    delete cleanData.orderItems;
+    delete cleanData.savedBy;
+
+    return await prisma.product.update({ where: { id }, data: cleanData }); 
+  } catch (error) {
+    if (error.code === 'P1001' || error.code === 'P1003') {
+      throw new Error("Inventory database is currently warming up. Please try again in a few seconds.");
+    }
+    if (error.code === 'P2002') {
+      throw new Error(`Duplicate Product ID: ${data.productId} already exists.`);
+    }
+    throw error;
+  } finally {
+    revalidatePath('/admin/products'); 
+  }
 }
 
 export async function deleteProduct(id) { await prisma.product.delete({ where: { id } }); revalidatePath('/admin/products'); }

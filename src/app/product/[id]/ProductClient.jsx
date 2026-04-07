@@ -209,7 +209,7 @@ export default function ProductClient({ product, navCategory, subCategory, relat
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-start">
               <div className="space-y-6 lg:sticky lg:top-24">
-                <div className="relative aspect-square md:aspect-[4/5] overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5">
+                <div className="relative aspect-square overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5">
                   <Image
                     src={productImages[activeImageIdx]}
                     alt={product.name}
@@ -301,7 +301,7 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                   <div className="flex items-center gap-2 mb-4">
                     <div className="h-px w-6 bg-brand-secondary"></div>
                     <span className="text-brand-secondary text-[10px] font-bold uppercase tracking-[0.3em]">
-                      {product.category}
+                      {product.category} {product.productId && ` • ${product.productId}`}
                     </span>
                   </div>
 
@@ -309,10 +309,21 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                     {product.name}
                   </h1>
 
-                  <div className="flex items-center gap-6 mb-8 lg:mb-12 text-left">
-                    <span className="text-3xl lg:text-4xl font-serif font-bold text-brand-primary">
-                      ₹{product.price}
-                    </span>
+                   <div className="flex items-center gap-6 mb-8 lg:mb-12 text-left">
+                     {product.isOfferProduct && product.offerPrice ? (
+                       <div className="flex flex-col">
+                         <span className="text-3xl lg:text-4xl font-serif font-bold text-red-600">
+                           ₹{product.offerPrice}
+                         </span>
+                         <span className="text-sm font-bold text-brand-primary/40 line-through">
+                           ₹{product.price}
+                         </span>
+                       </div>
+                     ) : (
+                       <span className="text-3xl lg:text-4xl font-serif font-bold text-brand-primary">
+                         ₹{product.price}
+                       </span>
+                     )}
                     <div className="h-8 w-px bg-brand-primary/10"></div>
                     <div className="flex flex-col text-left">
                       <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary underline decoration-brand-secondary decoration-2 underline-offset-4">
@@ -495,7 +506,7 @@ export default function ProductClient({ product, navCategory, subCategory, relat
                     {relatedProducts.map((p) => (
                       <div key={p.id} className="px-2 md:px-4 pb-8 lg:pb-16 pt-6">
                         <Link href={`/product/${p.id}`} className="block group">
-                          <div className="relative aspect-[3/4] rounded-[24px] lg:rounded-[32px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 bg-white border border-brand-primary/5">
+                          <div className="relative aspect-square rounded-[24px] lg:rounded-[32px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 bg-white border border-brand-primary/5">
                             <Image src={p.image} alt={p.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover transition-transform duration-1000 group-hover:scale-110" />
                             <div className="absolute bottom-4 left-4 right-4 z-10 transition-all duration-1000">
                               <div className="bg-white/95 backdrop-blur-md p-4 lg:p-5 rounded-3xl border border-white/20 shadow-xl group-hover:bg-white/10 group-hover:text-white">

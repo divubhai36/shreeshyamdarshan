@@ -16,7 +16,8 @@ const CustomSelect = ({
   placeholder = "Select...", 
   isSearchable = false, 
   className = "", 
-  disabled = false 
+  disabled = false,
+  theme = "light" // light | dark
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -46,12 +47,16 @@ const CustomSelect = ({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between bg-brand-primary/2 border border-brand-primary/5 rounded-2xl p-4 text-[11px] font-bold text-brand-primary outline-none focus:ring-4 focus:ring-brand-secondary/5 transition-all text-left ${disabled ? 'opacity-50 cursor-not-allowed bg-brand-primary/1' : 'cursor-pointer hover:bg-brand-primary/5 shadow-sm hover:shadow-md'}`}
+        className={`w-full flex items-center justify-between border rounded-2xl p-4 text-[11px] font-bold outline-none focus:ring-4 transition-all text-left 
+          ${theme === 'dark' 
+            ? 'bg-white/10 border-white/10 text-white focus:ring-white/5 hover:bg-white/20 shadow-lg' 
+            : 'bg-brand-primary/2 border-brand-primary/5 text-brand-primary focus:ring-brand-secondary/5 hover:bg-brand-primary/5 shadow-sm hover:shadow-md'}
+          ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       >
         <span className={!selectedOption ? "opacity-30 italic font-serif" : "tracking-wider uppercase"}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <Icon icon="solar:alt-arrow-down-linear" className={`w-4 h-4 transition-transform duration-500 ease-in-out ${isOpen ? 'rotate-180 text-brand-secondary' : 'text-brand-primary/20'}`} />
+        <Icon icon="solar:alt-arrow-down-linear" className={`w-4 h-4 transition-transform duration-500 ease-in-out ${isOpen ? 'rotate-180 text-brand-secondary' : theme === 'dark' ? 'text-white/40' : 'text-brand-primary/20'}`} />
       </button>
 
       {isOpen && !disabled && (

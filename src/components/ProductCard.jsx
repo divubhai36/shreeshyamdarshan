@@ -22,17 +22,26 @@ export default function ProductCard({ product }) {
           className="object-cover group-hover:scale-110 transition-transform duration-1000"
         />
 
+        {/* Offer Badge - Boutique Aura Pill */}
+        {product.isOfferProduct && (
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="absolute top-2 left-2 md:top-3 md:left-3 flex items-center gap-2 bg-red-500/80 backdrop-blur-md px-2 py-1 lg:px-4 lg:py-2 rounded-full border border-white/10 shadow-2xl z-10"
+          >
+            <span className="text-white text-[7px] lg:text-[9px] md:font-bold uppercase tracking-[0.2em]">
+              Offer
+            </span>
+          </motion.div>
+        )}
+
         {/* Best Seller Badge - Boutique Aura Pill */}
-        {product.isBestSeller && (
+        {product.isBestSeller && !product.isOfferProduct && (
           <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             className="absolute top-2 left-2 md:top-3 md:left-3 flex items-center gap-2 bg-brand-primary/80 backdrop-blur-md px-2 py-1 lg:px-4 lg:py-2 rounded-full border border-white/10 shadow-2xl z-10"
           >
-            <div className="relative hidden lg:block">
-              <Icon icon="solar:star-bold" className="text-brand-secondary w-3.5 h-3.5 animate-pulse" />
-              <div className="absolute inset-0 bg-brand-secondary/40 blur-sm rounded-full scale-150 -z-10" />
-            </div>
             <span className="text-white text-[7px] lg:text-[9px] md:font-bold uppercase tracking-[0.2em]">
               Best Seller
             </span>
@@ -41,7 +50,7 @@ export default function ProductCard({ product }) {
 
         {/* Price Tag */}
         <div className="absolute bottom-2 left-2 lg:bottom-3 lg:left-3 px-2 py-1 lg:px-4 lg:py-2 bg-brand-primary/90 text-white font-bold rounded-full text-[10px] lg:text-sm backdrop-blur-sm shadow-xl z-10">
-          ₹{product.price}
+          {product.isOfferProduct && product.offerPrice ? `₹${product.offerPrice}` : `₹${product.price}`}
         </div>
       </Link>
 

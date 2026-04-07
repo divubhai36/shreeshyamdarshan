@@ -54,6 +54,8 @@ export default async function SubCategoryPage({ params }) {
        description: p.description, 
        image: p.images[0] || "/hero.png", 
        isBestSeller: p.isBestSeller,
+       isOfferProduct: p.isOfferProduct,
+       offerPrice: p.offerPrice,
        innerSubId: p.innerSubId
      }));
      
