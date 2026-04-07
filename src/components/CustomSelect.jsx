@@ -17,7 +17,8 @@ const CustomSelect = ({
   isSearchable = false, 
   className = "", 
   disabled = false,
-  theme = "light" // light | dark
+  theme = "light", // light | dark
+  size = "normal" // normal | small
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -47,7 +48,8 @@ const CustomSelect = ({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between border rounded-2xl p-4 text-[11px] font-bold outline-none focus:ring-4 transition-all text-left 
+        className={`w-full flex items-center justify-between border rounded-2xl text-[10px] sm:text-[11px] font-bold outline-none focus:ring-4 transition-all text-left 
+          ${size === 'small' ? 'p-2.5' : 'p-4'}
           ${theme === 'dark' 
             ? 'bg-white/10 border-white/10 text-white focus:ring-white/5 hover:bg-white/20 shadow-lg' 
             : 'bg-brand-primary/2 border-brand-primary/5 text-brand-primary focus:ring-brand-secondary/5 hover:bg-brand-primary/5 shadow-sm hover:shadow-md'}
@@ -60,17 +62,17 @@ const CustomSelect = ({
       </button>
 
       {isOpen && !disabled && (
-        <div className="fixed sm:absolute z-[1000] left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl border border-brand-primary/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] overflow-hidden animate-in fade-in zoom-in duration-300 min-w-full origin-top transform-gpu">
+        <div className="absolute z-[1000] left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl border border-brand-primary/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] overflow-hidden animate-in fade-in zoom-in duration-300 min-w-[150px] sm:min-w-[200px] origin-top transform-gpu">
           {isSearchable && (
-            <div className="p-3 border-b border-brand-primary/5 relative bg-white">
-              <Icon icon="solar:magnifer-linear" className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-secondary w-3.5 h-3.5" />
+            <div className={`${size === 'small' ? 'p-2' : 'p-3'} border-b border-brand-primary/5 relative bg-white`}>
+              <Icon icon="solar:magnifer-linear" className={`absolute ${size === 'small' ? 'left-4' : 'left-6'} top-1/2 -translate-y-1/2 text-brand-secondary ${size === 'small' ? 'w-3 h-3' : 'w-3.5 h-3.5'}`} />
               <input
                 autoFocus
                 type="text"
                 placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-brand-primary/2 rounded-xl p-3 pl-11 text-[11px] font-bold text-brand-primary outline-none focus:ring-2 focus:ring-brand-secondary/10 border-none transition-all placeholder:text-brand-primary/20"
+                className={`w-full bg-brand-primary/2 rounded-xl p-2.5 ${size === 'small' ? 'pl-8 text-[9px]' : 'pl-11 text-[11px]'} font-bold text-brand-primary outline-none focus:ring-2 focus:ring-brand-secondary/10 border-none transition-all placeholder:text-brand-primary/20`}
                 onClick={(e) => e.stopPropagation()}
               />
             </div>
