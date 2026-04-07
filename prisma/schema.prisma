@@ -48,12 +48,14 @@ model Product {
   mrp               Float
   price             Float
   discountPercent   Int?
+  offerPrice        Float?
   images            String[]
   videos            String[]
   details           Json?
   isBestSeller      Boolean           @default(false)
   isOfferProduct    Boolean           @default(false)
   
+  productId         String            @unique
   categoryId        String
   category          Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   subCategoryId     String

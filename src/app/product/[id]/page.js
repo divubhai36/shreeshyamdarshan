@@ -51,13 +51,16 @@ export default async function ProductPage({ params }) {
          const mappedProduct = {
              id: dbProduct.id,
              name: dbProduct.name,
+             productId: dbProduct.productId,
              category: dbProduct.category?.name || "Unknown",
              price: dbProduct.price,
              description: dbProduct.description,
              image: dbProduct.images[0] || "/hero.png", // Hero image map
              images: dbProduct.images, // Full array map
              videos: dbProduct.videos, // Full array map
-             isBestSeller: dbProduct.isBestSeller
+             isBestSeller: dbProduct.isBestSeller,
+             isOfferProduct: dbProduct.isOfferProduct,
+             offerPrice: dbProduct.offerPrice
          };
 
          const mappedRelated = relatedDb.map(p => ({
