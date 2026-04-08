@@ -181,19 +181,19 @@ export default function ProductClient({ product, navCategory, subCategory, inner
         }}
       />
       <div className="min-h-screen bg-brand-accent/30 overflow-x-hidden text-left">
-        <main className="flex-grow">
+        <main className="grow">
           <div className="container mx-auto px-4 pt-20 lg:pt-28 mb-5 max-w-7xl">
-            <div className="flex flex-wrap items-center gap-2 lg:gap-3 text-[10px] items-start mb-4 lg:mb-12 text-brand-primary/20 font-bold uppercase tracking-[0.2em] w-full">
+            <div className="flex flex-wrap items-start gap-2 lg:gap-3 text-[10px] mb-4 lg:mb-12 text-brand-primary/20 font-bold uppercase tracking-[0.2em] w-full">
               <Link href="/" className="hover:text-brand-secondary transition-colors shrink-0">
                 Home
               </Link>
-              <Icon icon="lucide:chevron-right" className="w-2.5 h-2.5 opacity-30 mt-[1px] shrink-0" />
+              <Icon icon="lucide:chevron-right" className="w-3 h-3 mt-px shrink-0" />
               {navCategory && (
                 <>
                   <Link href={`/collections/${navCategory.id}`} className="hover:text-brand-secondary transition-colors shrink-0">
                     {navCategory.name}
                   </Link>
-                  <Icon icon="lucide:chevron-right" className="w-2.5 h-2.5 opacity-30 mt-[1px] shrink-0" />
+                  <Icon icon="lucide:chevron-right" className="w-3 h-3 mt-px shrink-0" />
                 </>
               )}
               {subCategory && (
@@ -201,7 +201,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   <Link href={`/category/${navCategory.id}/${subCategory.id}`} className="hover:text-brand-secondary transition-colors shrink-0">
                     {subCategory.name}
                   </Link>
-                  <Icon icon="lucide:chevron-right" className="w-2.5 h-2.5 opacity-30 mt-[1px] shrink-0" />
+                  <Icon icon="lucide:chevron-right" className="w-3 h-3 mt-px shrink-0" />
                 </>
               )}
               <span className="text-brand-primary/60 truncate">{product.name}</span>
@@ -220,8 +220,8 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   />
                   {/* Brand Best Seller Ribbon Sash */}
                   {product.isBestSeller && (
-                    <div className="absolute top-0 left-0 w-40 h-40 overflow-hidden z-20 pointer-events-none">
-                      <div className="bg-linear-to-r from-red-600 to-rose-700 text-white text-[10px] font-black uppercase tracking-[0.25em] py-2 w-[160%] absolute top-8 -left-16 -rotate-45 shadow-[0_5px_15px_rgba(0,0,0,0.3)] border-y border-white/10 flex justify-center text-center">
+                    <div className="absolute top-0 right-0 w-40 h-40 overflow-hidden z-20 pointer-events-none">
+                      <div className="bg-linear-to-r from-red-600 to-rose-700 text-white text-[10px] font-black uppercase tracking-[0.25em] py-2 w-[160%] absolute top-8 -right-16 rotate-45 shadow-[0_5px_15px_rgba(0,0,0,0.3)] border-y border-white/10 flex justify-center text-center">
                         Best Seller
                       </div>
                     </div>
@@ -290,14 +290,14 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
               <div className="flex flex-col pt-0 lg:pl-4">
                 <div className="text-left w-full">
-                  <div className="flex items-center gap-2 mb-4">
+                  {/* <div className="flex items-center gap-2 mb-4">
                     <div className="h-px w-6 bg-brand-secondary"></div>
                     <span className="text-brand-secondary text-[10px] font-bold uppercase tracking-[0.3em]">
-                      {product.category}  {product.productId && ` • ${product.productId}`}
+                      {product.category}
                     </span>
-                  </div>
+                  </div> */}
 
-                  <h1 className="text-3xl lg:text-5xl font-serif font-bold text-brand-primary leading-tight mb-6 lg:mb-8 tracking-tight text-left">
+                  <h1 className="text-3xl lg:text-5xl font-serif font-bold text-brand-primary leading-tight mb-6 lg:mb-8 tracking-tight text-left capitalize">
                     {product.name}
                   </h1>
 
@@ -416,7 +416,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                                 { n: "5", h: '3.80"', d: '10"' },
                                 { n: "6", h: '4.40"', d: '12"' },
                               ].map((row, i) => (
-                                <tr key={i} className="border-b border-brand-primary/5 last:border-0 hover:bg-brand-secondary/[0.01]">
+                                <tr key={i} className="border-b border-brand-primary/5 last:border-0 hover:bg-brand-secondary/1">
                                   <td className="py-3 pr-4 font-bold text-brand-secondary">{row.n} No.</td>
                                   <td className="py-3 px-4">{row.h}</td>
                                   <td className="py-3 pl-4 font-medium">{row.d}</td>
@@ -511,9 +511,9 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   >
                     {[{ url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244607/lv_0_20250325174749_cdcicc.mp4", title: "Handwork" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244604/lv_0_20250426151713_exrd5i.mp4", title: "Fabric Shine" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244599/lv_0_20250411143949_iwsj9d.mp4" },].map((video, idx) => (
                       <div key={idx} className="px-2 md:px-4 py-8 pb-10">
-                        <motion.div whileHover={{ y: -10 }} onClick={() => setActiveVideo(video.url)} className="group relative aspect-[9/16] overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5">
+                        <motion.div whileHover={{ y: -10 }} onClick={() => setActiveVideo(video.url)} className="group relative aspect-9/16 overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5">
                           <video src={video.url} autoPlay muted loop playsInline className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
+                          <div className="absolute inset-0 bg-linear-to-t from-brand-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
                             <h3 className="text-xl lg:text-xl font-serif text-white">Watch Story</h3>
                           </div>
                         </motion.div>
@@ -569,9 +569,9 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
         <AnimatePresence>
           {activeVideo && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-brand-primary/95 flex items-center justify-center p-4 backdrop-blur-3xl" onClick={() => setActiveVideo(null)}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-100 bg-brand-primary/95 flex items-center justify-center p-4 backdrop-blur-3xl" onClick={() => setActiveVideo(null)}>
               <button onClick={() => setActiveVideo(null)} className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white z-20"><Icon icon="lucide:x" className="w-6 h-6" /></button>
-              <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-[450px] aspect-[9/16] rounded-[40px] overflow-hidden">
+              <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-[450px] aspect-9/16 rounded-[40px] overflow-hidden">
                 <video src={activeVideo} autoPlay controls playsInline className="w-full h-full object-cover" />
               </motion.div>
             </motion.div>

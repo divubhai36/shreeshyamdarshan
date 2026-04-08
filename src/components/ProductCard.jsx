@@ -41,8 +41,8 @@ export default function ProductCard({ product }) {
 
         {/* Classic Diagonal Best Seller Sash - High-Impact Red */}
         {product.isBestSeller && (
-          <div className="absolute top-0 left-0 w-24 h-24 overflow-hidden z-20 pointer-events-none">
-            <div className="bg-red-600 text-white text-[8px] font-black uppercase tracking-[0.2em] py-1.5 w-[140%] text-center absolute top-4 -left-10 -rotate-45 shadow-[0_5px_15px_rgba(220,38,38,0.4)] border-y border-white/10">
+          <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden z-20 pointer-events-none">
+            <div className="bg-red-600 text-white text-[8px] font-black uppercase tracking-[0.2em] py-1.5 w-[140%] text-center absolute top-4 -right-10 rotate-45 shadow-[0_5px_15px_rgba(220,38,38,0.4)] border-y border-white/10">
               Best Seller
             </div>
           </div>

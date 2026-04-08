@@ -18,7 +18,7 @@ export default function ProductsPage() {
     const [step, setStep] = useState(1);
     const [offerType, setOfferType] = useState("price"); // price | percentage
 
-    const initForm = { productId: "", name: "", slug: "", description: "", mrp: 0, price: 0, offerPrice: 0, discountPercent: 0, categoryId: "", subCategoryId: "", innerSubId: null, images: [], videos: [], isBestSeller: false, isOfferProduct: false, showSizeGuide: false, showWashCare: false, details: [] };
+    const initForm = { productId: "", name: "", slug: "", description: "", mrp: 0, price: 0, offerPrice: 0, discountPercent: 0, categoryId: "", subCategoryId: "", innerSubId: null, images: [], videos: [], isBestSeller: false, isOfferProduct: false, isReadyStock: false, showSizeGuide: false, showWashCare: false, details: [] };
     const [form, setForm] = useState(initForm);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [uploadingVideo, setUploadingVideo] = useState(false);
@@ -118,7 +118,8 @@ export default function ProductsPage() {
             offerPrice: parseFloat(form.offerPrice),
             discountPercent: parseInt(form.discountPercent),
             showSizeGuide: !!form.showSizeGuide,
-            showWashCare: !!form.showWashCare
+            showWashCare: !!form.showWashCare,
+            isReadyStock: !!form.isReadyStock
         };
         if (!payload.innerSubId) payload.innerSubId = null;
 
@@ -224,7 +225,8 @@ export default function ProductsPage() {
                                                 innerSubId: p.innerSubId || "",
                                                 details: Array.isArray(p.details) ? p.details : [],
                                                 showSizeGuide: !!p.showSizeGuide,
-                                                showWashCare: !!p.showWashCare
+                                                showWashCare: !!p.showWashCare,
+                                                isReadyStock: !!p.isReadyStock
                                             });
                                             setOfferType(p.discountPercent > 0 ? "percentage" : "price");
                                             setStep(1);
@@ -278,8 +280,8 @@ export default function ProductsPage() {
                                     </div>
 
                                     <div className="space-y-6">
-                                        <div className="p-8 bg-brand-primary rounded-[32px] text-white shadow-xl">
-                                            <h4 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-white/40">Taxonomy Placement</h4>
+                                        <div className="p-8 bg-brand-accent/20 rounded-[32px] border border-brand-primary/5">
+                                            <h4 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-brand-primary/40">Taxonomy Placement</h4>
                                             <div className="space-y-3">
                                                 <CustomSelect
                                                     placeholder="1. Select Category"
@@ -288,7 +290,7 @@ export default function ProductsPage() {
                                                     onChange={val => setForm({ ...form, categoryId: val, subCategoryId: '', innerSubId: null })}
                                                     isSearchable={true}
                                                     className="mb-2"
-                                                    theme="dark"
+                                                // theme="dark"
                                                 />
                                                 <CustomSelect
                                                     placeholder="2. Select Sub-category"
@@ -298,7 +300,7 @@ export default function ProductsPage() {
                                                     isSearchable={true}
                                                     disabled={!form.categoryId}
                                                     className="mb-2"
-                                                    theme="dark"
+                                                // theme="dark"
                                                 />
                                                 <CustomSelect
                                                     placeholder="3. Optional Inner Filter"
@@ -307,7 +309,7 @@ export default function ProductsPage() {
                                                     onChange={val => setForm({ ...form, innerSubId: val })}
                                                     isSearchable={true}
                                                     disabled={!form.subCategoryId || availableInners.length === 0}
-                                                    theme="dark"
+                                                // theme="dark"
                                                 />
                                             </div>
                                         </div>
@@ -393,6 +395,38 @@ export default function ProductsPage() {
                                                         </div>
                                                     )}
                                                 </div>
+
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-3">
+                                                    {[
+                                                        { id: 'isBestSeller', label: 'Best Seller', icon: 'solar:star-bold' },
+                                                        { id: 'isReadyStock', label: 'Ready Stock', icon: 'solar:box-bold' },
+                                                        { id: 'showSizeGuide', label: 'Size Guide', icon: 'solar:ruler-bold' },
+                                                        { id: 'showWashCare', label: 'Wash Care', icon: 'ic:twotone-wash' }
+                                                    ].map((item) => (
+                                                        <label
+                                                            key={item.id}
+                                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full cursor-pointer border transition-all duration-300 ${form[item.id]
+                                                                ? 'bg-brand-primary border-brand-primary shadow-lg shadow-brand-primary/20 -translate-y-px'
+                                                                : 'bg-white border-brand-primary/10 hover:border-brand-primary/30'
+                                                                }`}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={form[item.id]}
+                                                                onChange={e => setForm({ ...form, [item.id]: e.target.checked })}
+                                                                className="sr-only"
+                                                            />
+                                                            <Icon
+                                                                icon={item.icon}
+                                                                className={`w-2.5 h-2.5 ${form[item.id] ? 'text-brand-secondary' : 'text-brand-primary/30'}`}
+                                                            />
+                                                            <span className={`text-[8px] font-bold uppercase tracking-widest transition-colors ${form[item.id] ? 'text-white' : 'text-brand-primary/40'
+                                                                }`}>
+                                                                {item.label}
+                                                            </span>
+                                                        </label>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -410,91 +444,38 @@ export default function ProductsPage() {
                                                 </div>
                                             </div>
 
-                                            {/* Unified Selection Bar */}
-                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-3 mb-4 pb-4 border-b border-brand-primary/5">
-                                                {[
-                                                    { id: 'isBestSeller', label: 'Best Seller', icon: 'solar:star-bold' },
-                                                    { id: 'showSizeGuide', label: 'Size Guide', icon: 'solar:ruler-bold' },
-                                                    { id: 'showWashCare', label: 'Wash Care', icon: 'solar:droplet-bold' }
-                                                ].map((item) => (
-                                                    <label
-                                                        key={item.id}
-                                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full cursor-pointer border transition-all duration-300 ${form[item.id]
-                                                                ? 'bg-brand-primary border-brand-primary shadow-lg shadow-brand-primary/20 -translate-y-px'
-                                                                : 'bg-white border-brand-primary/10 hover:border-brand-primary/30'
-                                                            }`}
-                                                    >
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={form[item.id]}
-                                                            onChange={e => setForm({ ...form, [item.id]: e.target.checked })}
-                                                            className="sr-only"
-                                                        />
-                                                        <Icon
-                                                            icon={item.icon}
-                                                            className={`w-2.5 h-2.5 ${form[item.id] ? 'text-brand-secondary' : 'text-brand-primary/30'}`}
-                                                        />
-                                                        <span className={`text-[8px] font-bold uppercase tracking-widest transition-colors ${form[item.id] ? 'text-white' : 'text-brand-primary/40'
-                                                            }`}>
-                                                            {item.label}
-                                                        </span>
-                                                    </label>
-                                                ))}
-                                            </div>
-
                                             <div className="grow space-y-4">
-                                                <div className="flex items-center justify-between border-b border-brand-primary/5 pb-4 mb-4">
-                                                    <h5 className="text-[9px] font-bold uppercase tracking-[0.2em] text-brand-primary/30">Detailed Specifications</h5>
-                                                    <button type="button" onClick={() => setForm({ ...form, details: [...form.details, { label: "Fabric", value: "" }] })} className="bg-brand-secondary text-white px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest hover:shadow-lg transition-all flex items-center gap-2">
-                                                        <Icon icon="lucide:plus" className="w-3 h-3" /> Add Detail
-                                                    </button>
-                                                </div>
-
-                                                <div className="space-y-3">
-                                                    {form.details.map((detail, idx) => (
-                                                        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} key={idx} className="flex gap-3 items-center group bg-brand-primary/1 p-2 rounded-2xl hover:bg-brand-primary/3 transition-all border border-transparent hover:border-brand-primary/5">
-                                                            <div className="w-[35%] shrink-0">
-                                                                <CustomSelect
-                                                                    isSearchable={true}
-                                                                    size="small"
-                                                                    options={[
-                                                                        { value: "Fabric", label: "Fabric" },
-                                                                        { value: "Embroidery", label: "Embroidery" },
-                                                                        { value: "Colour", label: "Colour" },
-                                                                        { value: "Included", label: "Included" },
-                                                                    ]}
-                                                                    value={detail.label}
-                                                                    onChange={(val) => {
-                                                                        const newDetails = [...form.details];
-                                                                        newDetails[idx].label = val;
-                                                                        setForm({ ...form, details: newDetails });
-                                                                    }}
-                                                                />
+                                                <div className="space-y-4">
+                                                    {["Fabric", "Embroidery", "Work", "Included"].map((label) => {
+                                                        const detail = form.details.find(d => d.label === label);
+                                                        return (
+                                                            <div key={label} className="flex gap-3 items-center group bg-brand-primary/1 p-2 rounded-2xl hover:bg-brand-primary/3 transition-all border border-transparent hover:border-brand-primary/5">
+                                                                <div className="w-[30%] shrink-0 pl-4">
+                                                                    <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary/40">{label}</span>
+                                                                </div>
+                                                                <div className="grow relative">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={detail?.value || ""}
+                                                                        onChange={(e) => {
+                                                                            const val = e.target.value;
+                                                                            let newDetails = [...form.details];
+                                                                            const idx = newDetails.findIndex(d => d.label === label);
+                                                                            if (idx > -1) {
+                                                                                if (val) newDetails[idx].value = val;
+                                                                                else newDetails.splice(idx, 1);
+                                                                            } else if (val) {
+                                                                                newDetails.push({ label, value: val });
+                                                                            }
+                                                                            setForm({ ...form, details: newDetails });
+                                                                        }}
+                                                                        placeholder={`Enter ${label}`}
+                                                                        className="w-full p-3 border border-brand-primary/10 rounded-xl bg-white text-[10px] font-bold text-brand-primary outline-none focus:ring-4 focus:ring-brand-secondary/5 transition-all"
+                                                                    />
+                                                                </div>
                                                             </div>
-                                                            <div className="grow relative">
-                                                                <input
-                                                                    type="text"
-                                                                    value={detail.value}
-                                                                    onChange={(e) => {
-                                                                        const newDetails = [...form.details];
-                                                                        newDetails[idx].value = e.target.value;
-                                                                        setForm({ ...form, details: newDetails });
-                                                                    }}
-                                                                    placeholder="e.g. Pure Zardosi Silk"
-                                                                    className="w-full p-3 border border-brand-primary/5 rounded-xl bg-white text-[10px] font-bold text-brand-primary outline-none focus:ring-4 focus:ring-brand-secondary/5 transition-all shadow-sm"
-                                                                />
-                                                            </div>
-                                                            <button type="button" onClick={() => setForm({ ...form, details: form.details.filter((_, i) => i !== idx) })} className="w-10 h-10 shrink-0 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
-                                                                <Icon icon="solar:trash-bin-trash-bold-duotone" className="w-5 h-5" />
-                                                            </button>
-                                                        </motion.div>
-                                                    ))}
-                                                    {form.details.length === 0 && (
-                                                        <div className="flex flex-col items-center justify-center py-12 text-center opacity-20 filter grayscale">
-                                                            <Icon icon="solar:document-list-bold-duotone" className="w-16 h-16 mb-4" />
-                                                            <p className="text-[10px] font-bold uppercase tracking-widest italic">No attributes defined for this masterpiece</p>
-                                                        </div>
-                                                    )}
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         </div>

@@ -42,11 +42,12 @@ export default async function ProductPage({ params }) {
       });
 
       if (dbProduct) {
-         // Gather up to 10 related products from the same subcategory
-         const relatedDb = await prisma.product.findMany({
+         // Gather up to 10 random related products from the same subcategory
+         const relatedDbPool = await prisma.product.findMany({
              where: { subCategoryId: dbProduct.subCategoryId, id: { not: dbProduct.id } },
-             take: 10
+             take: 20
          });
+         const relatedDb = relatedDbPool.sort(() => 0.5 - Math.random()).slice(0, 10);
 
          const mappedProduct = {
              id: dbProduct.id,

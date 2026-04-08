@@ -54,6 +54,7 @@ model Product {
   details           Json?
   isBestSeller      Boolean           @default(false)
   isOfferProduct    Boolean           @default(false)
+  isReadyStock      Boolean           @default(false)
   showSizeGuide     Boolean           @default(false)
   showWashCare      Boolean           @default(false)
   

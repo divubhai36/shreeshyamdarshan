@@ -9,13 +9,13 @@ import { Icon } from "@iconify/react";
  * - Responsive absolute/fixed positioning to prevent clipping.
  * - Smooth fade/zoom animations.
  */
-const CustomSelect = ({ 
-  options = [], 
-  value, 
-  onChange, 
-  placeholder = "Select...", 
-  isSearchable = false, 
-  className = "", 
+const CustomSelect = ({
+  options = [],
+  value,
+  onChange,
+  placeholder = "Select...",
+  isSearchable = false,
+  className = "",
   disabled = false,
   theme = "light", // light | dark
   size = "normal" // normal | small
@@ -36,7 +36,7 @@ const CustomSelect = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const filteredOptions = isSearchable 
+  const filteredOptions = isSearchable
     ? options.filter(opt => opt.label.toLowerCase().includes(search.toLowerCase()))
     : options;
 
@@ -48,11 +48,11 @@ const CustomSelect = ({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between border rounded-2xl text-[10px] sm:text-[11px] font-bold outline-none focus:ring-4 transition-all text-left 
+        className={`w-full flex items-center justify-between border rounded-2xl text-[10px] sm:text-[11px] font-bold outline-none focus:ring-4 transition-all text-left
           ${size === 'small' ? 'p-2.5' : 'p-4'}
-          ${theme === 'dark' 
-            ? 'bg-white/10 border-white/10 text-white focus:ring-white/5 hover:bg-white/20 shadow-lg' 
-            : 'bg-brand-primary/2 border-brand-primary/5 text-brand-primary focus:ring-brand-secondary/5 hover:bg-brand-primary/5 shadow-sm hover:shadow-md'}
+          ${theme === 'dark'
+            ? 'bg-white/10 border-white/10 text-white focus:ring-white/5 hover:bg-white/20 shadow-lg'
+            : 'bg-brand-primary/2 border-brand-primary/5 text-brand-primary focus:ring-brand-secondary/5 hover:bg-brand-primary/5 '}  
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       >
         <span className={!selectedOption ? "opacity-30 italic font-serif" : "tracking-wider uppercase"}>
