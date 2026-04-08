@@ -33,8 +33,8 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 lg:p-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
+    <div className="max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
         <div>
           <h1 className="text-3xl font-serif font-bold text-brand-primary">Order Registry</h1>
           <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase mt-1">Transaction Monitor</p>
@@ -71,25 +71,25 @@ export default function OrdersPage() {
                   <Icon icon="line-md:loading-loop" className="w-10 h-10 text-brand-secondary mx-auto" />
                 </td>
               </tr>
-            ) : data.filter(o => 
-                o.orderNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-                o.wholesaler?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                o.wholesaler?.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                o.status.toLowerCase().includes(searchTerm.toLowerCase())
+            ) : data.filter(o =>
+              o.orderNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+              o.wholesaler?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              o.wholesaler?.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              o.status.toLowerCase().includes(searchTerm.toLowerCase())
             ).length === 0 ? (
               <tr>
                 <td colSpan="5" className="p-20 text-center text-brand-primary/30 italic font-serif">No orders matching your search criteria.</td>
               </tr>
-            ) : data.filter(o => 
-                o.orderNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-                o.wholesaler?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                o.wholesaler?.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                o.status.toLowerCase().includes(searchTerm.toLowerCase())
+            ) : data.filter(o =>
+              o.orderNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+              o.wholesaler?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              o.wholesaler?.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              o.status.toLowerCase().includes(searchTerm.toLowerCase())
             ).map(o => (
               <tr key={o.id} className="hover:bg-brand-primary/[0.02] transition-colors group">
                 <td className="p-6" onClick={() => setViewOrder(o)}>
-                   <p className="font-bold text-brand-primary group-hover:text-brand-secondary cursor-pointer transition-colors">#{o.orderNumber}</p>
-                   <p className="text-[10px] text-brand-primary/40 font-medium">{new Date(o.createdAt).toLocaleDateString()}</p>
+                  <p className="font-bold text-brand-primary group-hover:text-brand-secondary cursor-pointer transition-colors">#{o.orderNumber}</p>
+                  <p className="text-[10px] text-brand-primary/40 font-medium">{new Date(o.createdAt).toLocaleDateString()}</p>
                 </td>
                 <td className="p-6">
                   <p className="font-bold text-brand-primary">{o.wholesaler?.name}</p>
@@ -105,8 +105,8 @@ export default function OrdersPage() {
                   </div>
                 </td>
                 <td className="p-6 text-right">
-                  <CustomSelect 
-                    value={o.status} 
+                  <CustomSelect
+                    value={o.status}
                     onChange={(val) => handleStatusUpdate(o.id, val)}
                     options={[
                       { value: "PENDING", label: "Mark Pending" },
@@ -128,67 +128,67 @@ export default function OrdersPage() {
       {viewOrder && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-primary/80 backdrop-blur-md p-4 overflow-y-auto pt-20 pb-10">
           <div className="bg-white max-w-4xl w-full rounded-[40px] p-8 lg:p-12 shadow-2xl relative my-auto border border-white/20">
-            <button suppressHydrationWarning onClick={()=>setViewOrder(null)} className="absolute top-8 right-8 w-10 h-10 bg-brand-primary/5 rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
+            <button suppressHydrationWarning onClick={() => setViewOrder(null)} className="absolute top-8 right-8 w-10 h-10 bg-brand-primary/5 rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
 
               <Icon icon="lucide:x" className="w-5 h-5" />
             </button>
-            
+
             <div className="flex justify-between items-start mb-12">
               <div>
                 <h2 className="text-3xl font-serif font-bold text-brand-primary">Order Manifest</h2>
                 <p className="text-sm text-brand-primary/40 mt-1 font-medium tracking-widest uppercase">ID: #{viewOrder.orderNumber} • {new Date(viewOrder.createdAt).toLocaleString()}</p>
               </div>
               <div className={`px-6 py-2 rounded-full border text-[10px] font-bold uppercase tracking-[0.3em] ${STATUS_COLORS[viewOrder.status]}`}>
-                 {viewOrder.status}
+                {viewOrder.status}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12 bg-brand-primary/2 p-8 rounded-[32px] border border-brand-primary/5">
-                <div>
-                    <h3 className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 mb-4 ml-1">Client Authorization</h3>
-                    <p className="text-lg font-serif font-bold text-brand-primary">{viewOrder.wholesaler.name}</p>
-                    <p className="text-sm font-medium text-brand-primary/60 mt-1 uppercase tracking-widest">{viewOrder.wholesaler.companyName || 'B2B Client'}</p>
-                    <p className="text-sm text-brand-primary/40 mt-3 font-medium leading-relaxed">{viewOrder.wholesaler.address || 'Standard Partner Logistics'}</p>
-                </div>
-                <div>
-                    <h3 className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 mb-4 ml-1">Communication Channels</h3>
-                    <p className="text-sm font-bold text-brand-primary">{viewOrder.wholesaler.email}</p>
-                    <p className="text-sm font-bold text-brand-primary mt-2">{viewOrder.wholesaler.phone || 'Registry Phone Not Available'}</p>
-                </div>
+              <div>
+                <h3 className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 mb-4 ml-1">Client Authorization</h3>
+                <p className="text-lg font-serif font-bold text-brand-primary">{viewOrder.wholesaler.name}</p>
+                <p className="text-sm font-medium text-brand-primary/60 mt-1 uppercase tracking-widest">{viewOrder.wholesaler.companyName || 'B2B Client'}</p>
+                <p className="text-sm text-brand-primary/40 mt-3 font-medium leading-relaxed">{viewOrder.wholesaler.address || 'Standard Partner Logistics'}</p>
+              </div>
+              <div>
+                <h3 className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 mb-4 ml-1">Communication Channels</h3>
+                <p className="text-sm font-bold text-brand-primary">{viewOrder.wholesaler.email}</p>
+                <p className="text-sm font-bold text-brand-primary mt-2">{viewOrder.wholesaler.phone || 'Registry Phone Not Available'}</p>
+              </div>
             </div>
 
             <div>
-                 <h3 className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 mb-6 ml-1">Allocated Inventory Items</h3>
-                 <div className="space-y-4 max-h-[300px] overflow-y-auto pr-4 custom-scrollbar">
-                    {viewOrder.items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between items-center p-5 bg-white rounded-2xl border border-brand-primary/5 hover:bg-brand-primary/[0.01] transition-all">
-                            <div className="flex items-center gap-5">
-                                <div className="w-12 h-14 rounded-xl overflow-hidden bg-gray-50 border border-brand-primary/10">
-                                    <img src={item.product?.images?.[0] || '/hero.png'} className="w-full h-full object-cover" />
-                                </div>
-                                <div>
-                                    <p className="font-bold text-brand-primary">{item.product?.name}</p>
-                                    <p className="text-[10px] text-brand-primary/40 uppercase font-bold tracking-widest mt-1">₹{item.price.toLocaleString()} per unit</p>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-sm font-serif font-bold text-brand-primary">Qty: {item.quantity}</p>
-                                <p className="text-[10px] text-brand-secondary font-bold tracking-[0.2em] mt-1 uppercase">Subtotal: ₹{(item.quantity * item.price).toLocaleString()}</p>
-                            </div>
-                        </div>
-                    ))}
-                 </div>
+              <h3 className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 mb-6 ml-1">Allocated Inventory Items</h3>
+              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-4 custom-scrollbar">
+                {viewOrder.items.map((item, idx) => (
+                  <div key={idx} className="flex justify-between items-center p-5 bg-white rounded-2xl border border-brand-primary/5 hover:bg-brand-primary/[0.01] transition-all">
+                    <div className="flex items-center gap-5">
+                      <div className="w-12 h-14 rounded-xl overflow-hidden bg-gray-50 border border-brand-primary/10">
+                        <img src={item.product?.images?.[0] || '/hero.png'} className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-brand-primary">{item.product?.name}</p>
+                        <p className="text-[10px] text-brand-primary/40 uppercase font-bold tracking-widest mt-1">₹{item.price.toLocaleString()} per unit</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-serif font-bold text-brand-primary">Qty: {item.quantity}</p>
+                      <p className="text-[10px] text-brand-secondary font-bold tracking-[0.2em] mt-1 uppercase">Subtotal: ₹{(item.quantity * item.price).toLocaleString()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="mt-12 pt-8 border-t border-brand-primary/5 flex justify-between items-end">
-                <div>
-                   <p className="text-[10px] text-brand-primary/40 font-bold uppercase tracking-widest mb-2">Registry Signature</p>
-                   <p className="text-xs font-serif italic text-brand-primary/30">Secure Transaction Verified by SSD Internal Logs</p>
-                </div>
-                <div className="text-right">
-                   <p className="text-[10px] text-brand-primary/40 font-bold uppercase tracking-widest mb-1">Taxation & Fulfillment Inclusive</p>
-                   <p className="text-4xl font-serif font-bold text-brand-primary tracking-tight">₹{viewOrder.totalAmount.toLocaleString()}</p>
-                </div>
+              <div>
+                <p className="text-[10px] text-brand-primary/40 font-bold uppercase tracking-widest mb-2">Registry Signature</p>
+                <p className="text-xs font-serif italic text-brand-primary/30">Secure Transaction Verified by SSD Internal Logs</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] text-brand-primary/40 font-bold uppercase tracking-widest mb-1">Taxation & Fulfillment Inclusive</p>
+                <p className="text-4xl font-serif font-bold text-brand-primary tracking-tight">₹{viewOrder.totalAmount.toLocaleString()}</p>
+              </div>
             </div>
           </div>
         </div>
