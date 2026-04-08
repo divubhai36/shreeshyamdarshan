@@ -17,6 +17,8 @@ export default function ProductsPage() {
     const [editingId, setEditingId] = useState(null);
     const [step, setStep] = useState(1);
     const [offerType, setOfferType] = useState("price"); // price | percentage
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
 
     const initForm = { productId: "", name: "", slug: "", description: "", mrp: 0, price: 0, offerPrice: 0, discountPercent: 0, categoryId: "", subCategoryId: "", innerSubId: null, images: [], videos: [], isBestSeller: false, isOfferProduct: false, isReadyStock: false, showSizeGuide: false, showWashCare: false, details: [] };
     const [form, setForm] = useState(initForm);
@@ -143,8 +145,8 @@ export default function ProductsPage() {
     const availableInners = form.subCategoryId ? inners.filter(i => i.subCategoryId === form.subCategoryId) : inners;
 
     return (
-        <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
+<div className="max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
                 <div>
                     <h1 className="text-3xl font-serif font-bold text-brand-primary">Master Catalog</h1>
                     <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase mt-1">Administer Inventory Flow</p>
@@ -232,7 +234,7 @@ export default function ProductsPage() {
                                             setStep(1);
                                             setIsOpen(true);
                                         }} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg mr-2"><Icon icon="lucide:edit-2" /></button>
-                                        <button onClick={async () => { if (confirm("Delete this masterpiece?")) { await deleteProduct(p.id); toast.success("Masterpiece Removed"); loadData(); } }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Icon icon="lucide:trash-2" /></button>
+                                        <button onClick={() => { setItemToDelete(p); setIsDeleteModalOpen(true); }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Icon icon="lucide:trash-2" /></button>
 
                                     </td>
                                 </tr>
@@ -264,8 +266,8 @@ export default function ProductsPage() {
                             {step === 1 && (
                                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                                     <div className="space-y-6">
-                                        <div className="p-8 bg-brand-accent/20 rounded-[32px] border border-brand-primary/5">
-                                            <h4 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-brand-primary/40">Primary Identifiers</h4>
+                                        <div className="p-8 bg-brand-accent/40 rounded-[32px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                            <h4 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-brand-primary/60">Primary Identifiers</h4>
                                             <div className="space-y-5">
                                                 <div>
                                                     <label className="text-[10px] uppercase tracking-widest font-bold block mb-1.5 ml-1">Product ID / SKU</label>
@@ -280,8 +282,8 @@ export default function ProductsPage() {
                                     </div>
 
                                     <div className="space-y-6">
-                                        <div className="p-8 bg-brand-accent/20 rounded-[32px] border border-brand-primary/5">
-                                            <h4 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-brand-primary/40">Taxonomy Placement</h4>
+                                        <div className="p-8 bg-brand-accent/30 rounded-[32px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                            <h4 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-brand-primary/60">Product Placement</h4>
                                             <div className="space-y-3">
                                                 <CustomSelect
                                                     placeholder="1. Select Category"
@@ -321,7 +323,7 @@ export default function ProductsPage() {
                                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
                                     {/* Financial Card */}
                                     <div className="md:col-span-5 space-y-6">
-                                        <div className="bg-white rounded-[32px] p-8 border border-brand-primary/5 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                        <div className="bg-brand-accent/20 rounded-[32px] p-8 border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
                                             <div className="flex items-center gap-3 mb-8">
                                                 <div className="w-10 h-10 bg-brand-secondary/10 rounded-xl flex items-center justify-center">
                                                     <Icon icon="solar:wallet-money-bold-duotone" className="w-5 h-5 text-brand-secondary" />
@@ -351,7 +353,7 @@ export default function ProductsPage() {
                                                 </div>
 
                                                 <div className={`p-6 rounded-[24px] border transition-all duration-500 ${form.isOfferProduct ? 'bg-brand-primary/5 border-brand-primary/10 shadow-inner' : 'bg-brand-primary/2 border-brand-primary/5'}`}>
-                                                    <label className="flex items-center justify-between cursor-pointer mb-6">
+                                                    <label className="flex items-center justify-between cursor-pointer">
                                                         <div className="flex items-center gap-3">
                                                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${form.isOfferProduct ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/20' : 'bg-brand-primary/10 text-brand-primary'}`}>
                                                                 <Icon icon="solar:tag-bold" className="w-5 h-5" />
@@ -363,7 +365,7 @@ export default function ProductsPage() {
                                                     </label>
 
                                                     {form.isOfferProduct && (
-                                                        <div className="space-y-5 animate-in fade-in slide-in-from-top-4 duration-500">
+                                                        <div className="space-y-5 animate-in fade-in slide-in-from-top-4 duration-500 mt-4">
                                                             <div className="flex p-1 bg-white/50 backdrop-blur rounded-xl border border-black/5">
                                                                 <button type="button" onClick={() => setOfferType("price")} className={`grow py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all ${offerType === 'price' ? 'bg-brand-primary text-white shadow-lg' : 'text-brand-primary/40 hover:bg-black/5'}`}>Price</button>
                                                                 <button type="button" onClick={() => setOfferType("percentage")} className={`grow py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all ${offerType === 'percentage' ? 'bg-brand-primary text-white shadow-lg' : 'text-brand-primary/40 hover:bg-black/5'}`}>Percentage</button>
@@ -433,7 +435,7 @@ export default function ProductsPage() {
 
                                     {/* Specs & Tags Card */}
                                     <div className="md:col-span-7 space-y-6">
-                                        <div className="bg-white rounded-[32px] p-8 border border-brand-primary/5 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] min-h-[400px] flex flex-col">
+                                        <div className="bg-brand-accent/20 rounded-[32px] p-8 border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)] min-h-[400px] flex flex-col">
                                             <div className="flex items-center gap-3 mb-8">
                                                 <div className="w-10 h-10 bg-brand-primary/5 rounded-xl flex items-center justify-center text-brand-primary">
                                                     <Icon icon="solar:medal-star-bold-duotone" className="w-5 h-5" />
@@ -488,7 +490,7 @@ export default function ProductsPage() {
                                     <div className="space-y-5">
                                         <div>
                                             <label className="text-[10px] uppercase tracking-widest font-bold">Rich Description (Optional)</label>
-                                            <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full p-4 border border-black/10 rounded-2xl bg-gray-50 mt-1 h-32 lg:h-48 resize-none" placeholder="Tell the story of this divine creation..." />
+                                            <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full p-4 border border-black/10 rounded-2xl bg-brand-accent/20 mt-1 h-32 lg:h-48 resize-none shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]" placeholder="Tell the story of this divine creation..." />
                                         </div>
                                     </div>
                                     <div className="space-y-5">
@@ -539,26 +541,64 @@ export default function ProductsPage() {
                             )}
 
                             <div className="col-span-1 md:col-span-2 pt-8 border-t border-black/5 flex justify-between items-center gap-4">
-                                <button type="button" onClick={() => setIsOpen(false)} className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors">Terminate Process</button>
+                                <button type="button" onClick={() => setIsOpen(false)} className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors cursor-pointer">Terminate Process</button>
 
                                 <div className="flex gap-4">
                                     {step > 1 && (
-                                        <button type="button" onClick={() => setStep(s => s - 1)} className="px-8 py-4 rounded-2xl font-bold uppercase tracking-widest bg-gray-100 hover:bg-gray-200 transition-all text-[10px]">Backward</button>
+                                        <button type="button" onClick={() => setStep(s => s - 1)} className="px-8 py-4 rounded-2xl font-bold uppercase tracking-widest bg-gray-100 hover:bg-gray-200 transition-all text-[10px] flex items-center gap-2"> <Icon icon="lucide:arrow-left" className="w-4 h-4" /> Back</button>
                                     )}
 
                                     {step < 3 ? (
                                         <button type="button" onClick={() => setStep(s => s + 1)} className="px-10 py-4 lg:px-14 rounded-2xl font-bold uppercase tracking-widest bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl text-[10px] flex items-center gap-2">
-                                            Proceed <Icon icon="lucide:arrow-right" className="w-4 h-4" />
+                                            Next <Icon icon="lucide:arrow-right" className="w-4 h-4" />
                                         </button>
                                     ) : (
                                         <button type="button" onClick={handleSubmit} disabled={uploadingImage || uploadingVideo} className="px-10 py-4 lg:px-14 rounded-2xl font-bold uppercase tracking-widest bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl text-[10px] flex items-center gap-2">
-                                            <Icon icon="lucide:save" className="w-4 h-4" /> Finalize Injection
+                                            <Icon icon="lucide:save" className="w-4 h-4" /> Save
                                         </button>
                                     )}
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            )}
+            {/* Delete Confirmation Modal */}
+            {isDeleteModalOpen && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 backdrop-blur-md">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="bg-white max-w-sm w-full rounded-[32px] p-8 shadow-2xl text-center border border-black/5"
+                    >
+                        <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 mx-auto mb-6">
+                            <Icon icon="solar:trash-bin-trash-bold-duotone" className="w-8 h-8" />
+                        </div>
+                        <h3 className="text-xl font-serif font-bold text-brand-primary mb-2">Remove Masterpiece?</h3>
+                        <p className="text-[10px] text-brand-primary/40 uppercase font-bold tracking-[0.2em] mb-8 leading-relaxed">
+                            "{itemToDelete?.name}" will be permanently removed from the catalog.
+                        </p>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setIsDeleteModalOpen(false)}
+                                className="grow py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest text-brand-primary hover:bg-gray-50 transition-all border border-black/20 cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    await deleteProduct(itemToDelete.id);
+                                    toast.success("Masterpiece Removed");
+                                    setIsDeleteModalOpen(false);
+                                    loadData();
+                                }}
+                                className="grow py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest bg-red-500 text-white hover:bg-red-600 transition-all shadow-lg shadow-red-500/20 cursor-pointer"
+                            >
+                                Confirm
+                            </button>
+                        </div>
+                    </motion.div>
                 </div>
             )}
         </div>
