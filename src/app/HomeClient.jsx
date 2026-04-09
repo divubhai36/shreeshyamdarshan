@@ -29,8 +29,14 @@ export default function HomeClient({ products, categories, reviews }) {
       }
    ];
    const [textIndex, setTextIndex] = useState(0);
+   const [isLogged, setIsLogged] = useState(false);
 
    useEffect(() => {
+      const cookies = document.cookie.split(';');
+      const hasUserSession = cookies.some((item) => item.trim().startsWith('ssd_wholesale_logged=true'));
+      const storedUser = localStorage.getItem('ssd_user');
+      setIsLogged(hasUserSession || !!storedUser);
+
       const timer = setInterval(() => {
          setTextIndex((prev) => (prev + 1) % signatures.length);
       }, 5000);
@@ -102,6 +108,141 @@ export default function HomeClient({ products, categories, reviews }) {
             </AnimatePresence>
          </div>
          <Hero />
+
+         {/* Gated Wholesaler Sections */}
+         {isLogged && (
+            <>
+               {/* 1. Discount Offer Section */}
+               <section className="py-12 lg:py-20 bg-brand-primary relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-1/2 h-full opacity-[0.03] pointer-events-none">
+                     <Icon icon="solar:tag-bold-duotone" className="w-[800px] h-[800px] -translate-y-1/4 translate-x-1/4" />
+                  </div>
+
+                  <div className="container mx-auto px-4 max-w-7xl relative z-10">
+                     <Icon icon="material-symbols-light:percent-discount-outline-rounded" className="w-[850px] h-[850px] text-white absolute bottom-[-350px] left-[-350px] hidden lg:block opacity-20" />
+                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        <div className="lg:col-span-5 relative hidden lg:block">
+                           {/* <Icon icon="material-symbols-light:percent-discount-outline-rounded" className="w-[500px] h-[500px] text-white" /> */}
+                        </div>
+                        <div className="lg:col-span-7 space-y-8">
+                           <motion.div
+                              initial={{ opacity: 0, x: -30 }}
+                              whileInView={{ opacity: 1, x: 0 }}
+                              viewport={{ once: true }}
+                              className="flex items-center gap-4"
+                           >
+                              <div className="w-12 h-[1px] bg-brand-secondary"></div>
+                              <span className="text-brand-secondary text-[10px] lg:text-xs font-bold uppercase tracking-[0.4em]">Exclusive Privileges</span>
+                           </motion.div>
+
+                           <motion.h2
+                              initial={{ opacity: 0, y: 30 }}
+                              whileInView={{ opacity: 1, y: 0 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: 0.2 }}
+                              className="text-4xl lg:text-7xl font-serif font-black text-white leading-tight"
+                           >
+                              The Discount <br />
+                              <span className="italic font-normal text-brand-secondary underline decoration-brand-secondary/30 decoration-offset-8">Treasury</span>
+                           </motion.h2>
+
+                           <motion.p
+                              initial={{ opacity: 0 }}
+                              whileInView={{ opacity: 1 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: 0.4 }}
+                              className="text-white/60 text-base lg:text-lg font-serif italic max-w-xl leading-relaxed"
+                           >
+                              Access curated inventories marked with our signature partner margins. These limited-edition masterpieces are currently available at competitive prices specifically for our authorized wholesalers.
+                           </motion.p>
+
+                           <motion.div
+                              initial={{ opacity: 0, y: 20 }}
+                              whileInView={{ opacity: 1, y: 0 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: 0.6 }}
+                           >
+                              <Link
+                                 href="/wholesalers/dashboard/collection/offers"
+                                 className="inline-flex items-center gap-4 bg-white text-brand-primary px-10 py-5 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs hover:bg-brand-secondary hover:text-white transition-all shadow-2xl group"
+                              >
+                                 Explore Offers
+                                 <Icon icon="lucide:arrow-up-right" className="w-4 h-4 group-hover:rotate-45 transition-transform" />
+                              </Link>
+                           </motion.div>
+                        </div>
+
+                        {/* <div className="lg:col-span-5 relative hidden lg:block">
+                           <div className="bg-white/10 backdrop-blur-3xl p-10 rounded-[60px] border border-white/10 shadow-2xl">
+                              <div className="flex flex-col items-center text-center space-y-4">
+                                 <div className="w-24 h-24 rounded-full bg-brand-secondary flex items-center justify-center shadow-2xl">
+                                    <Icon icon="solar:ticket-sale-bold-duotone" className="w-12 h-12 text-white" />
+                                 </div>
+                                 <h4 className="text-white text-xl font-serif">Bulk Margins</h4>
+                                 <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">Live Inventory Refined For Partners</p>
+                              </div>
+                           </div>
+                        </div> */}
+                     </div>
+                  </div>
+               </section>
+
+               {/* 2. Ready Stock Section */}
+               <section className="py-12 lg:py-24 bg-white border-b border-brand-primary/5 relative">
+                  <div className="container mx-auto px-4 max-w-7xl">
+                     <div className="flex flex-col items-center text-center space-y-10">
+                        <motion.div
+                           initial={{ opacity: 0, scale: 0.9 }}
+                           whileInView={{ opacity: 1, scale: 1 }}
+                           viewport={{ once: true }}
+                           className="inline-flex items-center gap-3 bg-brand-secondary/10 px-6 py-2 rounded-full border border-brand-secondary/20"
+                        >
+                           <div className="w-2 h-2 rounded-full bg-brand-secondary animate-pulse" />
+                           <span className="text-brand-secondary text-[10px] font-bold uppercase tracking-widest">Real-Time Inventory</span>
+                        </motion.div>
+
+                        <div className="space-y-4">
+                           <motion.h2
+                              initial={{ opacity: 0, y: 20 }}
+                              whileInView={{ opacity: 1, y: 0 }}
+                              viewport={{ once: true }}
+                              className="text-4xl lg:text-8xl font-serif font-black text-brand-primary tracking-tighter"
+                           >
+                              Ready-Stock <span className="italic font-normal text-brand-secondary">Registry</span>
+                           </motion.h2>
+                           <motion.p
+                              initial={{ opacity: 0 }}
+                              whileInView={{ opacity: 1 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: 0.2 }}
+                              className="text-brand-primary/40 text-[10px] lg:text-xs font-bold uppercase tracking-[0.4em] max-w-2xl mx-auto"
+                           >
+                              Skip the weaving timeline. Access the immediate dispatch vault featuring our most revered designs ready to ship within 24 hours of confirmation.
+                           </motion.p>
+                        </div>
+
+                        <motion.div
+                           initial={{ opacity: 0, y: 30 }}
+                           whileInView={{ opacity: 1, y: 0 }}
+                           viewport={{ once: true }}
+                           transition={{ delay: 0.4 }}
+                        >
+                           <Link
+                              href="/wholesalers/dashboard/collection/ready-stock"
+                              className="px-16 py-6 bg-brand-primary text-white rounded-[30px] font-bold uppercase tracking-[0.3em] text-xs hover:bg-brand-secondary transition-all shadow-[0_25px_50px_-12px_rgba(26,67,50,0.4)] flex items-center gap-4 group"
+                           >
+                              Open Vault
+                              <Icon icon="solar:box-minimalistic-bold-duotone" className="w-5 h-5 group-hover:scale-125 transition-transform" />
+                           </Link>
+                        </motion.div>
+                     </div>
+                  </div>
+
+                  {/* Decorative Elements */}
+                  <div className="absolute bottom-0 left-0 w-full h-[1px] bg-linear-to-r from-transparent via-brand-secondary/20 to-transparent" />
+               </section>
+            </>
+         )}
 
          {/* Featured Cinematic Reel Section */}
          <section className="py-12 lg:py-10 container mx-auto px-4 max-w-7xl">
@@ -395,7 +536,7 @@ export default function HomeClient({ products, categories, reviews }) {
                         setActiveVideo(null);
                      }}
                      className="absolute top-6 right-6 lg:top-8 lg:right-8 w-12 h-12 rounded-full bg-white/10 hover:bg-brand-secondary transition-colors flex items-center justify-center text-white z-20 border border-white/10 shadow-2xl"
-                   >
+                  >
                      <Icon icon="lucide:x" className="w-6 h-6" />
                   </button>
 

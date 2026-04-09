@@ -17,10 +17,19 @@ export default function ProductClient({ product, navCategory, subCategory, inner
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [activeAccordion, setActiveAccordion] = useState(null);
   const [activeVideo, setActiveVideo] = useState(null);
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const [isZooming, setIsZooming] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [product.id]);
+
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPos({ x, y });
+  };
 
   // Enhanced product images stack
   const productImages = (product.images && product.images.length > 0)
@@ -209,15 +218,25 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-start">
               <div className="space-y-6 lg:sticky lg:top-24">
-                <div className="relative aspect-square overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5">
-                  <Image
-                    src={productImages[activeImageIdx]}
-                    alt={product.name}
-                    fill
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover transition-transform duration-1000 hover:scale-110"
-                  />
+                <div 
+                  onMouseMove={handleMouseMove}
+                  onMouseEnter={() => setIsZooming(true)}
+                  onMouseLeave={() => setIsZooming(false)}
+                  className="relative aspect-square overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5 cursor-zoom-in"
+                >
+                  <div className="relative w-full h-full transition-transform duration-300 ease-out" style={{
+                    transform: isZooming ? 'scale(1.8)' : 'scale(1)',
+                    transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`
+                  }}>
+                    <Image
+                      src={productImages[activeImageIdx]}
+                      alt={product.name}
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      className="object-cover"
+                    />
+                  </div>
                   {/* Brand Best Seller Ribbon Sash */}
                   {product.isBestSeller && (
                     <div className="absolute top-0 right-0 w-40 h-40 overflow-hidden z-20 pointer-events-none">

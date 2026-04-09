@@ -13,12 +13,21 @@ export default function ProductCard({ product }) {
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className="premium-card group relative flex flex-col h-full bg-white rounded-2xl lg:rounded-3xl shadow-sm hover:shadow-[0_40px_80px_-15px_rgba(26,67,50,0.2)] transition-all duration-500 overflow-hidden border border-brand-primary/5"
     >
-      <Link href={`/product/${product.id}`} className="relative aspect-square lg:aspect-square overflow-hidden bg-brand-accent block m-2 lg:m-3 rounded-xl lg:rounded-2xl shadow-inner group/image">
+      {/* Classic Diagonal Best Seller Sash - Now Card Relative for Premium Look */}
+      {product.isBestSeller && (
+        <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden z-30 pointer-events-none rounded-tr-2xl lg:rounded-tr-3xl">
+          <div className="bg-red-600 text-white text-[7px] font-black uppercase tracking-[0.2em] py-1 w-[140%] text-center absolute top-6 -right-8 rotate-45 shadow-[0_5px_15px_rgba(220,38,38,0.4)] border-y border-white/10">
+            Best Seller
+          </div>
+        </div>
+      )}
+
+      <Link href={`/product/${product.id}`} className="relative aspect-square lg:aspect-square overflow-hidden bg-brand-accent block m-2 lg:m-3 rounded-xl lg:rounded-2xl shadow-inner group/image border border-black/[0.03]">
         {/* Boutique Cinematic Reflective Shine Effect - TL to BR */}
         <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden">
           <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_0%,rgba(255,255,255,0.02)_40%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.02)_60%,transparent_100%)] -translate-x-[150%] -translate-y-[150%] group-hover:translate-x-[150%] group-hover:translate-y-[150%] transition-transform duration-3000 ease-in-out backdrop-blur-[1px]" />
         </div>
-        
+
         <div className="relative w-full h-full">
           <Image
             src={product.images?.[0] || product.image}
@@ -27,7 +36,7 @@ export default function ProductCard({ product }) {
             sizes="(max-width: 768px) 50vw, 25vw"
             className={`object-cover transition-all duration-1000 ease-in-out group-hover:scale-110 ${product.images?.length > 1 ? 'group-hover:opacity-0' : ''}`}
           />
-          
+
           {product.images?.length > 1 && (
             <Image
               src={product.images[1]}
@@ -39,17 +48,8 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        {/* Classic Diagonal Best Seller Sash - High-Impact Red */}
-        {product.isBestSeller && (
-          <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden z-20 pointer-events-none">
-            <div className="bg-red-600 text-white text-[8px] font-black uppercase tracking-[0.2em] py-1.5 w-[140%] text-center absolute top-4 -right-10 rotate-45 shadow-[0_5px_15px_rgba(220,38,38,0.4)] border-y border-white/10">
-              Best Seller
-            </div>
-          </div>
-        )}
-
-        {/* Price Tag */}
-        <div className="absolute bottom-2 left-2 lg:bottom-0 lg:left-0 px-2 py-1 lg:px-4 lg:py-2 bg-brand-primary/90 text-white font-bold rounded-tr-2xl text-[10px] lg:text-sm backdrop-blur-sm shadow-xl z-10">
+        {/* Price Tag - Added rounded-bl to fix sharp corners on desktop */}
+        <div className="absolute bottom-1 left-1 lg:bottom-0 lg:left-0 px-2 py-1 lg:px-4 lg:py-2 bg-brand-primary/90 text-white font-bold rounded-tr-2xl rounded-bl-xl lg:rounded-bl-2xl text-[10px] lg:text-sm backdrop-blur-sm shadow-xl z-20 transition-all">
           {product.isOfferProduct && product.offerPrice ? `₹${product.offerPrice}` : `₹${product.price}`}
         </div>
       </Link>

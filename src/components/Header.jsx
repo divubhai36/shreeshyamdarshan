@@ -85,7 +85,21 @@ export default function Header() {
 
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1 lg:space-x-3 text-[9px] uppercase tracking-widest font-bold text-brand-primary/70 scale-95 origin-center">
+          <nav className="hidden lg:flex items-center space-x-1 lg:space-x-0 text-[9px] uppercase tracking-widest font-bold text-brand-primary/70 scale-95 origin-center">
+            {isLogged && (
+              <>
+                <Link href="/wholesalers/dashboard/collection/offers" className="px-3 py-2 text-brand-secondary flex items-center gap-2 group relative">
+                  {/* <Icon icon="solar:ticket-sale-bold-duotone" className="w-4 h-4" /> */}
+                  Discount Offers
+                  <span className="absolute -bottom-1 left-3 right-3 h-0.5 bg-brand-secondary scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300 rounded-full"></span>
+                </Link>
+                <Link href="/wholesalers/dashboard/collection/ready-stock" className="px-3 py-2 text-brand-secondary flex items-center gap-2 group relative">
+                  {/* <Icon icon="solar:box-minimalistic-bold-duotone" className="w-4 h-4" /> */}
+                  Ready Stock
+                  <span className="absolute -bottom-1 left-3 right-3 h-0.5 bg-brand-secondary scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300 rounded-full"></span>
+                </Link>
+              </>
+            )}
             {navigationData.map((cat) => (
               <div
                 key={cat.id}
@@ -288,86 +302,123 @@ export default function Header() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsMobileMenuOpen(false)} className="fixed inset-0 bg-brand-primary/60 backdrop-blur-sm z-[100]" />
-            <motion.div initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="fixed top-0 left-0 h-full w-[85%] max-w-sm bg-white z-[110] shadow-2xl flex flex-col" >
-              <div className="p-5 border-b flex items-center justify-between">
-                <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-serif font-bold text-brand-primary tracking-widest uppercase">SHREE SHYAM <span className="text-brand-secondary">DARSHAN</span>
-                </Link>
+             {/* Glassmorphic Backdrop */}
+             <motion.div 
+               initial={{ opacity: 0 }} 
+               animate={{ opacity: 1 }} 
+               exit={{ opacity: 0 }} 
+               onClick={() => setIsMobileMenuOpen(false)} 
+               className="fixed inset-0 bg-brand-primary/40 backdrop-blur-md z-[100]" 
+             />
+             
+             {/* Minimalist Side Drawer */}
+             <motion.div 
+               initial={{ x: '-100%' }} 
+               animate={{ x: 0 }} 
+               exit={{ x: '-100%' }} 
+               transition={{ type: 'spring', damping: 30, stiffness: 300 }} 
+               className="fixed top-0 left-0 h-full w-[80%] max-w-[320px] bg-white z-[110] shadow-2xl flex flex-col" 
+             >
+               {/* Unified Header */}
+               <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                 <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-bold tracking-[0.2em] text-brand-primary uppercase">
+                   SHREE SHYAM
+                 </Link>
+                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-brand-primary/40 hover:text-brand-primary">
+                   <Icon icon="lucide:x" className="w-5 h-5" />
+                 </button>
+               </div>
 
-                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-brand-accent rounded-full text-brand-primary">
-                  <Icon icon="lucide:x" className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="flex-grow overflow-y-auto py-4">
-                {navigationData.map((cat) => (
-                  <div key={cat.id} className="border-b border-gray-50">
-                    <button onClick={() => setExpandedMobileCat(expandedMobileCat === cat.id ? null : cat.id)} className="w-full px-8 py-5 flex items-center justify-between text-[11px] font-bold tracking-[0.2em] text-brand-primary uppercase">
-                      {cat.name}
-                      <Icon icon="lucide:chevron-right" className={`w-4 h-4 transition-transform ${expandedMobileCat === cat.id ? 'rotate-90 text-brand-secondary' : 'text-brand-primary/20'}`} />
-                    </button>
-                    <AnimatePresence>
-                      {expandedMobileCat === cat.id && (
-                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden bg-brand-accent/30" >
-                          {cat.subCategories.map((sub) => (
-                            <Link key={sub.name} href={`/category/${cat.id}/${sub.id}`} className="block px-12 py-4 text-[11px] font-medium text-brand-primary/70 active:text-brand-secondary active:bg-brand-accent uppercase tracking-widest" >
-                              {sub.name}
-                            </Link>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ))}
+               <div className="flex-grow overflow-y-auto no-scrollbar py-4">
+                 {/* 1. Integrated Wholesaler Links (Small & Clean) */}
+                 {isLogged && (
+                   <div className="px-6 py-4 mb-4 bg-brand-accent/30 border-y border-brand-primary/5">
+                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-secondary mb-3">Partner Desk</p>
+                     <div className="space-y-3">
+                       {[
+                         { href: "/wholesalers/dashboard/collection/offers", label: "Discount Offers", icon: "solar:ticket-sale-linear" },
+                         { href: "/wholesalers/dashboard/collection/ready-stock", label: "Ready Stock", icon: "solar:box-minimalistic-linear" },
+                         { href: "/wholesalers/dashboard/cart", label: "My Cart", icon: "solar:cart-large-2-linear", badge: cartCount }
+                       ].map((item) => (
+                         <Link key={item.label} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between group">
+                           <div className="flex items-center gap-3">
+                             <Icon icon={item.icon} className="w-4 h-4 text-brand-primary/60 group-active:text-brand-secondary" />
+                             <span className="text-[10px] font-medium tracking-widest text-brand-primary/80 uppercase">{item.label}</span>
+                           </div>
+                           {item.badge > 0 && (
+                             <span className="px-1.5 py-0.5 bg-brand-secondary text-white text-[8px] font-bold rounded-full">{item.badge}</span>
+                           )}
+                         </Link>
+                       ))}
+                     </div>
+                   </div>
+                 )}
 
-                {isLogged && (
-                  <div className="border-t border-brand-primary/5 mt-4 bg-brand-primary/2">
-                    <div className="px-8 py-6">
-                      <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-secondary mb-4 italic font-serif">Partner Central</p>
+                 {/* 2. Main Navigation List */}
+                 <div className="px-2">
+                   {navigationData.map((cat) => (
+                     <div key={cat.id} className="mb-1">
+                       <button 
+                         onClick={() => setExpandedMobileCat(expandedMobileCat === cat.id ? null : cat.id)} 
+                         className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 rounded-xl transition-colors"
+                       >
+                         <span className={`text-[11px] font-bold tracking-[0.1em] uppercase ${expandedMobileCat === cat.id ? 'text-brand-secondary' : 'text-brand-primary/70'}`}>{cat.name}</span>
+                         <Icon icon="lucide:chevron-down" className={`w-3 h-3 transition-transform ${expandedMobileCat === cat.id ? 'rotate-180 text-brand-secondary' : 'text-brand-primary/20'}`} />
+                       </button>
+                       
+                       <AnimatePresence>
+                         {expandedMobileCat === cat.id && (
+                           <motion.div 
+                             initial={{ height: 0, opacity: 0 }} 
+                             animate={{ height: 'auto', opacity: 1 }} 
+                             exit={{ height: 0, opacity: 0 }} 
+                             className="overflow-hidden"
+                           >
+                             <div className="py-2 pl-4 space-y-1">
+                               {cat.subCategories.map((sub) => (
+                                 <Link 
+                                   key={sub.name} 
+                                   href={`/category/${cat.id}/${sub.id}`} 
+                                   onClick={() => setIsMobileMenuOpen(false)}
+                                   className="block px-4 py-2 text-[10px] font-medium text-brand-primary/50 uppercase tracking-widest hover:text-brand-secondary"
+                                 >
+                                   {sub.name}
+                                 </Link>
+                               ))}
+                             </div>
+                           </motion.div>
+                         )}
+                       </AnimatePresence>
+                     </div>
+                   ))}
+                 </div>
 
-                      <div className="space-y-4">
-                        <Link href="/wholesalers/dashboard/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between group">
-                          <div className="flex items-center gap-4">
-                            <Icon icon="solar:cart-large-2-bold-duotone" className="w-5 h-5 text-brand-primary" />
-                            <span className="text-[10px] font-bold tracking-widest text-brand-primary uppercase">Procurement Registry</span>
-                          </div>
-                          {cartCount > 0 && (
-                            <span className="w-5 h-5 bg-brand-secondary text-white text-[9px] font-bold rounded-full flex items-center justify-center font-serif">
-                              {cartCount}
-                            </span>
-                          )}
-                        </Link>
+                 {/* 3. Footer Links */}
+                 <div className="mt-6 px-6 pt-6 border-t border-gray-50 space-y-4">
+                   <Link href="/contact-us" onClick={() => setIsMobileMenuOpen(false)} className="block text-[10px] font-bold tracking-[0.2em] text-brand-primary/40 uppercase">
+                     Contact Us
+                   </Link>
+                   
+                   <button
+                     onClick={async () => {
+                       const res = await fetch(isAdmin ? '/api/admin/logout' : '/api/user/logout', { method: 'POST' });
+                       document.cookie = "ssd_wholesale_logged=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                       localStorage.removeItem('ssd_user');
+                       if (res.ok) window.location.href = '/';
+                     }}
+                     className="block text-[10px] font-bold tracking-[0.2em] text-red-400 uppercase"
+                   >
+                     Sign Out
+                   </button>
+                 </div>
+               </div>
 
-                        <button
-                          onClick={async () => {
-                            const res = await fetch(isAdmin ? '/api/admin/logout' : '/api/user/logout', { method: 'POST' });
-                            document.cookie = "ssd_wholesale_logged=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-                            localStorage.removeItem('ssd_user');
-                            if (res.ok) window.location.href = '/';
-                          }}
-                          className="w-full flex items-center gap-4 py-3 text-red-500/60"
-                        >
-                          <Icon icon="solar:logout-3-linear" className="w-5 h-5" />
-                          <span className="text-[10px] font-bold tracking-widest uppercase">Sign Out</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="pt-4 mt-4 border-t border-gray-50 mb-10">
-                  <Link href="/contact-us" onClick={() => setIsMobileMenuOpen(false)} className="block px-8 py-4 text-[11px] font-bold tracking-[0.2em] text-brand-primary uppercase hover:text-brand-secondary transition-colors">
-                    Contact Us
-                  </Link>
-                </div>
-              </div>
-
-              <div className="p-8 bg-brand-primary text-white text-center text-left">
-                <p className="text-[9px] uppercase tracking-[0.3em] font-medium text-brand-secondary mb-2 text-left">Visit Our Outlet</p>
-                <p className="text-sm font-serif italic text-white/60 text-left">"Divine Elegance for Every Occasion"</p>
-              </div>
-            </motion.div>
-          </>
-        )}
+               <div className="p-6 bg-brand-accent/20 border-t border-brand-primary/5">
+                 <p className="text-[10px] font-serif italic text-brand-primary/40">"Divine Elegance for Every Occasion"</p>
+               </div>
+             </motion.div>
+           </>
+         )}
       </AnimatePresence>
 
       {/* Refined Minimalist Search Overlay */}
