@@ -20,6 +20,12 @@ function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (phone.length !== 10 || !/^\d+$/.test(phone)) {
+      toast.error("Please enter a valid 10-digit mobile number");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -33,7 +39,7 @@ function LoginForm() {
       if (resp.ok) {
         // Store user for persistent UI check
         localStorage.setItem('ssd_user', JSON.stringify(res.user));
-        
+
         router.push(searchParams.get("callbackUrl") || "/wholesalers/dashboard");
         router.refresh();
       } else {
@@ -91,7 +97,7 @@ function LoginForm() {
 
           <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6 relative z-10">
             <div className="space-y-2">
-                <label className="text-[9px] lg:text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest pl-2 block">WhatsApp ID</label>
+                <label className="text-[9px] lg:text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest pl-2 block">WhatsApp IqD</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/20 group-focus-within:text-brand-secondary transition-colors">
                     <Icon icon="solar:phone-bold-duotone" className="w-5 lg:w-6 h-5 lg:h-6" />
@@ -124,6 +130,20 @@ function LoginForm() {
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-primary/30 hover:text-brand-secondary transition-colors p-2 rounded-lg">
                     <Icon icon={showPassword ? "solar:eye-bold-duotone" : "solar:eye-closed-bold-duotone"} className="w-5 lg:w-6 h-5 lg:h-6" />
                   </button>
+                </div>
+                <div className="flex justify-end pr-2">
+                   <button 
+                    type="button" 
+                    onClick={() => {
+                        if (!phone) return toast.error("Please enter your WhatsApp Number first");
+                        const whatsappNum = "917383699199";
+                        const text = `Hi, *Shree Shyam Darshan Team*\n\nI forgot my access code for the Wholesale Portal.\nMy WhatsApp Number: ${phone}\n\nPlease help me reset it.`;
+                        window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(text)}`, "_blank");
+                    }} 
+                    className="text-[9px] font-bold text-brand-secondary hover:text-brand-primary uppercase tracking-widest transition-colors outline-none"
+                   >
+                     Forgot Access Code?
+                   </button>
                 </div>
             </div>
 

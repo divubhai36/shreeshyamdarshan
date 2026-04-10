@@ -30,7 +30,12 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          items: cart.map(item => ({ id: item.id, quantity: item.quantity, price: item.price })),
+          items: cart.map(item => ({ 
+            id: item.id, 
+            quantity: item.quantity, 
+            price: item.price,
+            variantName: item.variantName
+          })),
           totalAmount: cartTotal
         })
       });
@@ -39,6 +44,14 @@ export default function CheckoutPage() {
       if (resp.ok) {
         setOrderInfo(res.order);
         setOrderSuccess(true);
+        
+        // Send WhatsApp Message
+        const phone = "917383699199";
+        const itemsList = cart.map(item => `- ${item.name}${item.variantName ? ' ('+item.variantName+')' : ''}: ${item.quantity} x ₹${item.price}`).join('\n');
+        const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Order Placed!\n*Order ID:* #${res.order.orderNumber}\n*Total:* ₹${cartTotal}\n\n*Items:*\n${itemsList}\n\n*Partner:* ${res.order.wholesaler.name}\n------------------\nPlease process this order.`;
+        const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+        window.open(whatsappUrl, "_blank");
+        
         clearCart();
       } else {
         toast.error(`Registry failed: ${res.error}`);
@@ -99,6 +112,7 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex-grow">
                         <p className="font-bold text-brand-primary text-sm line-clamp-1">{item.name}</p>
+                        {item.variantName && <p className="text-[9px] font-bold text-brand-secondary uppercase tracking-widest">{item.variantName}</p>}
                         <p className="text-[10px] text-brand-primary/40 uppercase font-bold tracking-widest mt-1">{item.quantity} units</p>
                         <p className="text-xs font-serif font-bold text-brand-secondary mt-1">₹{(item.price * item.quantity).toLocaleString()}</p>
                       </div>

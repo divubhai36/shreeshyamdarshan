@@ -42,11 +42,12 @@ export default async function ProductPage({ params }) {
       });
 
       if (dbProduct) {
-         // Gather up to 10 related products from the same subcategory
-         const relatedDb = await prisma.product.findMany({
+         // Gather up to 10 random related products from the same subcategory
+         const relatedDbPool = await prisma.product.findMany({
              where: { subCategoryId: dbProduct.subCategoryId, id: { not: dbProduct.id } },
-             take: 10
+             take: 20
          });
+         const relatedDb = relatedDbPool.sort(() => 0.5 - Math.random()).slice(0, 10);
 
          const mappedProduct = {
              id: dbProduct.id,
@@ -65,7 +66,12 @@ export default async function ProductPage({ params }) {
              offerPrice: dbProduct.offerPrice,
              showSizeGuide: dbProduct.showSizeGuide,
              showWashCare: dbProduct.showWashCare,
-             details: dbProduct.details
+             details: dbProduct.details,
+             wholesalerDescription: dbProduct.wholesalerDescription,
+             variants: dbProduct.variants,
+             mrp: dbProduct.mrp,
+             discountPercent: dbProduct.discountPercent,
+             allowToBuy: dbProduct.allowToBuy
          };
 
          const mappedRelated = relatedDb.map(p => ({

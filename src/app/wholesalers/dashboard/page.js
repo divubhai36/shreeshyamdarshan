@@ -9,16 +9,16 @@ export default function WholesalerDashboard() {
   const [user, setUser] = useState(null);
   const router = useRouter();
 
-  useEffect(() => { 
+  useEffect(() => {
     const cookies = document.cookie.split(';');
     const isLogged = cookies.some(c => c.trim().startsWith('ssd_wholesale_logged=true'));
     const storedUser = localStorage.getItem('ssd_user');
-    
+
     if (!isLogged && !storedUser) {
         router.push('/login?callbackUrl=/wholesalers/dashboard');
         return;
     }
-    
+
     if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
 
@@ -33,7 +33,7 @@ export default function WholesalerDashboard() {
   return (
     <div className="min-h-screen bg-[#fcfbf7]">
       <main className="container mx-auto px-4 lg:px-8 pt-24 lg:pt-36 pb-12 max-w-2xl">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-8"
@@ -54,29 +54,35 @@ export default function WholesalerDashboard() {
 
           {/* Menu Options (WhatsApp/Settings Style) */}
           <div className="bg-white rounded-[40px] border border-brand-primary/5 shadow-2xl shadow-brand-primary/5 overflow-hidden">
-            <MenuOption 
-              icon="solar:bill-list-bold-duotone" 
-              label="Orders" 
-              sub="Fulfillment history & status" 
-              onClick={() => router.push('/wholesalers/dashboard/orders')}
-            />
-            <MenuOption 
-              icon="solar:cart-large-bold-duotone" 
-              label="Cart" 
-              sub="Your procurement registry" 
+            <MenuOption
+              icon="solar:cart-large-bold-duotone"
+              label="Cart"
+              sub="Your procurement registry"
               onClick={() => router.push('/wholesalers/dashboard/cart')}
             />
-            <MenuOption 
-              icon="solar:heart-bold-duotone" 
-              label="Saved Product" 
-              sub="Curated favorites" 
+            <MenuOption
+              icon="solar:heart-bold-duotone"
+              label="Saved Product"
+              sub="Curated favorites"
               onClick={() => router.push('/wholesalers/dashboard/saved')}
             />
-            <MenuOption 
-              icon="solar:tag-bold-duotone" 
-              label="Offers For You" 
-              sub="Exclusive B2B promotions" 
+            <MenuOption
+              icon="solar:bill-list-bold-duotone"
+              label="Orders"
+              sub="Fulfillment history & status"
+              onClick={() => router.push('/wholesalers/dashboard/orders')}
+            />
+            <MenuOption
+              icon="solar:tag-bold-duotone"
+              label="Offers For You"
+              sub="Exclusive B2B promotions"
               onClick={() => router.push('/wholesalers/dashboard/offers')}
+            />
+            <MenuOption
+              icon="si:inventory-duotone"
+              label="Ready Stock"
+              sub="Exclusive B2B promotions"
+              onClick={() => router.push('/wholesalers/dashboard/collection/ready-stock')}
             />
           </div>
 
@@ -95,7 +101,7 @@ export default function WholesalerDashboard() {
 
 function MenuOption({ icon, label, sub, onClick }) {
   return (
-    <button 
+    <button
       onClick={onClick}
       className="w-full flex items-center gap-5 p-6 hover:bg-brand-primary/2 active:bg-brand-primary/5 transition-all group text-left border-b border-brand-primary/5 last:border-0"
     >

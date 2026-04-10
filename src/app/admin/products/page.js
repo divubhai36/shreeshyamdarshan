@@ -17,8 +17,10 @@ export default function ProductsPage() {
     const [editingId, setEditingId] = useState(null);
     const [step, setStep] = useState(1);
     const [offerType, setOfferType] = useState("price"); // price | percentage
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
 
-    const initForm = { productId: "", name: "", slug: "", description: "", mrp: 0, price: 0, offerPrice: 0, discountPercent: 0, categoryId: "", subCategoryId: "", innerSubId: null, images: [], videos: [], isBestSeller: false, isOfferProduct: false, showSizeGuide: false, showWashCare: false, details: [] };
+    const initForm = { productId: "", name: "", slug: "", description: "", wholesalerDescription: "", mrp: 0, price: 0, offerPrice: 0, discountPercent: 0, categoryId: "", subCategoryId: "", innerSubId: null, images: [], videos: [], isBestSeller: false, isOfferProduct: false, isReadyStock: false, showSizeGuide: false, showWashCare: false, allowToBuy: true, details: [], variants: [] };
     const [form, setForm] = useState(initForm);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [uploadingVideo, setUploadingVideo] = useState(false);
@@ -85,29 +87,57 @@ export default function ProductsPage() {
     const slugify = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
     const handleSubmit = async () => {
-        if (step < 3) {
-            setStep(s => Math.min(s + 1, 3));
+        // PER-STEP VALIDATION LOGIC
+        if (step === 1) {
+            if (!form.name || !form.productId) {
+                toast.error("Identity: Product Name and ID are mandatory");
+                return;
+            }
+            if (!form.categoryId || !form.subCategoryId) {
+                toast.error("Taxonomy: Please select a valid Category and Sub-category");
+                return;
+            }
+        }
+
+        if (step === 2) {
+            const mrp = parseFloat(form.mrp) || 0;
+            const price = parseFloat(form.price) || 0;
+            if (mrp <= 0 || price <= 0) {
+                toast.error("Economics: MRP and Sale Price must be positive values");
+                return;
+            }
+            if (price > mrp) {
+                toast.error("Economics: Sale Price cannot exceed MRP Basis");
+                return;
+            }
+            if (form.isOfferProduct) {
+                const discount = parseFloat(form.discountPercent) || 0;
+                if (discount < 0 || discount > 100) {
+                    toast.error("Economics: Discount must be between 0% and 100%");
+                    return;
+                }
+            }
+            if (form.variants.length > 0) {
+                const invalidVariant = form.variants.find(v => !v.name || parseFloat(v.price) <= 0);
+                if (invalidVariant) {
+                    toast.error("Architecture: Every variant requires a name and positive price");
+                    return;
+                }
+            }
+        }
+
+        if (step === 3) {
+            // Registry is usually optional, but we check if it proceeds
+        }
+
+        if (step < 4) {
+            setStep(s => s + 1);
             return;
         }
+
+        // FINAL SUBMISSION VALIDATION (Step 4)
         if (form.images.length === 0) {
-            toast.error("Please upload at least one image");
-            return;
-        }
-        if (!form.categoryId || !form.subCategoryId) {
-            toast.error("Category and Sub-category are required");
-            setStep(1);
-            return;
-        }
-
-        if (form.isOfferProduct && parseFloat(form.offerPrice) > parseFloat(form.mrp)) {
-            toast.error("Discount Price cannot exceed MRP");
-            setStep(2);
-            return;
-        }
-
-        if (parseFloat(form.price) > parseFloat(form.mrp)) {
-            toast.error("Sale Price cannot exceed MRP");
-            setStep(2);
+            toast.error("Assets: Please upload at least one visual masterpiece (image)");
             return;
         }
 
@@ -115,10 +145,12 @@ export default function ProductsPage() {
             ...form,
             mrp: parseFloat(form.mrp),
             price: parseFloat(form.price),
-            offerPrice: parseFloat(form.offerPrice),
+            offerPrice: form.isOfferProduct ? parseFloat(form.price * (1 - form.discountPercent / 100)) : parseFloat(form.price),
             discountPercent: parseInt(form.discountPercent),
             showSizeGuide: !!form.showSizeGuide,
-            showWashCare: !!form.showWashCare
+            showWashCare: !!form.showWashCare,
+            isReadyStock: !!form.isReadyStock,
+            allowToBuy: !!form.allowToBuy
         };
         if (!payload.innerSubId) payload.innerSubId = null;
 
@@ -142,7 +174,18 @@ export default function ProductsPage() {
     const availableInners = form.subCategoryId ? inners.filter(i => i.subCategoryId === form.subCategoryId) : inners;
 
     return (
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-6xl mx-auto">
+            <style jsx global>{`
+                input[type='number']::-webkit-inner-spin-button,
+                input[type='number']::-webkit-outer-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
+                input[type='number'] {
+                    -moz-appearance: textfield;
+                }
+            `}</style>
+
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
                 <div>
                     <h1 className="text-3xl font-serif font-bold text-brand-primary">Master Catalog</h1>
@@ -156,11 +199,11 @@ export default function ProductsPage() {
                             placeholder="Search by name, SKU or category..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-white border border-brand-primary/5 rounded-xl p-3 pl-11 text-[11px] font-bold text-brand-primary focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider"
+                            className="w-full bg-white border border-brand-primary/5 rounded-xl p-4 pl-11 text-[11px] font-bold text-brand-primary focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider"
                         />
                     </div>
-                    <button onClick={() => { setEditingId(null); setForm(initForm); setIsOpen(true); setStep(1); setOfferType("price"); }} className="bg-brand-primary text-white px-6 py-3 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:shadow-2xl transition-all shadow-xl whitespace-nowrap flex items-center gap-2">
-                        <Icon icon="lucide:plus" className="w-4 h-4" /> Add
+                    <button onClick={() => { setEditingId(null); setForm(initForm); setIsOpen(true); setStep(1); setOfferType("price"); }} className="bg-brand-primary text-white px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:shadow-2xl transition-all shadow-xl whitespace-nowrap flex items-center gap-2">
+                        <Icon icon="lucide:plus" className="w-4 h-4" /> Add Product
                     </button>
                 </div>
             </div>
@@ -223,14 +266,17 @@ export default function ProductsPage() {
                                                 ...p,
                                                 innerSubId: p.innerSubId || "",
                                                 details: Array.isArray(p.details) ? p.details : [],
-                                                showSizeGuide: !!p.showSizeGuide,
-                                                showWashCare: !!p.showWashCare
+                                                showWashCare: !!p.showWashCare,
+                                                isReadyStock: !!p.isReadyStock,
+                                                wholesalerDescription: p.wholesalerDescription || "",
+                                                allowToBuy: p.allowToBuy !== undefined ? p.allowToBuy : true,
+                                                variants: Array.isArray(p.variants) ? p.variants : []
                                             });
                                             setOfferType(p.discountPercent > 0 ? "percentage" : "price");
                                             setStep(1);
                                             setIsOpen(true);
                                         }} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg mr-2"><Icon icon="lucide:edit-2" /></button>
-                                        <button onClick={async () => { if (confirm("Delete this masterpiece?")) { await deleteProduct(p.id); toast.success("Masterpiece Removed"); loadData(); } }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Icon icon="lucide:trash-2" /></button>
+                                        <button onClick={() => { setItemToDelete(p); setIsDeleteModalOpen(true); }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Icon icon="lucide:trash-2" /></button>
 
                                     </td>
                                 </tr>
@@ -242,18 +288,20 @@ export default function ProductsPage() {
 
             {isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm overflow-y-auto pt-24 pb-10">
-                    <div className="bg-white max-w-4xl w-full rounded-[40px] p-6 lg:p-10 shadow-2xl relative my-auto">
-                        <button onClick={() => setIsOpen(false)} className="absolute top-6 right-6 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200"><Icon icon="lucide:x" /></button>
-                        <div className="mb-5 block">
-                            <h2 className="text-3xl font-serif font-bold text-brand-primary">{editingId ? 'Modify' : 'Inject'} Masterpiece</h2>
-                            <div className="flex gap-2 mt-4">
-                                {[1, 2, 3].map(s => (
-                                    <div key={s} className={`h-1.5 grow rounded-full transition-all duration-500 ${step >= s ? 'bg-brand-secondary' : 'bg-gray-100'}`} />
+                    <div className="bg-white max-w-5xl w-full rounded-[48px] p-6 lg:p-12 shadow-2xl relative my-auto">
+                        <button onClick={() => setIsOpen(false)} className="absolute top-8 right-8 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all z-10"><Icon icon="lucide:x" className="w-5 h-5" /></button>
+
+                        <div className="mb-10 block">
+                            <h2 className="text-4xl font-serif font-bold text-brand-primary">{editingId ? 'Modify' : 'Inject'} Masterpiece</h2>
+                            <div className="flex gap-2 mt-6">
+                                {[1, 2, 3, 4].map(s => (
+                                    <div key={s} className={`h-1.5 grow rounded-full transition-all duration-700 ${step >= s ? 'bg-brand-secondary shadow-[0_0_10px_rgba(var(--brand-secondary-rgb),0.3)]' : 'bg-gray-100'}`} />
                                 ))}
                             </div>
-                            <div className="flex justify-between mt-2 text-[8px] uppercase tracking-[0.2em] font-bold text-brand-primary/40">
+                            <div className="flex justify-between mt-3 text-[9px] uppercase tracking-[0.3em] font-black text-brand-primary/30">
                                 <span>Identity</span>
                                 <span>Economics</span>
+                                <span>Registry</span>
                                 <span>Assets</span>
                             </div>
                         </div>
@@ -262,52 +310,59 @@ export default function ProductsPage() {
                             {step === 1 && (
                                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                                     <div className="space-y-6">
-                                        <div className="p-8 bg-brand-accent/20 rounded-[32px] border border-brand-primary/5">
-                                            <h4 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-brand-primary/40">Primary Identifiers</h4>
-                                            <div className="space-y-5">
-                                                <div>
-                                                    <label className="text-[10px] uppercase tracking-widest font-bold block mb-1.5 ml-1">Product ID / SKU</label>
-                                                    <input type="text" value={form.productId} onChange={e => setForm({ ...form, productId: e.target.value.toUpperCase() })} className="w-full p-4 border border-black/10 rounded-2xl bg-white font-mono text-[11px] focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none" placeholder="e.g. VG A-517" required />
+                                        <div className="p-10 bg-brand-accent/30 rounded-[40px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                            <div className="flex items-center gap-3 mb-8">
+                                                <div className="w-10 h-10 bg-brand-primary/10 rounded-2xl flex items-center justify-center text-brand-primary">
+                                                    <Icon icon="solar:id-card-bold-duotone" className="w-5 h-5" />
                                                 </div>
-                                                <div>
-                                                    <label className="text-[10px] uppercase tracking-widest font-bold block mb-1.5 ml-1">Product Name</label>
-                                                    <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: slugify(e.target.value) })} className="w-full p-4 border border-black/10 rounded-2xl bg-white focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none" placeholder="Enter Product Name" required />
+                                                <h4 className="text-[11px] uppercase tracking-[0.2em] font-black text-brand-primary/60">Primary Identifiers</h4>
+                                            </div>
+                                            <div className="space-y-6">
+                                                <div className="group">
+                                                    <label className="text-[10px] uppercase tracking-[0.2em] font-black block mb-2 ml-1 text-brand-primary/40 group-focus-within:text-brand-primary transition-colors">Product ID / SKU</label>
+                                                    <input type="text" value={form.productId} onChange={e => setForm({ ...form, productId: e.target.value.toUpperCase() })} className="w-full p-5 border border-brand-primary/5 rounded-[24px] bg-white font-serif font-bold text-lg text-brand-primary focus:border-brand-secondary/40 transition-all outline-none shadow-inner" placeholder="E.G. VG A-517" required />
+                                                </div>
+                                                <div className="group">
+                                                    <label className="text-[10px] uppercase tracking-[0.2em] font-black block mb-2 ml-1 text-brand-primary/40 group-focus-within:text-brand-primary transition-colors">Product Display Name</label>
+                                                    <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: slugify(e.target.value) })} className="w-full p-5 border border-brand-primary/5 rounded-[24px] bg-white font-serif font-bold text-lg text-brand-primary focus:border-brand-secondary/40 transition-all outline-none shadow-inner" placeholder="Enter Product Name" required />
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="space-y-6">
-                                        <div className="p-8 bg-brand-primary rounded-[32px] text-white shadow-xl">
-                                            <h4 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-white/40">Taxonomy Placement</h4>
-                                            <div className="space-y-3">
+                                        <div className="p-10 bg-brand-accent/30 rounded-[40px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                            <div className="flex items-center gap-3 mb-8">
+                                                <div className="w-10 h-10 bg-brand-primary/10 rounded-2xl flex items-center justify-center text-brand-primary">
+                                                    <Icon icon="solar:layers-bold-duotone" className="w-5 h-5" />
+                                                </div>
+                                                <h4 className="text-[11px] uppercase tracking-[0.2em] font-black text-brand-primary/60">Taxonomy Registry</h4>
+                                            </div>
+                                            <div className="space-y-4">
                                                 <CustomSelect
-                                                    placeholder="1. Select Category"
+                                                    placeholder="1. Select Primary Category"
                                                     options={cats.map(c => ({ value: c.id, label: c.name }))}
                                                     value={form.categoryId}
                                                     onChange={val => setForm({ ...form, categoryId: val, subCategoryId: '', innerSubId: null })}
                                                     isSearchable={true}
                                                     className="mb-2"
-                                                    theme="dark"
                                                 />
                                                 <CustomSelect
-                                                    placeholder="2. Select Sub-category"
+                                                    placeholder="2. Select Luxury Sub-category"
                                                     options={availableSubs.map(c => ({ value: c.id, label: c.name }))}
                                                     value={form.subCategoryId}
                                                     onChange={val => setForm({ ...form, subCategoryId: val, innerSubId: null })}
                                                     isSearchable={true}
                                                     disabled={!form.categoryId}
                                                     className="mb-2"
-                                                    theme="dark"
                                                 />
                                                 <CustomSelect
-                                                    placeholder="3. Optional Inner Filter"
+                                                    placeholder="3. Select Divine Variant (Optional)"
                                                     options={availableInners.map(c => ({ value: c.id, label: c.name }))}
                                                     value={form.innerSubId || ""}
                                                     onChange={val => setForm({ ...form, innerSubId: val })}
                                                     isSearchable={true}
                                                     disabled={!form.subCategoryId || availableInners.length === 0}
-                                                    theme="dark"
                                                 />
                                             </div>
                                         </div>
@@ -316,186 +371,156 @@ export default function ProductsPage() {
                             )}
 
                             {step === 2 && (
-                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-                                    {/* Financial Card */}
-                                    <div className="md:col-span-5 space-y-6">
-                                        <div className="bg-white rounded-[32px] p-8 border border-brand-primary/5 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                            <div className="flex items-center gap-3 mb-8">
-                                                <div className="w-10 h-10 bg-brand-secondary/10 rounded-xl flex items-center justify-center">
-                                                    <Icon icon="solar:wallet-money-bold-duotone" className="w-5 h-5 text-brand-secondary" />
+                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                                    <div className="space-y-6">
+                                        <div className="bg-brand-accent/30 rounded-[40px] p-10 border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                            <div className="flex items-center gap-4 mb-10">
+                                                <div className="w-12 h-12 bg-brand-secondary/10 rounded-[20px] flex items-center justify-center shadow-inner">
+                                                    <Icon icon="solar:wallet-money-bold-duotone" className="w-6 h-6 text-brand-secondary" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-primary">Financials</h4>
-                                                    <p className="text-[8px] text-brand-primary/40 uppercase font-bold tracking-widest">Configure value metrics</p>
+                                                    <h4 className="text-[12px] uppercase tracking-[0.3em] font-black text-brand-primary">Financials</h4>
+                                                    <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest mt-0.5">Economic Parameters</p>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-6">
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="space-y-2">
-                                                        <label className="text-[9px] uppercase tracking-widest font-bold text-brand-primary/40 ml-1">MRP</label>
-                                                        <div className="relative">
-                                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/30 font-serif text-sm">₹</span>
-                                                            <input type="number" value={form.mrp} onChange={e => setForm({ ...form, mrp: e.target.value })} className="w-full p-4 pl-10 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 font-serif font-bold text-brand-primary transition-all focus:ring-4 focus:ring-brand-secondary/5 outline-none" placeholder="0" required />
+                                            <div className="space-y-8">
+                                                <div className="grid grid-cols-2 gap-6">
+                                                    <div className="space-y-3">
+                                                        <label className="text-[10px] uppercase tracking-widest font-black text-brand-primary/30 ml-2">MRP Basis</label>
+                                                        <div className="relative group">
+                                                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-brand-primary/20 font-serif text-xl">₹</span>
+                                                            <input type="number" min="0" onWheel={(e) => e.target.blur()} value={form.mrp} onChange={e => setForm({ ...form, mrp: e.target.value })} className="w-full p-5 pl-12 border border-brand-primary/5 rounded-[24px] bg-white font-serif font-black text-2xl text-brand-primary outline-none focus:border-brand-secondary/40 transition-all shadow-inner" placeholder="0" required />
                                                         </div>
                                                     </div>
-                                                    <div className="space-y-2">
-                                                        <label className="text-[9px] uppercase tracking-widest font-bold text-brand-secondary ml-1">Sell Price</label>
-                                                        <div className="relative">
-                                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-secondary/40 font-serif text-sm">₹</span>
-                                                            <input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value, offerPrice: form.isOfferProduct && offerType === 'percentage' ? (e.target.value * (1 - form.discountPercent / 100)).toFixed(2) : form.offerPrice })} className="w-full p-4 pl-10 border border-brand-secondary/20 rounded-2xl bg-brand-secondary/3 font-serif font-bold text-brand-secondary transition-all focus:ring-4 focus:ring-brand-secondary/10 outline-none" placeholder="0" required />
+                                                    <div className="space-y-3">
+                                                        <label className="text-[10px] uppercase tracking-widest font-black text-brand-secondary/60 ml-2">Sale Price</label>
+                                                        <div className="relative group">
+                                                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-brand-secondary/40 font-serif text-xl">₹</span>
+                                                            <input type="number" min="0" onWheel={(e) => e.target.blur()} value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full p-5 pl-12 border border-brand-secondary/10 rounded-[24px] bg-brand-secondary/5 font-serif font-black text-2xl text-brand-secondary outline-none focus:border-brand-secondary/40 transition-all shadow-inner" placeholder="0" required />
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div className={`p-6 rounded-[24px] border transition-all duration-500 ${form.isOfferProduct ? 'bg-brand-primary/5 border-brand-primary/10 shadow-inner' : 'bg-brand-primary/2 border-brand-primary/5'}`}>
-                                                    <label className="flex items-center justify-between cursor-pointer mb-6">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${form.isOfferProduct ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/20' : 'bg-brand-primary/10 text-brand-primary'}`}>
-                                                                <Icon icon="solar:tag-bold" className="w-5 h-5" />
+                                                <div className={`p-8 rounded-[32px] border transition-all duration-700 ${form.isOfferProduct ? 'bg-white border-brand-primary/20 shadow-xl' : 'bg-brand-primary/5 border-transparent'}`}>
+                                                    <label className="flex items-center justify-between cursor-pointer">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className={`w-12 h-12 rounded-[18px] flex items-center justify-center transition-all ${form.isOfferProduct ? 'bg-brand-primary text-white shadow-lg' : 'bg-brand-primary/10 text-brand-primary'}`}>
+                                                                <Icon icon="solar:tag-bold" className="w-6 h-6" />
                                                             </div>
-                                                            <span className={`text-[10px] font-bold uppercase tracking-widest ${form.isOfferProduct ? 'text-brand-primary' : 'text-brand-primary/40'}`}>Discount Offer</span>
+                                                            <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${form.isOfferProduct ? 'text-brand-primary' : 'text-brand-primary/30'}`}>Discount Offer</span>
                                                         </div>
                                                         <input type="checkbox" checked={form.isOfferProduct} onChange={e => setForm({ ...form, isOfferProduct: e.target.checked })} className="sr-only peer" />
-                                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[20px] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-200 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-primary relative shadow-inner"></div>
+                                                        <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-[28px] after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-primary relative"></div>
                                                     </label>
-
                                                     {form.isOfferProduct && (
-                                                        <div className="space-y-5 animate-in fade-in slide-in-from-top-4 duration-500">
-                                                            <div className="flex p-1 bg-white/50 backdrop-blur rounded-xl border border-black/5">
-                                                                <button type="button" onClick={() => setOfferType("price")} className={`grow py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all ${offerType === 'price' ? 'bg-brand-primary text-white shadow-lg' : 'text-brand-primary/40 hover:bg-black/5'}`}>Price</button>
-                                                                <button type="button" onClick={() => setOfferType("percentage")} className={`grow py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all ${offerType === 'percentage' ? 'bg-brand-primary text-white shadow-lg' : 'text-brand-primary/40 hover:bg-black/5'}`}>Percentage</button>
-                                                            </div>
-
-                                                            <div className="grid grid-cols-2 gap-4 items-end">
-                                                                {offerType === 'price' ? (
-                                                                    <div className="col-span-2 space-y-2">
-                                                                        <label className="text-[9px] uppercase tracking-widest font-bold text-brand-primary/60 ml-1">Discount Price</label>
-                                                                        <input type="number" value={form.offerPrice} onChange={e => setForm({ ...form, offerPrice: e.target.value })} className="w-full p-4 border border-brand-primary/10 rounded-2xl bg-white font-serif font-bold text-brand-primary outline-none focus:ring-4 focus:ring-brand-primary/5 transition-all text-xl" required />
+                                                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-8 pt-8 border-t border-brand-primary/5">
+                                                            <div className="flex items-center  gap-4">
+                                                                <div className="flex-1">
+                                                                    <label className="text-[10px] uppercase tracking-widest font-black text-brand-primary/40 block mb-2 px-1">Discount (%)</label>
+                                                                    <div className="relative">
+                                                                        <input 
+                                                                            type="number" 
+                                                                            min="0" 
+                                                                            max="100" 
+                                                                            onWheel={(e) => e.target.blur()} 
+                                                                            value={form.discountPercent} 
+                                                                            onChange={e => {
+                                                                                let val = e.target.value;
+                                                                                if (val > 100) val = 100;
+                                                                                if (val < 0) val = 0;
+                                                                                setForm({ ...form, discountPercent: val });
+                                                                            }} 
+                                                                            className="w-full p-5 border border-brand-primary/10 rounded-[24px] bg-brand-primary/5 font-serif font-black text-2xl text-brand-primary outline-none focus:border-brand-primary/40 transition-all" 
+                                                                            placeholder="0" 
+                                                                        />
+                                                                        <span className="absolute right-5 top-1/2 -translate-y-1/2 text-brand-primary/30 text-xl font-bold">%</span>
                                                                     </div>
-                                                                ) : (
-                                                                    <>
-                                                                        <div className="space-y-2">
-                                                                            <label className="text-[9px] uppercase tracking-widest font-bold text-brand-primary/60 ml-1">Discount %</label>
-                                                                            <input type="number" value={form.discountPercent} onChange={e => {
-                                                                                const pct = e.target.value;
-                                                                                const op = (form.price * (1 - pct / 100)).toFixed(2);
-                                                                                setForm({ ...form, discountPercent: pct, offerPrice: op });
-                                                                            }} className="w-full p-4 border border-brand-primary/10 rounded-2xl bg-white font-serif font-bold text-brand-primary outline-none focus:ring-4 focus:ring-brand-primary/5 transition-all text-xl" required />
-                                                                        </div>
-                                                                        <div className="space-y-2">
-                                                                            <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400 ml-1">Discount Price</label>
-                                                                            <div className="w-full p-4 border border-black/5 rounded-2xl bg-white/50 font-serif font-bold text-brand-primary opacity-50 flex items-center text-xl">₹{form.offerPrice}</div>
-                                                                        </div>
-                                                                    </>
-                                                                )}
+                                                                </div>
+                                                                {/* <span className="font-serif font-black text-xl text-brand-primary">₹{(form.price * (1 - form.discountPercent/100)).toFixed(0)}</span> */}
+                                                                <div className="  flex flex-col items-center justify-center mt-5">
+                                                                    <span className="text-[8px] font-black uppercase text-brand-primary/30 mb-1">Price</span>
+                                                                    <span className="font-serif font-black text-xl text-brand-primary">₹{(form.price * (1 - form.discountPercent/100)).toFixed(0)}</span>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        </motion.div>
                                                     )}
+                                                </div>
+
+                                                <div className={`p-8 rounded-[32px] border transition-all duration-700 ${form.allowToBuy ? 'bg-emerald-500/5 border-emerald-500/20 shadow-xl shadow-emerald-500/5' : 'bg-brand-primary/5 border-transparent'}`}>
+                                                    <label className="flex items-center justify-between cursor-pointer">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className={`w-12 h-12 rounded-[18px] flex items-center justify-center transition-all ${form.allowToBuy ? 'bg-emerald-500 text-white shadow-lg' : 'bg-brand-primary/10 text-brand-primary'}`}>
+                                                                <Icon icon="solar:cart-large-bold" className="w-6 h-6" />
+                                                            </div>
+                                                            <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${form.allowToBuy ? 'text-emerald-700' : 'text-brand-primary/30'}`}>Allow to Buy</span>
+                                                        </div>
+                                                        <input type="checkbox" checked={form.allowToBuy} onChange={e => setForm({ ...form, allowToBuy: e.target.checked })} className="sr-only peer" />
+                                                        <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-[28px] after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 relative"></div>
+                                                    </label>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Specs & Tags Card */}
-                                    <div className="md:col-span-7 space-y-6">
-                                        <div className="bg-white rounded-[32px] p-8 border border-brand-primary/5 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] min-h-[400px] flex flex-col">
-                                            <div className="flex items-center gap-3 mb-8">
-                                                <div className="w-10 h-10 bg-brand-primary/5 rounded-xl flex items-center justify-center text-brand-primary">
-                                                    <Icon icon="solar:medal-star-bold-duotone" className="w-5 h-5" />
+                                    {/* Column 2: Variants */}
+                                    <div className="space-y-6 h-full flex flex-col">
+                                        <div className="bg-white rounded-[32px] p-8 border border-brand-primary/10 shadow-[0_20px_50_rgba(0,0,0,0.03)] h-full flex flex-col">
+                                            <div className="flex items-center justify-between gap-4 mb-8">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 bg-brand-primary/5 rounded-2xl flex items-center justify-center text-brand-primary shadow-sm">
+                                                        <Icon icon="solar:layers-bold-duotone" className="w-6 h-6" />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-primary">Architecture</h4>
+                                                        <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest">Multi-Pricing Registry</p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <h4 className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-primary">Characteristics</h4>
-                                                    <p className="text-[8px] text-brand-primary/40 uppercase font-bold tracking-widest">Masterpiece DNA & Tags</p>
-                                                </div>
-                                            </div>
-
-                                            {/* Unified Selection Bar */}
-                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-3 mb-4 pb-4 border-b border-brand-primary/5">
-                                                {[
-                                                    { id: 'isBestSeller', label: 'Best Seller', icon: 'solar:star-bold' },
-                                                    { id: 'showSizeGuide', label: 'Size Guide', icon: 'solar:ruler-bold' },
-                                                    { id: 'showWashCare', label: 'Wash Care', icon: 'solar:droplet-bold' }
-                                                ].map((item) => (
-                                                    <label
-                                                        key={item.id}
-                                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full cursor-pointer border transition-all duration-300 ${form[item.id]
-                                                                ? 'bg-brand-primary border-brand-primary shadow-lg shadow-brand-primary/20 -translate-y-px'
-                                                                : 'bg-white border-brand-primary/10 hover:border-brand-primary/30'
-                                                            }`}
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        type="button"
+                                                        title="Quick Inject Sizes (00-6)"
+                                                        onClick={() => {
+                                                            const q = ["00","0","1","2","3","4","5","6"];
+                                                            setForm({...form, variants: [...form.variants, ...q.map(s=>({name:s, price: form.price}))]});
+                                                            toast.success("Injected common sizes");
+                                                        }}
+                                                        className="w-10 h-10 bg-brand-secondary/10 text-brand-secondary rounded-[12px] flex items-center justify-center border border-brand-secondary/20 hover:bg-brand-secondary hover:text-white transition-all active:scale-90"
                                                     >
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={form[item.id]}
-                                                            onChange={e => setForm({ ...form, [item.id]: e.target.checked })}
-                                                            className="sr-only"
-                                                        />
-                                                        <Icon
-                                                            icon={item.icon}
-                                                            className={`w-2.5 h-2.5 ${form[item.id] ? 'text-brand-secondary' : 'text-brand-primary/30'}`}
-                                                        />
-                                                        <span className={`text-[8px] font-bold uppercase tracking-widest transition-colors ${form[item.id] ? 'text-white' : 'text-brand-primary/40'
-                                                            }`}>
-                                                            {item.label}
-                                                        </span>
-                                                    </label>
-                                                ))}
+                                                        <Icon icon="mdi:size-s" className="w-8 h-8" />
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        title="Quick Inject Dimensions (1ft-3ft)"
+                                                        onClick={() => {
+                                                            const q = ["1ft", "1.5ft", "2ft", "2.5ft", "3ft"];
+                                                            setForm({...form, variants: [...form.variants, ...q.map(s=>({name:s, price: form.price}))]});
+                                                            toast.success("Injected common dimensions");
+                                                        }}
+                                                        className="w-10 h-10 bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                    >
+                                                        <Icon icon="solar:ruler-bold" className="w-5 h-5" />
+                                                    </button>
+
+                                                    <button type="button" onClick={() => setForm({ ...form, variants: [...form.variants, { name: "", price: "" }] })} className="w-10 h-10 bg-brand-primary text-white rounded-[12px] flex items-center justify-center transition-all active:scale-90 shadow-lg shadow-brand-primary/20"><Icon icon="lucide:plus" className="w-5 h-5" /></button>
+                                                </div>
                                             </div>
 
-                                            <div className="grow space-y-4">
-                                                <div className="flex items-center justify-between border-b border-brand-primary/5 pb-4 mb-4">
-                                                    <h5 className="text-[9px] font-bold uppercase tracking-[0.2em] text-brand-primary/30">Detailed Specifications</h5>
-                                                    <button type="button" onClick={() => setForm({ ...form, details: [...form.details, { label: "Fabric", value: "" }] })} className="bg-brand-secondary text-white px-4 py-2 rounded-xl text-[8px] font-bold uppercase tracking-widest hover:shadow-lg transition-all flex items-center gap-2">
-                                                        <Icon icon="lucide:plus" className="w-3 h-3" /> Add Detail
-                                                    </button>
-                                                </div>
-
-                                                <div className="space-y-3">
-                                                    {form.details.map((detail, idx) => (
-                                                        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} key={idx} className="flex gap-3 items-center group bg-brand-primary/1 p-2 rounded-2xl hover:bg-brand-primary/3 transition-all border border-transparent hover:border-brand-primary/5">
-                                                            <div className="w-[35%] shrink-0">
-                                                                <CustomSelect
-                                                                    isSearchable={true}
-                                                                    size="small"
-                                                                    options={[
-                                                                        { value: "Fabric", label: "Fabric" },
-                                                                        { value: "Embroidery", label: "Embroidery" },
-                                                                        { value: "Colour", label: "Colour" },
-                                                                        { value: "Included", label: "Included" },
-                                                                    ]}
-                                                                    value={detail.label}
-                                                                    onChange={(val) => {
-                                                                        const newDetails = [...form.details];
-                                                                        newDetails[idx].label = val;
-                                                                        setForm({ ...form, details: newDetails });
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            <div className="grow relative">
-                                                                <input
-                                                                    type="text"
-                                                                    value={detail.value}
-                                                                    onChange={(e) => {
-                                                                        const newDetails = [...form.details];
-                                                                        newDetails[idx].value = e.target.value;
-                                                                        setForm({ ...form, details: newDetails });
-                                                                    }}
-                                                                    placeholder="e.g. Pure Zardosi Silk"
-                                                                    className="w-full p-3 border border-brand-primary/5 rounded-xl bg-white text-[10px] font-bold text-brand-primary outline-none focus:ring-4 focus:ring-brand-secondary/5 transition-all shadow-sm"
-                                                                />
-                                                            </div>
-                                                            <button type="button" onClick={() => setForm({ ...form, details: form.details.filter((_, i) => i !== idx) })} className="w-10 h-10 shrink-0 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
-                                                                <Icon icon="solar:trash-bin-trash-bold-duotone" className="w-5 h-5" />
-                                                            </button>
-                                                        </motion.div>
-                                                    ))}
-                                                    {form.details.length === 0 && (
-                                                        <div className="flex flex-col items-center justify-center py-12 text-center opacity-20 filter grayscale">
-                                                            <Icon icon="solar:document-list-bold-duotone" className="w-16 h-16 mb-4" />
-                                                            <p className="text-[10px] font-bold uppercase tracking-widest italic">No attributes defined for this masterpiece</p>
-                                                        </div>
-                                                    )}
-                                                </div>
+                                            <div className="space-y-3 flex-grow overflow-y-auto no-scrollbar max-h-[400px]">
+                                                {form.variants.map((v, i) => (
+                                                    <div key={i} className="flex gap-3 items-center px-3 h-12 rounded-2xl bg-brand-accent/10 border border-brand-primary/5 group transition-all hover:bg-white hover:border-brand-primary/10">
+                                                        <input type="text" placeholder="Size" value={v.name} onChange={e => { const nv = [...form.variants]; nv[i].name = e.target.value; setForm({ ...form, variants: nv }); }} className="h-12 flex-1 bg-transparent border-none text-[14px] font-bold text-brand-primary outline-none" required />
+                                                        <input type="number" min="0" onWheel={(e) => e.target.blur()} placeholder="0" value={v.price} onChange={e => { const nv = [...form.variants]; nv[i].price = e.target.value; setForm({ ...form, variants: nv }); }} className="h-12 w-20 bg-transparent border-none text-[16px] font-serif font-bold text-brand-secondary text-right outline-none" required />
+                                                        <button type="button" onClick={() => setForm({ ...form, variants: form.variants.filter((_, idx) => idx !== i) })} className="text-red-500/20 hover:text-red-500 transition-colors"><Icon icon="solar:trash-bin-trash-bold" className="w-4 h-4" /></button>
+                                                    </div>
+                                                ))}
+                                                {form.variants.length === 0 && (
+                                                    <div className="flex flex-col items-center justify-center py-10 opacity-10">
+                                                        <Icon icon="solar:layers-broken" className="w-12 h-12 mb-2" />
+                                                        <span className="text-[10px] uppercase font-black tracking-widest">No Variants Recorded</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -503,81 +528,233 @@ export default function ProductsPage() {
                             )}
 
                             {step === 3 && (
-                                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div className="space-y-5">
-                                        <div>
-                                            <label className="text-[10px] uppercase tracking-widest font-bold">Rich Description (Optional)</label>
-                                            <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full p-4 border border-black/10 rounded-2xl bg-gray-50 mt-1 h-32 lg:h-48 resize-none" placeholder="Tell the story of this divine creation..." />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-5">
-                                        <label className="text-[10px] uppercase tracking-widest font-bold block mb-2">Cloudinary Media Payload</label>
-                                        <div
-                                            onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
-                                            onDragLeave={() => setIsDraggingImage(false)}
-                                            onDrop={(e) => { e.preventDefault(); setIsDraggingImage(false); handleUpload(null, 'image', Array.from(e.dataTransfer.files)); }}
-                                            className={`grid grid-cols-4 gap-3 p-2 rounded-3xl border-2 border-dashed transition-all ${isDraggingImage ? 'border-brand-secondary bg-brand-secondary/5 rotate-1' : 'border-transparent'}`}
-                                        >
-                                            {form.images.map((img, i) => <div key={i} className="aspect-square rounded-2xl overflow-hidden border border-black/5 relative group shadow-sm"><img src={img} className="w-full h-full object-cover" /><button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="lucide:x" className="text-white" /></button></div>)}
-                                            {pendingUploads.filter(p => p.type === 'image').map(p => (
-                                                <div key={p.id} className="aspect-square rounded-2xl overflow-hidden border border-brand-secondary/20 relative group shadow-sm opacity-60">
-                                                    <img src={p.previewUrl} className="w-full h-full object-cover grayscale" />
-                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-[2px]">
-                                                        <Icon icon="line-md:loading-loop" className="w-6 h-6 text-brand-secondary" />
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            <div className={`aspect-square rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingImage ? 'border-brand-secondary' : 'border-gray-200'}`}>
-                                                {uploadingImage ? <Icon icon="line-md:loading-loop" className="text-brand-secondary w-6 h-6" /> : <><Icon icon="lucide:image-plus" className={isDraggingImage ? 'text-brand-secondary' : 'text-gray-400'} /><span className="text-[7px] font-bold uppercase mt-1 text-gray-300">Add Image</span></>}
-                                                <input type="file" multiple disabled={uploadingImage} onChange={(e) => handleUpload(e, 'image')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                                <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+                                    <div className="p-10 bg-brand-accent/30 rounded-[40px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)] h-full">
+                                        <div className="flex items-center gap-4 mb-10">
+                                            <div className="w-12 h-12 bg-white rounded-[20px] shadow-sm flex items-center justify-center text-brand-primary">
+                                                <Icon icon="solar:eye-bold-duotone" className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-[12px] uppercase tracking-[0.3em] font-black text-brand-primary">Display Orchestration</h4>
+                                                <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest mt-0.5">Visibility Logic</p>
                                             </div>
                                         </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {[
+                                                { id: 'isBestSeller', label: 'Best Seller', icon: 'solar:star-bold', color: 'text-yellow-500' },
+                                                { id: 'isReadyStock', label: 'Ready Stock', icon: 'solar:box-bold', color: 'text-brand-secondary' },
+                                                { id: 'showSizeGuide', label: 'Size Guide', icon: 'solar:ruler-bold', color: 'text-blue-500' },
+                                                { id: 'showWashCare', label: 'Wash Care', icon: 'ic:twotone-wash', color: 'text-emerald-500' }
+                                            ].map((item) => (
+                                                <label key={item.id} className={`flex flex-col gap-4 p-6 rounded-[32px] cursor-pointer border transition-all duration-500 ${form[item.id] ? 'bg-white border-brand-primary/20 shadow-xl' : 'bg-brand-primary/5 border-transparent hover:bg-brand-primary/10'}`}>
+                                                    <div className="flex justify-between items-start">
+                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${form[item.id] ? 'bg-brand-primary/5' : 'bg-white/50'}`}>
+                                                            <Icon icon={item.icon} className={`w-5 h-5 ${form[item.id] ? item.color : 'text-brand-primary/10'}`} />
+                                                        </div>
+                                                        <input type="checkbox" checked={form[item.id]} onChange={e => setForm({ ...form, [item.id]: e.target.checked })} className="sr-only" />
+                                                        <div className={`w-4 h-4 rounded-full border-2 transition-all ${form[item.id] ? 'bg-brand-primary border-brand-primary' : 'border-brand-primary/10'}`} />
+                                                    </div>
+                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${form[item.id] ? 'text-brand-primary' : 'text-brand-primary/20'}`}>{item.label}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
 
-                                        <div
-                                            onDragOver={(e) => { e.preventDefault(); setIsDraggingVideo(true); }}
-                                            onDragLeave={() => setIsDraggingVideo(false)}
-                                            onDrop={(e) => { e.preventDefault(); setIsDraggingVideo(false); handleUpload(null, 'video', Array.from(e.dataTransfer.files)); }}
-                                            className={`flex gap-3 overflow-x-auto pt-2 no-scrollbar p-2 rounded-3xl border-2 border-dashed transition-all ${isDraggingVideo ? 'border-brand-secondary bg-brand-secondary/5 rotate-1' : 'border-transparent'}`}
-                                        >
-                                            {form.videos.map((vid, i) => <div key={i} className="w-32 h-20 shrink-0 rounded-2xl overflow-hidden border bg-black relative group"><video src={vid} className="w-full h-full object-cover" /><button type="button" onClick={() => setForm({ ...form, videos: form.videos.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/50 flex items-center justify-center opacity-0 group-hover:opacity-100"><Icon icon="lucide:x" className="text-white" /></button></div>)}
-                                            {pendingUploads.filter(p => p.type === 'video').map(p => (
-                                                <div key={p.id} className="w-32 h-20 shrink-0 rounded-2xl overflow-hidden border bg-black relative shadow-sm opacity-60">
-                                                    <video src={p.previewUrl} className="w-full h-full object-cover grayscale" />
-                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-                                                        <Icon icon="line-md:loading-loop" className="w-6 h-6 text-brand-secondary" />
+                                    <div className="p-10 bg-brand-accent/30 rounded-[40px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                        <div className="flex items-center gap-4 mb-10">
+                                            <div className="w-12 h-12 bg-white rounded-[20px] shadow-sm flex items-center justify-center text-brand-primary">
+                                                <Icon icon="solar:medal-star-bold-duotone" className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-[12px] uppercase tracking-[0.3em] font-black text-brand-primary">Divine Infusions</h4>
+                                                <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest mt-0.5">Specifications Registry</p>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            {["Fabric", "Embroidery", "Work", "Included"].map((label) => {
+                                                const detail = form.details.find(d => d.label === label);
+                                                return (
+                                                    <div key={label} className="group bg-white p-5 rounded-[24px] border border-brand-primary/5 transition-all focus-within:border-brand-secondary/40">
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-brand-secondary/40" />
+                                                            <span className="text-[9px] font-black uppercase tracking-widest text-brand-primary/30 group-focus-within:text-brand-secondary transition-colors">{label} Composition</span>
+                                                        </div>
+                                                        <input
+                                                            type="text"
+                                                            value={detail?.value || ""}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                let newDetails = [...form.details];
+                                                                const idx = newDetails.findIndex(d => d.label === label);
+                                                                if (idx > -1) {
+                                                                    if (val) newDetails[idx].value = val;
+                                                                    else newDetails.splice(idx, 1);
+                                                                } else if (val) {
+                                                                    newDetails.push({ label, value: val });
+                                                                }
+                                                                setForm({ ...form, details: newDetails });
+                                                            }}
+                                                            placeholder={`Define the ${label} quality...`}
+                                                            className="w-full bg-transparent border-none text-[13px] font-bold text-brand-primary outline-none placeholder:text-brand-primary/10"
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {step === 4 && (
+                                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                                    <div className="lg:col-span-5 space-y-6">
+                                        <div className="p-10 bg-brand-accent/30 rounded-[40px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                            <div className="flex items-center gap-4 mb-10">
+                                                <div className="w-12 h-12 bg-white rounded-[20px] shadow-sm flex items-center justify-center text-brand-primary">
+                                                    <Icon icon="solar:document-text-bold-duotone" className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-[12px] uppercase tracking-[0.3em] font-black text-brand-primary">Narrative Payload</h4>
+                                                    <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest mt-0.5">Linguistic Composition</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-8">
+                                                <div className="group">
+                                                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-primary/30 block mb-3 px-1 group-focus-within:text-brand-primary transition-colors">Global Storytelling</label>
+                                                    <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full p-6 border border-brand-primary/5 rounded-[32px] bg-white text-[13px] font-bold text-brand-primary h-40 resize-none focus:border-brand-primary/40 outline-none transition-all shadow-inner leading-relaxed" placeholder="Describe the soul of this masterpiece..." />
+                                                </div>
+                                                <div className="group">
+                                                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-secondary/40 block mb-3 px-1 group-focus-within:text-brand-secondary transition-colors">Partner Directives (Wholesale Only)</label>
+                                                    <textarea value={form.wholesalerDescription} onChange={e => setForm({ ...form, wholesalerDescription: e.target.value })} className="w-full p-6 border border-brand-secondary/10 rounded-[32px] bg-brand-secondary/5 text-[13px] font-bold text-brand-primary h-40 resize-none focus:border-brand-secondary/40 outline-none transition-all shadow-inner leading-relaxed" placeholder="Confidential insights for our valued partners..." />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="lg:col-span-7 space-y-6">
+                                        <div className="p-8 bg-white rounded-[40px] border border-brand-primary/10 shadow-xl overflow-hidden relative group/payload">
+                                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-primary/20 via-brand-secondary/20 to-brand-primary/20 opacity-50" />
+
+                                            <div className="flex items-center justify-between mb-8">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 bg-brand-primary/5 rounded-[20px] flex items-center justify-center text-brand-primary shadow-inner">
+                                                        <Icon icon="solar:gallery-bold-duotone" className="w-6 h-6" />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-primary">Media Payload</h4>
+                                                        <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest mt-0.5">Visual Assets Registry</p>
                                                     </div>
                                                 </div>
-                                            ))}
-                                            <div className={`w-32 h-20 shrink-0 rounded-2xl border-2 border-dashed flex items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingVideo ? 'border-brand-secondary' : 'border-gray-200'}`}>
-                                                {uploadingVideo ? <Icon icon="line-md:loading-loop" /> : <><Icon icon="lucide:video" className={isDraggingVideo ? 'text-brand-secondary' : 'text-gray-400 mr-2 w-4 h-4'} /><span className={`text-[9px] font-bold uppercase ${isDraggingVideo ? 'text-brand-secondary' : 'text-gray-400'}`}>Add Video</span></>}
-                                                <input type="file" multiple disabled={uploadingVideo} onChange={(e) => handleUpload(e, 'video')} className="absolute inset-0 opacity-0 cursor-pointer" accept="video/*" />
+                                            </div>
+
+                                            <div className="space-y-8">
+                                                <div>
+                                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-brand-primary/20 mb-4 block underline underline-offset-8">Imagery Stream</span>
+                                                    <div
+                                                        onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
+                                                        onDragLeave={() => setIsDraggingImage(false)}
+                                                        onDrop={(e) => { e.preventDefault(); setIsDraggingImage(false); handleUpload(null, 'image', Array.from(e.dataTransfer.files)); }}
+                                                        className={`grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 p-4 rounded-3xl border-2 border-dashed transition-all ${isDraggingImage ? 'border-brand-secondary bg-brand-secondary/5 scale-[1.02]' : 'border-gray-100 hover:border-brand-primary/20'}`}
+                                                    >
+                                                        {form.images.map((img, i) => (
+                                                            <div key={i} className="aspect-[3/4] rounded-2xl overflow-hidden border border-black/5 relative group shadow-sm transition-transform hover:scale-105">
+                                                                <img src={img} className="w-full h-full object-cover" />
+                                                                <button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="solar:trash-bin-trash-bold" className="text-white w-6 h-6" /></button>
+                                                            </div>
+                                                        ))}
+                                                        <div className={`aspect-[3/4] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingImage ? 'border-brand-secondary' : 'border-gray-200'}`}>
+                                                            {uploadingImage ? <Icon icon="line-md:loading-loop" className="text-brand-secondary w-8 h-8" /> : <><Icon icon="solar:camera-add-bold-duotone" className={`w-8 h-8 ${isDraggingImage ? 'text-brand-secondary' : 'text-gray-300'}`} /><span className="text-[7px] font-black uppercase mt-2 text-gray-400">Capture Image</span></>}
+                                                            <input type="file" multiple disabled={uploadingImage} onChange={(e) => handleUpload(e, 'image')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-brand-primary/20 mb-4 block underline underline-offset-8">Kinetic Motion (Videos)</span>
+                                                    <div
+                                                        onDragOver={(e) => { e.preventDefault(); setIsDraggingVideo(true); }}
+                                                        onDragLeave={() => setIsDraggingVideo(false)}
+                                                        onDrop={(e) => { e.preventDefault(); setIsDraggingVideo(false); handleUpload(null, 'video', Array.from(e.dataTransfer.files)); }}
+                                                        className={`flex gap-4 overflow-x-auto pt-2 pb-4 no-scrollbar p-4 rounded-3xl border-2 border-dashed transition-all ${isDraggingVideo ? 'border-brand-secondary bg-brand-secondary/5 scale-[1.02]' : 'border-gray-100 hover:border-brand-primary/20'}`}
+                                                    >
+                                                        {form.videos.map((vid, i) => (
+                                                            <div key={i} className="w-48 h-28 shrink-0 rounded-2xl overflow-hidden border bg-black relative group shadow-lg">
+                                                                <video src={vid} className="w-full h-full object-cover" />
+                                                                <button type="button" onClick={() => setForm({ ...form, videos: form.videos.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="solar:trash-bin-trash-bold" className="text-white w-6 h-6" /></button>
+                                                            </div>
+                                                        ))}
+                                                        <div className={`w-48 h-28 shrink-0 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingVideo ? 'border-brand-secondary' : 'border-gray-200'}`}>
+                                                            {uploadingVideo ? <Icon icon="line-md:loading-loop" className="w-8 h-8 text-brand-secondary" /> : <><Icon icon="solar:videocamera-add-bold-duotone" className={`w-8 h-8 ${isDraggingVideo ? 'text-brand-secondary' : 'text-gray-300'}`} /><span className="text-[8px] font-black uppercase mt-2 text-gray-400 tracking-widest">Inject Motion</span></>}
+                                                            <input type="file" multiple disabled={uploadingVideo} onChange={(e) => handleUpload(e, 'video')} className="absolute inset-0 opacity-0 cursor-pointer" accept="video/*" />
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </motion.div>
                             )}
 
-                            <div className="col-span-1 md:col-span-2 pt-8 border-t border-black/5 flex justify-between items-center gap-4">
-                                <button type="button" onClick={() => setIsOpen(false)} className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors">Terminate Process</button>
+                            <div className="pt-10 border-t border-brand-primary/5 flex justify-between items-center mt-auto">
+                                <button type="button" onClick={() => setIsOpen(false)} className="px-8 py-5 rounded-[24px] text-[11px] font-black uppercase tracking-[0.2em] text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100">Terminate Protocol</button>
 
                                 <div className="flex gap-4">
                                     {step > 1 && (
-                                        <button type="button" onClick={() => setStep(s => s - 1)} className="px-8 py-4 rounded-2xl font-bold uppercase tracking-widest bg-gray-100 hover:bg-gray-200 transition-all text-[10px]">Backward</button>
+                                        <button type="button" onClick={() => setStep(s => s - 1)} className="px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-gray-100 hover:bg-gray-200 transition-all text-[11px] flex items-center gap-3 text-brand-primary/60"> <Icon icon="lucide:arrow-left" className="w-5 h-5" /> Previous Stage</button>
                                     )}
 
-                                    {step < 3 ? (
-                                        <button type="button" onClick={() => setStep(s => s + 1)} className="px-10 py-4 lg:px-14 rounded-2xl font-bold uppercase tracking-widest bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl text-[10px] flex items-center gap-2">
-                                            Proceed <Icon icon="lucide:arrow-right" className="w-4 h-4" />
+                                    {step < 4 ? (
+                                        <button type="button" onClick={() => setStep(s => s + 1)} className="px-14 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/20 text-[11px] flex items-center gap-3">
+                                            Proceed <Icon icon="lucide:arrow-right" className="w-5 h-5" />
                                         </button>
                                     ) : (
-                                        <button type="button" onClick={handleSubmit} disabled={uploadingImage || uploadingVideo} className="px-10 py-4 lg:px-14 rounded-2xl font-bold uppercase tracking-widest bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl text-[10px] flex items-center gap-2">
-                                            <Icon icon="lucide:save" className="w-4 h-4" /> Finalize Injection
+                                        <button type="button" onClick={handleSubmit} disabled={uploadingImage || uploadingVideo} className="px-20 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/30 text-[11px] flex items-center gap-3">
+                                            <Icon icon="lucide:save" className="w-5 h-5" /> Commit Masterpiece
                                         </button>
                                     )}
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            )}
+            {/* Delete Confirmation Modal */}
+            {isDeleteModalOpen && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4 backdrop-blur-xl">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="bg-white max-w-sm w-full rounded-[48px] p-10 shadow-2xl text-center border border-black/5"
+                    >
+                        <div className="w-20 h-20 bg-red-50 rounded-[28px] flex items-center justify-center text-red-500 mx-auto mb-8 shadow-inner">
+                            <Icon icon="solar:trash-bin-trash-bold-duotone" className="w-10 h-10" />
+                        </div>
+                        <h3 className="text-2xl font-serif font-bold text-brand-primary mb-3">Redact Masterpiece?</h3>
+                        <p className="text-[11px] text-brand-primary/40 uppercase font-black tracking-[0.2em] mb-10 leading-relaxed px-4">
+                            "{itemToDelete?.name}" will be permanently expunged from the registry.
+                        </p>
+
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => setIsDeleteModalOpen(false)}
+                                className="grow py-5 rounded-[24px] font-black text-[10px] uppercase tracking-widest text-brand-primary hover:bg-gray-50 transition-all border border-brand-primary/10 cursor-pointer"
+                            >
+                                Archive
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    await deleteProduct(itemToDelete.id);
+                                    toast.success("Masterpiece Removed");
+                                    setIsDeleteModalOpen(false);
+                                    loadData();
+                                }}
+                                className="grow py-5 rounded-[24px] font-black text-[10px] uppercase tracking-widest bg-red-500 text-white hover:bg-red-600 transition-all shadow-xl shadow-red-500/20 cursor-pointer"
+                            >
+                                Expunge
+                            </button>
+                        </div>
+                    </motion.div>
                 </div>
             )}
         </div>

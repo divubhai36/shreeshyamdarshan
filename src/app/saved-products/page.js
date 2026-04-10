@@ -93,13 +93,6 @@ export default function SavedProductsPage() {
                         />
                       </Link>
                       
-                      {/* Glass remove button */}
-                      <button 
-                        onClick={() => toggleSave(product)}
-                        className="absolute top-6 right-6 w-14 h-14 bg-white/40 backdrop-blur-xl border border-white/20 rounded-full z-20 flex items-center justify-center text-rose-500 hover:scale-110 active:scale-90 transition-all shadow-xl"
-                      >
-                        <Icon icon="solar:heart-bold" className="w-7 h-7 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" />
-                      </button>
 
                       {/* Floating Info Overlay (Visible on Hover) */}
                       <div className="absolute inset-x-6 bottom-6 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 z-10">
@@ -122,9 +115,17 @@ export default function SavedProductsPage() {
                     </div>
 
                     {/* Simple Bottom Label (Always visible) */}
-                    <div className="mt-6 px-4 group-hover:opacity-0 transition-opacity duration-300">
-                       <p className="text-[9px] font-bold text-brand-secondary/60 uppercase tracking-[0.3em] mb-2">{product.category}</p>
-                       <h3 className="text-xl font-serif font-bold text-brand-primary truncate">{product.name}</h3>
+                    <div className="mt-6 px-4 group-hover:opacity-0 transition-opacity duration-300 flex justify-between items-start gap-2">
+                       <div className="grow overflow-hidden">
+                          <p className="text-[9px] font-bold text-brand-secondary/60 uppercase tracking-[0.3em] mb-2">{product.category}</p>
+                          <h3 className="text-xl font-serif font-bold text-brand-primary line-clamp-2 leading-tight">{product.name}</h3>
+                       </div>
+                       <button 
+                         onClick={() => toggleSave(product)}
+                         className="shrink-0 p-1 text-rose-500 hover:scale-110 transition-all mt-4"
+                       >
+                         <Icon icon="solar:heart-bold" className="w-6 h-6 lg:w-7 lg:h-7" />
+                       </button>
                     </div>
                  </motion.div>
                ))}

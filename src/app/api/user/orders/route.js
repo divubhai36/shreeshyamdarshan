@@ -13,13 +13,19 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const orders = await prisma.order.findMany({
-      where: { wholesalerId: session.userId },
-      include: { items: { include: { product: true } } },
-      orderBy: { createdAt: "desc" },
-    });
+    const [orders, user] = await Promise.all([
+      prisma.order.findMany({
+        where: { wholesalerId: session.userId },
+        include: { items: { include: { product: true } } },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.wholesaler.findUnique({
+        where: { id: session.userId },
+        select: { name: true, phone: true, companyName: true, address: true }
+      })
+    ]);
 
-    return NextResponse.json({ success: true, orders });
+    return NextResponse.json({ success: true, orders, user });
   } catch (error) {
     console.error("🚨 USER ORDERS FETCH FAILED:", error);
     return NextResponse.json({ error: "Failed to retrieve order history" }, { status: 500 });

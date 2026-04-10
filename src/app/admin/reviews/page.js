@@ -84,9 +84,8 @@ export default function ReviewsPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto p-4 lg:p-8">
-      {/* ... previous header logic ... */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
+    <div className="max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
         <div>
           <h1 className="text-3xl font-serif font-bold text-brand-primary">Feedback Moderation</h1>
           <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase mt-1">Manage Wholesaler Reviews</p>

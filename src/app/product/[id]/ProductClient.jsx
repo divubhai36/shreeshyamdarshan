@@ -17,10 +17,26 @@ export default function ProductClient({ product, navCategory, subCategory, inner
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [activeAccordion, setActiveAccordion] = useState(null);
   const [activeVideo, setActiveVideo] = useState(null);
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const [isZooming, setIsZooming] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
+  useEffect(() => {
+    if (isAuthenticated && product.variants && product.variants.length > 0) {
+      setSelectedVariant(product.variants[0]);
+    }
+  }, [isAuthenticated, product.variants]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [product.id]);
+
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPos({ x, y });
+  };
 
   // Enhanced product images stack
   const productImages = (product.images && product.images.length > 0)
@@ -53,7 +69,12 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
   const handleWhatsApp = () => {
     const phone = "917383699199";
-    const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Product:* ${product.name}\n*Quantity:* ${quantity} pcs\n------------------\nPlease help me with the details.`;
+    const discount = product.isOfferProduct ? (product.discountPercent || 0) : 0;
+    const variantInfo = selectedVariant ? `\n*Variant:* ${selectedVariant.name}` : "";
+    const rawPrice = selectedVariant ? selectedVariant.price : (product.price);
+    const finalPrice = discount > 0 ? (rawPrice * (1 - discount / 100)).toFixed(2) : rawPrice;
+
+    const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Product:* ${product.name}${variantInfo}\n*Price:* ₹${finalPrice}\n*Quantity:* ${quantity} pcs\n------------------\nPlease help me with the details.`;
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, "_blank");
   };
@@ -181,19 +202,19 @@ export default function ProductClient({ product, navCategory, subCategory, inner
         }}
       />
       <div className="min-h-screen bg-brand-accent/30 overflow-x-hidden text-left">
-        <main className="flex-grow">
+        <main className="grow">
           <div className="container mx-auto px-4 pt-20 lg:pt-28 mb-5 max-w-7xl">
-            <div className="flex flex-wrap items-center gap-2 lg:gap-3 text-[10px] items-start mb-4 lg:mb-12 text-brand-primary/20 font-bold uppercase tracking-[0.2em] w-full">
+            <div className="flex flex-wrap items-start gap-2 lg:gap-3 text-[10px] mb-4 lg:mb-12 text-brand-primary/20 font-bold uppercase tracking-[0.2em] w-full">
               <Link href="/" className="hover:text-brand-secondary transition-colors shrink-0">
                 Home
               </Link>
-              <Icon icon="lucide:chevron-right" className="w-2.5 h-2.5 opacity-30 mt-[1px] shrink-0" />
+              <Icon icon="lucide:chevron-right" className="w-3 h-3 mt-px shrink-0" />
               {navCategory && (
                 <>
                   <Link href={`/collections/${navCategory.id}`} className="hover:text-brand-secondary transition-colors shrink-0">
                     {navCategory.name}
                   </Link>
-                  <Icon icon="lucide:chevron-right" className="w-2.5 h-2.5 opacity-30 mt-[1px] shrink-0" />
+                  <Icon icon="lucide:chevron-right" className="w-3 h-3 mt-px shrink-0" />
                 </>
               )}
               {subCategory && (
@@ -201,7 +222,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   <Link href={`/category/${navCategory.id}/${subCategory.id}`} className="hover:text-brand-secondary transition-colors shrink-0">
                     {subCategory.name}
                   </Link>
-                  <Icon icon="lucide:chevron-right" className="w-2.5 h-2.5 opacity-30 mt-[1px] shrink-0" />
+                  <Icon icon="lucide:chevron-right" className="w-3 h-3 mt-px shrink-0" />
                 </>
               )}
               <span className="text-brand-primary/60 truncate">{product.name}</span>
@@ -209,59 +230,34 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-start">
               <div className="space-y-6 lg:sticky lg:top-24">
-                <div className="relative aspect-square overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5">
-                  <Image
-                    src={productImages[activeImageIdx]}
-                    alt={product.name}
-                    fill
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover transition-transform duration-1000 hover:scale-110"
-                  />
+                <div
+                  onMouseMove={handleMouseMove}
+                  onMouseEnter={() => setIsZooming(true)}
+                  onMouseLeave={() => setIsZooming(false)}
+                  className="relative aspect-square overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5 cursor-zoom-in"
+                >
+                  <div className="relative w-full h-full transition-transform duration-300 ease-out" style={{
+                    transform: isZooming ? 'scale(1.8)' : 'scale(1)',
+                    transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`
+                  }}>
+                    <Image
+                      src={productImages[activeImageIdx]}
+                      alt={product.name}
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      className="object-cover"
+                    />
+                  </div>
                   {/* Brand Best Seller Ribbon Sash */}
                   {product.isBestSeller && (
-                    <div className="absolute top-0 left-0 w-40 h-40 overflow-hidden z-20 pointer-events-none">
-                      <div className="bg-linear-to-r from-red-600 to-rose-700 text-white text-[10px] font-black uppercase tracking-[0.25em] py-2 w-[160%] absolute top-8 -left-16 -rotate-45 shadow-[0_5px_15px_rgba(0,0,0,0.3)] border-y border-white/10 flex justify-center text-center">
+                    <div className="absolute top-0 right-0 w-40 h-40 overflow-hidden z-20 pointer-events-none">
+                      <div className="bg-linear-to-r from-red-600 to-rose-700 text-white text-[10px] font-black uppercase tracking-[0.25em] py-2 w-[160%] absolute top-8 -right-16 rotate-45 shadow-[0_5px_15px_rgba(0,0,0,0.3)] border-y border-white/10 flex justify-center text-center">
                         Best Seller
                       </div>
                     </div>
                   )}
 
-                  {/* Cinema Floating Like Button */}
-                  {isAuthenticated && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="absolute top-1 right-1 z-30"
-                    >
-                      <motion.button
-                        whileHover={{ scale: 1.1, y: -4 }}
-                        whileTap={{ scale: 0.85 }}
-                        onClick={() => toggleSave(product)}
-                        className={`w-16 h-16 rounded-[24px] flex items-center justify-center transition-all duration-300 relative overflow-hidden ${saved ? "text-rose-500" : "text-white"
-                          }`}
-                      >
-                        {/* ✅ Single element (NO re-mount) */}
-                        <motion.div
-                          animate={{
-                            scale: saved ? [1, 1.25, 1] : 1,
-                          }}
-                          transition={{
-                            duration: 0.25,
-                            ease: "easeOut",
-                          }}
-                        >
-                          <Icon
-                            icon={saved ? "solar:heart-bold" : "solar:heart-linear"}
-                            className={`w-8 h-8 ${saved
-                              ? "drop-shadow-[0_0_15px_rgba(244,63,94,0.6)]"
-                              : "drop-shadow-[0_0_15px_rgba(26,67,50,0.4)]"
-                              }`}
-                          />
-                        </motion.div>
-                      </motion.button>
-                    </motion.div>
-                  )}
                 </div>
 
                 {productImages.length > 1 && (
@@ -290,19 +286,72 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
               <div className="flex flex-col pt-0 lg:pl-4">
                 <div className="text-left w-full">
-                  <div className="flex items-center gap-2 mb-4">
+                  {/* <div className="flex items-center gap-2 mb-4">
                     <div className="h-px w-6 bg-brand-secondary"></div>
                     <span className="text-brand-secondary text-[10px] font-bold uppercase tracking-[0.3em]">
-                      {product.category}  {product.productId && ` • ${product.productId}`}
+                      {product.category}
                     </span>
+                  </div> */}
+
+                  <div className="flex justify-between items-start gap-4 mb-6 lg:mb-8 text-left">
+                    <h1 className="text-3xl lg:text-5xl font-serif font-bold text-brand-primary leading-tight tracking-tight text-left capitalize grow">
+                      {product.name}
+                    </h1>
+                    {isAuthenticated && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="shrink-0"
+                      >
+                        <motion.button
+                          whileHover={{ scale: 1.1, y: -2 }}
+                          whileTap={{ scale: 0.85 }}
+                          onClick={() => toggleSave(product)}
+                          className={`transition-all duration-300 relative ${saved ? "text-rose-500" : "text-brand-primary hover:scale-95"
+                            }`}
+                        >
+                          <motion.div
+                            animate={{
+                              scale: saved ? [1, 1.25, 1] : 1,
+                            }}
+                            transition={{
+                              duration: 0.25,
+                              ease: "easeOut",
+                            }}
+                          >
+                            <Icon
+                              icon={saved ? "solar:heart-bold" : "solar:heart-linear"}
+                              className={`w-8 h-8 lg:w-10 lg:h-10 ${saved
+                                ? "drop-shadow-[0_0_15px_rgba(244,63,94,0.3)]"
+                                : ""
+                                }`}
+                            />
+                          </motion.div>
+                        </motion.button>
+                      </motion.div>
+                    )}
                   </div>
 
-                  <h1 className="text-3xl lg:text-5xl font-serif font-bold text-brand-primary leading-tight mb-6 lg:mb-8 tracking-tight text-left">
-                    {product.name}
-                  </h1>
-
-                  <div className="flex items-center gap-6 mb-8 lg:mb-12 text-left">
-                    {product.isOfferProduct && product.offerPrice ? (
+                  <div className="flex items-center gap-6 mb-8 lg:mb-10 text-left">
+                    {isAuthenticated ? (
+                       <div className="flex flex-col">
+                          <span className="text-3xl lg:text-4xl font-serif font-bold text-brand-primary">
+                            ₹{selectedVariant
+                                ? (product.isOfferProduct ? (selectedVariant.price * (1 - product.discountPercent / 100)).toFixed(2) : selectedVariant.price)
+                                : (product.isOfferProduct ? (product.price * (1 - product.discountPercent / 100)).toFixed(2) : product.price)
+                            }
+                          </span>
+                          {product.isOfferProduct && (
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[10px] font-bold text-brand-primary/30 line-through">₹{selectedVariant ? selectedVariant.price : product.price}</span>
+                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{product.discountPercent}% OFF Partner Deal</span>
+                            </div>
+                          )}
+                          {!selectedVariant && product.variants?.length > 0 && (
+                             <span className="text-[8px] font-bold text-brand-secondary uppercase tracking-widest mt-1 italic">Please select size/variant</span>
+                          )}
+                       </div>
+                    ) : product.isOfferProduct && product.offerPrice ? (
                       <div className="flex flex-col">
                         <span className="text-3xl lg:text-4xl font-serif font-bold text-red-600">
                           ₹{product.offerPrice}
@@ -326,6 +375,32 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                       </span>
                     </div>
                   </div>
+
+                  {/* Variant Selection UI */}
+                  {Array.isArray(product.variants) && product.variants.length > 0 && (
+                    <div className="mb-8">
+                      <p className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-[0.2em] mb-4">Select Variant</p>
+                      <div className="flex flex-wrap gap-3">
+                        {product.variants.map((v, i) => {
+                          const discountedPrice = product.isOfferProduct ? (v.price * (1 - product.discountPercent / 100)).toFixed(2) : v.price;
+                          return (
+                            <button
+                              key={i}
+                              onClick={() => setSelectedVariant(selectedVariant?.name === v.name ? null : v)}
+                              className={`px-5 py-3 rounded-xl border-2 font-bold text-[11px] transition-all flex flex-col items-center ${
+                                selectedVariant?.name === v.name
+                                  ? "border-brand-primary bg-brand-primary text-white shadow-lg"
+                                  : "border-brand-primary/10 hover:border-brand-primary/40 text-brand-primary bg-white"
+                              }`}
+                            >
+                              <span>{v.name}</span>
+                              <span className={`text-[9px] mt-0.5 ${selectedVariant?.name === v.name ? 'text-brand-secondary' : 'text-brand-primary/40'}`}>₹{discountedPrice}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="mb-6 text-left">
                     <p className="text-brand-primary/60 text-[14px] lg:text-[16px] leading-relaxed font-serif italic mb-4">
@@ -384,14 +459,62 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                         ))}
                       </div>
                     )}
+
+                    {/* Wholesaler Description */}
+                    {isAuthenticated && product.wholesalerDescription && (
+                      <div className="my-8 p-6 bg-brand-secondary/5 rounded-3xl border border-brand-secondary/20 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-all">
+                          <Icon icon="solar:medal-star-bold" className="w-12 h-12 text-brand-secondary" />
+                        </div>
+                        <h4 className="text-[10px] font-bold text-brand-secondary uppercase tracking-[0.3em] mb-3 flex items-center gap-2">
+                          <Icon icon="solar:crown-bold" className="w-4 h-4" />
+                          Wholesaler Exclusive info
+                        </h4>
+                        <p className="text-brand-primary/80 text-[13px] font-serif leading-relaxed italic">
+                          {product.wholesalerDescription}
+                        </p>
+                      </div>
+                    )}
                   </div>
+
+                  {product.allowToBuy !== false && (
+                    <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                      <div className="flex items-center bg-white border border-brand-primary/10 rounded-2xl p-1 shrink-0 w-full sm:w-auto">
+                        <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 flex items-center justify-center text-brand-primary hover:bg-brand-primary/5 rounded-xl transition-all">
+                          <Icon icon="lucide:minus" />
+                        </button>
+                        <input
+                          type="number"
+                          value={quantity}
+                          onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-16 text-center font-bold text-brand-primary focus:outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                          <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 flex items-center justify-center text-brand-primary hover:bg-brand-primary/5 rounded-xl transition-all">
+                          <Icon icon="lucide:plus" />
+                        </button>
+                      </div>
+
+                    <button
+                      onClick={() => {
+                        const discount = product.isOfferProduct ? (product.discountPercent || 0) : 0;
+                        const rawPrice = selectedVariant ? selectedVariant.price : product.price;
+                        const finalPrice = discount > 0 ? (rawPrice * (1 - discount / 100)).toFixed(2) : rawPrice;
+                        addToCart(product, quantity, selectedVariant?.name, finalPrice);
+                      }}
+                      className="grow bg-brand-primary text-white py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-xl hover:bg-brand-secondary transition-all active:scale-[0.98] group"
+                    >
+                      <Icon icon="solar:cart-large-bold" className="w-5 h-5" />
+                      <span>Add To Cart</span>
+                    </button>
+                    </div>
+                  )}
 
                   <button
                     onClick={handleWhatsApp}
-                    className="w-full bg-brand-primary text-white py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-[0_20px_40px_-10px_rgba(26,67,50,0.3)] hover:bg-brand-secondary hover:translate-y-[-4px] transition-all active:scale-[0.98] group"
+                    className="w-full bg-white text-brand-primary border border-brand-primary/10 py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-sm hover:shadow-lg hover:border-brand-primary/20 transition-all active:scale-[0.98] group"
                   >
                     <Icon icon="logos:whatsapp-icon" className="w-6 h-6" />
-                    <span>Order On Whatsapp</span>
+                    <span>Inquiry On Whatsapp</span>
                   </button>
 
                   <div className="mt-8 space-y-0 text-left">
@@ -416,7 +539,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                                 { n: "5", h: '3.80"', d: '10"' },
                                 { n: "6", h: '4.40"', d: '12"' },
                               ].map((row, i) => (
-                                <tr key={i} className="border-b border-brand-primary/5 last:border-0 hover:bg-brand-secondary/[0.01]">
+                                <tr key={i} className="border-b border-brand-primary/5 last:border-0 hover:bg-brand-secondary/1">
                                   <td className="py-3 pr-4 font-bold text-brand-secondary">{row.n} No.</td>
                                   <td className="py-3 px-4">{row.h}</td>
                                   <td className="py-3 pl-4 font-medium">{row.d}</td>
@@ -511,9 +634,9 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   >
                     {[{ url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244607/lv_0_20250325174749_cdcicc.mp4", title: "Handwork" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244604/lv_0_20250426151713_exrd5i.mp4", title: "Fabric Shine" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244599/lv_0_20250411143949_iwsj9d.mp4" },].map((video, idx) => (
                       <div key={idx} className="px-2 md:px-4 py-8 pb-10">
-                        <motion.div whileHover={{ y: -10 }} onClick={() => setActiveVideo(video.url)} className="group relative aspect-[9/16] overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5">
+                        <motion.div whileHover={{ y: -10 }} onClick={() => setActiveVideo(video.url)} className="group relative aspect-9/16 overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5">
                           <video src={video.url} autoPlay muted loop playsInline className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
+                          <div className="absolute inset-0 bg-linear-to-t from-brand-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
                             <h3 className="text-xl lg:text-xl font-serif text-white">Watch Story</h3>
                           </div>
                         </motion.div>
@@ -569,9 +692,9 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
         <AnimatePresence>
           {activeVideo && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-brand-primary/95 flex items-center justify-center p-4 backdrop-blur-3xl" onClick={() => setActiveVideo(null)}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-100 bg-brand-primary/95 flex items-center justify-center p-4 backdrop-blur-3xl" onClick={() => setActiveVideo(null)}>
               <button onClick={() => setActiveVideo(null)} className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white z-20"><Icon icon="lucide:x" className="w-6 h-6" /></button>
-              <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-[450px] aspect-[9/16] rounded-[40px] overflow-hidden">
+              <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-[450px] aspect-9/16 rounded-[40px] overflow-hidden">
                 <video src={activeVideo} autoPlay controls playsInline className="w-full h-full object-cover" />
               </motion.div>
             </motion.div>

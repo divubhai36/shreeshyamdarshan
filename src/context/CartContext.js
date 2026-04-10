@@ -74,23 +74,24 @@ export function CartProvider({ children }) {
     }
   }, [cart, saved]);
 
-  const addToCart = (product, quantity = 1) => {
+  const addToCart = (product, quantity = 1, variantName = null, variantPrice = null) => {
     setCart(prev => {
-      const existing = prev.find(item => item.id === product.id);
+      const priceToUse = variantPrice !== null ? parseFloat(variantPrice) : product.price;
+      const existing = prev.find(item => item.id === product.id && item.variantName === variantName);
       if (existing) {
-        return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item);
+        return prev.map(item => (item.id === product.id && item.variantName === variantName) ? { ...item, quantity: item.quantity + quantity } : item);
       }
-      return [...prev, { ...product, quantity }];
+      return [...prev, { ...product, quantity, price: priceToUse, variantName }];
     });
   };
 
-  const removeFromCart = (id) => {
-    setCart(prev => prev.filter(item => item.id !== id));
+  const removeFromCart = (id, variantName = null) => {
+    setCart(prev => prev.filter(item => !(item.id === id && item.variantName === variantName)));
   };
 
-  const updateQuantity = (id, quantity) => {
-    if (quantity < 1) return removeFromCart(id);
-    setCart(prev => prev.map(item => item.id === id ? { ...item, quantity } : item));
+  const updateQuantity = (id, variantName, quantity) => {
+    if (quantity < 1) return removeFromCart(id, variantName);
+    setCart(prev => prev.map(item => (item.id === id && item.variantName === variantName) ? { ...item, quantity } : item));
   };
 
   const clearCart = () => setCart([]);

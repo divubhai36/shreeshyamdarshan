@@ -54,9 +54,14 @@ model Product {
   details           Json?
   isBestSeller      Boolean           @default(false)
   isOfferProduct    Boolean           @default(false)
+  isReadyStock      Boolean           @default(false)
   showSizeGuide     Boolean           @default(false)
   showWashCare      Boolean           @default(false)
   
+  wholesalerDescription String?
+  variants          Json?             // Array of objects: { name: string, price: number }
+  allowToBuy        Boolean           @default(true)
+
   productId         String            @unique
   categoryId        String
   category          Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -124,6 +129,7 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
   quantity  Int
   price     Float
+  variantName String?
 }
 
 model SavedProduct {
@@ -132,9 +138,10 @@ model SavedProduct {
   wholesaler   Wholesaler @relation(fields: [wholesalerId], references: [id], onDelete: Cascade)
   productId    String
   product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantName  String?
   createdAt    DateTime   @default(now())
 
-  @@unique([wholesalerId, productId])
+  @@unique([wholesalerId, productId, variantName])
 }
 
 enum ReviewStatus {

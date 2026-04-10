@@ -45,8 +45,8 @@ export default function WholesalersPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 lg:p-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
+    <div className="max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
         <div>
           <h1 className="text-3xl font-serif font-bold text-brand-primary">Elite Wholesalers</h1>
           <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase mt-1">B2B Partnership Network</p>
@@ -70,7 +70,7 @@ export default function WholesalersPage() {
             className="bg-brand-primary text-white px-6 py-3 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:shadow-2xl transition-all shadow-xl whitespace-nowrap flex items-center gap-2"
           >
 
-             <Icon icon="lucide:plus" className="w-4 h-4" /> Add
+            <Icon icon="lucide:plus" className="w-4 h-4" /> Add
           </button>
         </div>
       </div>
@@ -95,21 +95,21 @@ export default function WholesalersPage() {
                 </td>
               </tr>
             ) : data.filter(w =>
-                w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                w.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                w.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                w.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                w.address?.toLowerCase().includes(searchTerm.toLowerCase())
+              w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              w.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              w.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              w.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              w.address?.toLowerCase().includes(searchTerm.toLowerCase())
             ).length === 0 ? (
               <tr>
                 <td colSpan="6" className="p-20 text-center text-brand-primary/30 italic font-serif">No accounts matching your search criteria.</td>
               </tr>
             ) : data.filter(w =>
-                w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                w.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                w.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                w.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                w.address?.toLowerCase().includes(searchTerm.toLowerCase())
+              w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              w.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              w.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              w.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              w.address?.toLowerCase().includes(searchTerm.toLowerCase())
             ).map(w => (
               <tr key={w.id} className="hover:bg-brand-primary/[0.02] transition-colors group">
                 <td className="p-6">
@@ -137,17 +137,17 @@ export default function WholesalersPage() {
                 <td className="p-6">
                   <div className="flex items-center gap-2">
                     <div className="bg-brand-primary/5 px-3 py-1.5 rounded-lg border border-brand-primary/5 relative group/pass overflow-hidden min-w-[120px]">
-                        <p className="font-mono text-[11px] font-bold tracking-widest text-brand-primary">
-                            {showPasswords[w.id] ? (w.plainPassword || 'N/A') : '••••••••'}
-                        </p>
-                        <button
-                          suppressHydrationWarning
-                          onClick={() => setShowPasswords(prev => ({...prev, [w.id]: !prev[w.id]}))}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-brand-secondary hover:scale-110 transition-transform"
-                        >
+                      <p className="font-mono text-[11px] font-bold tracking-widest text-brand-primary">
+                        {showPasswords[w.id] ? (w.plainPassword || 'N/A') : '••••••••'}
+                      </p>
+                      <button
+                        suppressHydrationWarning
+                        onClick={() => setShowPasswords(prev => ({ ...prev, [w.id]: !prev[w.id] }))}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-brand-secondary hover:scale-110 transition-transform"
+                      >
 
-                          <Icon icon={showPasswords[w.id] ? "solar:eye-bold-duotone" : "solar:eye-closed-bold-duotone"} className="w-4 h-4" />
-                        </button>
+                        <Icon icon={showPasswords[w.id] ? "solar:eye-bold-duotone" : "solar:eye-closed-bold-duotone"} className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 </td>
@@ -168,7 +168,7 @@ export default function WholesalersPage() {
                     </button>
                     <button
                       suppressHydrationWarning
-                      onClick={async () => { if(confirm("Terminate this account? All associated data will be frozen.")) { await deleteWholesaler(w.id); toast.success("Access Terminated"); loadData(); } }}
+                      onClick={async () => { if (confirm("Terminate this account? All associated data will be frozen.")) { await deleteWholesaler(w.id); toast.success("Access Terminated"); loadData(); } }}
                       className="p-3 text-brand-primary/40 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                     >
 
@@ -187,7 +187,7 @@ export default function WholesalersPage() {
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-primary/80 backdrop-blur-md p-4 overflow-y-auto">
           <div className="bg-white max-w-2xl w-full rounded-[40px] p-8 lg:p-12 shadow-2xl relative my-auto border border-white/20">
-            <button onClick={()=>setIsOpen(false)} className="absolute top-8 right-8 w-10 h-10 bg-brand-primary/5 rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
+            <button onClick={() => setIsOpen(false)} className="absolute top-8 right-8 w-10 h-10 bg-brand-primary/5 rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
               <Icon icon="lucide:x" className="w-5 h-5" />
             </button>
 
@@ -200,12 +200,12 @@ export default function WholesalersPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 ml-2">Full Name</label>
-                  <input suppressHydrationWarning type="text" value={form.name} onChange={e=>setForm({...form, name: e.target.value})} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" required />
+                  <input suppressHydrationWarning type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" required />
 
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 ml-2">WhatsApp Number</label>
-                  <input suppressHydrationWarning type="tel" value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary placeholder:text-brand-primary/10" placeholder="Required for Login" required />
+                  <input suppressHydrationWarning type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary placeholder:text-brand-primary/10" placeholder="Required for Login" required />
 
                 </div>
               </div>
@@ -213,42 +213,42 @@ export default function WholesalersPage() {
               {!editingId && (
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 ml-2">Password</label>
-                  <input type="text" value={form.password} onChange={e=>setForm({...form, password: e.target.value})} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" placeholder="Set password" required />
+                  <input type="text" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" placeholder="Set password" required />
                 </div>
               )}
 
               {editingId && (
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 ml-2">New Access Code (Leave blank to keep current)</label>
-                  <input type="text" value={form.password} onChange={e=>setForm({...form, password: e.target.value})} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" placeholder="Enter new password" />
+                  <input type="text" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" placeholder="Enter new password" />
                 </div>
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 ml-2">Company Name</label>
-                  <input type="text" value={form.companyName || ""} onChange={e=>setForm({...form, companyName: e.target.value})} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" />
+                  <input type="text" value={form.companyName || ""} onChange={e => setForm({ ...form, companyName: e.target.value })} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 ml-2">Optional Email</label>
-                  <input type="email" value={form.email || ""} onChange={e=>setForm({...form, email: e.target.value})} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" placeholder="Optional for notifications" />
+                  <input type="email" value={form.email || ""} onChange={e => setForm({ ...form, email: e.target.value })} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary" placeholder="Optional for notifications" />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 ml-2">Company Address</label>
-                <textarea value={form.address || ""} onChange={e=>setForm({...form, address: e.target.value})} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary h-24" />
+                <textarea value={form.address || ""} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary h-24" />
               </div>
 
               <div className="flex items-center gap-4 py-4">
                 <label className="text-xs font-bold uppercase tracking-widest text-brand-primary/60">Account Access:</label>
-                <button type="button" onClick={()=>setForm({...form, isActive: !form.isActive})} className={`px-6 py-2 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all ${form.isActive ? 'bg-green-500 text-white shadow-[0_5px_15px_rgba(34,197,94,0.3)]' : 'bg-red-500 text-white shadow-[0_5px_15px_rgba(239,68,68,0.3)]'}`}>
+                <button type="button" onClick={() => setForm({ ...form, isActive: !form.isActive })} className={`px-6 py-2 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all ${form.isActive ? 'bg-green-500 text-white shadow-[0_5px_15px_rgba(34,197,94,0.3)]' : 'bg-red-500 text-white shadow-[0_5px_15px_rgba(239,68,68,0.3)]'}`}>
                   {form.isActive ? 'Active' : 'Deactivated'}
                 </button>
               </div>
 
               <div className="pt-8 border-t border-brand-primary/5 flex justify-end gap-4">
-                <button type="button" onClick={()=>setIsOpen(false)} className="px-8 py-4 rounded-2xl font-bold uppercase tracking-widest bg-brand-primary/5 hover:bg-brand-primary/10 transition-all text-xs text-brand-primary">Discard</button>
+                <button type="button" onClick={() => setIsOpen(false)} className="px-8 py-4 rounded-2xl font-bold uppercase tracking-widest bg-brand-primary/5 hover:bg-brand-primary/10 transition-all text-xs text-brand-primary">Discard</button>
                 <button type="submit" className="px-10 py-4 rounded-2xl font-bold uppercase tracking-widest bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl text-xs flex items-center gap-2 hover:-translate-y-1 active:scale-95">
                   <Icon icon="solar:shield-check-bold" className="w-4 h-4" />
                   {editingId ? 'Update Information' : 'Authorize Member'}
