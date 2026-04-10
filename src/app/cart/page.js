@@ -41,7 +41,7 @@ export default function CartPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    key={item.id} 
+                    key={item.id + (item.variantName || '')} 
                     className="bg-white p-4 lg:p-6 rounded-[32px] border border-brand-primary/5 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row items-center gap-6"
                   >
                     <div className="w-24 h-28 shrink-0 rounded-2xl overflow-hidden bg-brand-accent border border-brand-primary/5">
@@ -51,19 +51,24 @@ export default function CartPage() {
                     <div className="flex-grow text-center sm:text-left">
                        <p className="text-[9px] font-bold text-brand-secondary uppercase tracking-widest mb-1">{item.category}</p>
                        <h3 className="text-lg lg:text-xl font-serif font-bold text-brand-primary leading-tight">{item.name}</h3>
+                       {item.variantName && (
+                         <div className="mt-1 flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-brand-secondary bg-brand-secondary/10 px-2 py-0.5 rounded-full uppercase tracking-widest">{item.variantName}</span>
+                         </div>
+                       )}
                        <p className="text-sm font-bold text-brand-primary/40 mt-1 uppercase tracking-widest">₹{item.price.toLocaleString()}</p>
                     </div>
 
                     <div className="flex items-center gap-4 bg-brand-accent/50 p-2 rounded-2xl border border-brand-primary/5">
                        <button 
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.id, item.variantName, item.quantity - 1)}
                         className="w-10 h-10 rounded-xl bg-white flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all shadow-sm"
                        >
                           <Icon icon="lucide:minus" className="w-4 h-4" />
                        </button>
                        <span className="w-10 text-center font-bold font-serif text-brand-primary">{item.quantity}</span>
                        <button 
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.id, item.variantName, item.quantity + 1)}
                         className="w-10 h-10 rounded-xl bg-white flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all shadow-sm"
                        >
                           <Icon icon="lucide:plus" className="w-4 h-4" />
@@ -76,7 +81,7 @@ export default function CartPage() {
                     </div>
 
                     <button 
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.id, item.variantName)}
                       className="p-3 text-brand-primary/20 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                     >
                        <Icon icon="solar:trash-bin-trash-bold" className="w-5 h-5" />

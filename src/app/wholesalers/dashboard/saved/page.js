@@ -108,13 +108,6 @@ export default function SavedPage() {
                    key={product.id}
                    className="bg-white rounded-[40px] overflow-hidden border border-brand-primary/5 shadow-sm hover:shadow-2xl transition-all duration-500 group relative flex flex-col"
                  >
-                    {/* Floating Remove Button */}
-                    <button
-                      onClick={() => toggleSave(product)}
-                      className="absolute top-4 right-4 w-12 h-12 bg-white/80 backdrop-blur-md shadow-xl rounded-full z-20 flex items-center justify-center text-rose-500 hover:scale-110 active:scale-90 transition-all border border-white/20"
-                    >
-                      <Icon icon="solar:heart-bold" className="w-6 h-6 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" />
-                    </button>
 
                     <Link href={`/product/${product.id}`} className="aspect-square block overflow-hidden bg-brand-accent/30 relative">
                        <img
@@ -126,9 +119,17 @@ export default function SavedPage() {
                     </Link>
 
                     <div className="p-8 grow flex flex-col">
-                       <div className="mb-4">
-                          <p className="text-[9px] font-bold text-brand-secondary uppercase tracking-[0.2em] mb-2">{product.category}</p>
-                          <h3 className="text-xl font-serif font-bold text-brand-primary line-clamp-2 leading-tight group-hover:text-brand-secondary transition-colors">{product.name}</h3>
+                       <div className="mb-4 flex justify-between items-start gap-3">
+                          <div className="grow overflow-hidden text-left">
+                             <p className="text-[9px] font-bold text-brand-secondary uppercase tracking-[0.2em] mb-2">{product.category}</p>
+                             <h3 className="text-xl font-serif font-bold text-brand-primary line-clamp-2 leading-tight group-hover:text-brand-secondary transition-colors text-left">{product.name}</h3>
+                          </div>
+                          <button 
+                            onClick={() => toggleSave(product)}
+                            className="shrink-0 text-rose-500 hover:scale-110 transition-all mt-4"
+                          >
+                             <Icon icon="solar:heart-bold" className="w-6 h-6 lg:w-7 lg:h-7" />
+                          </button>
                        </div>
 
                        <div className="mt-auto pt-6 border-t border-brand-primary/5 flex items-center justify-between gap-4">

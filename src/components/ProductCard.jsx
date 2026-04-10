@@ -4,8 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
 
 export default function ProductCard({ product }) {
+  const { toggleSave, isProductSaved, isAuthenticated } = useCart();
+  const saved = isProductSaved(product.id);
 
   return (
     <motion.div
@@ -54,16 +57,40 @@ export default function ProductCard({ product }) {
         </div>
       </Link>
 
-      <div className="p-3 lg:p-4 flex-grow flex flex-col text-center">
-        <Link href={`/product/${product.id}`}>
-          <p className="text-[7px] lg:text-[10px] font-bold uppercase tracking-[0.15em] lg:tracking-[0.2em] text-brand-secondary/80 mb-1 lg:mb-2 line-clamp-1">
-            {product.category}
-          </p>
-
-          <h3 className="text-xs lg:text-xl font-serif text-brand-primary font-bold mb-2 lg:mb-6 group-hover:text-brand-secondary transition-colors line-clamp-2 leading-tight">
-            {product.name}
-          </h3>
-        </Link>
+      <div className="p-3 lg:p-4 flex-grow flex flex-col">
+        <div className="text-center transition-all duration-500">
+          <Link href={`/product/${product.id}`}>
+            <p className="text-[7px] lg:text-[10px] font-bold uppercase tracking-[0.15em] lg:tracking-[0.2em] text-brand-secondary/80 mb-1 lg:mb-2 line-clamp-1">
+              {product.category}
+            </p>
+          </Link>
+          
+          <div className="flex justify-between items-start gap-2 mb-2 lg:mb-6">
+            <Link href={`/product/${product.id}`} className="grow">
+              <h3 className="text-xs lg:text-xl font-serif text-brand-primary font-bold group-hover:text-brand-secondary transition-colors line-clamp-2 leading-tight text-left">
+                {product.name}
+              </h3>
+            </Link>
+            
+            {isAuthenticated && (
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleSave(product);
+                }}
+                className={`transition-all duration-300 shrink-0 ${
+                  saved ? "text-rose-500" : "text-brand-primary/10 hover:text-brand-primary"
+                }`}
+              >
+                <Icon 
+                  icon={saved ? "solar:heart-bold" : "solar:heart-linear"} 
+                  className={`w-5 h-5 lg:w-6 lg:h-6 ${saved ? "drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : ""}`} 
+                />
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </motion.div>
   );

@@ -131,6 +131,20 @@ function LoginForm() {
                     <Icon icon={showPassword ? "solar:eye-bold-duotone" : "solar:eye-closed-bold-duotone"} className="w-5 lg:w-6 h-5 lg:h-6" />
                   </button>
                 </div>
+                <div className="flex justify-end pr-2">
+                   <button 
+                    type="button" 
+                    onClick={() => {
+                        if (!phone) return toast.error("Please enter your WhatsApp Number first");
+                        const whatsappNum = "917383699199";
+                        const text = `Hi, *Shree Shyam Darshan Team*\n\nI forgot my access code for the Wholesale Portal.\nMy WhatsApp Number: ${phone}\n\nPlease help me reset it.`;
+                        window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(text)}`, "_blank");
+                    }} 
+                    className="text-[9px] font-bold text-brand-secondary hover:text-brand-primary uppercase tracking-widest transition-colors outline-none"
+                   >
+                     Forgot Access Code?
+                   </button>
+                </div>
             </div>
 
             <button

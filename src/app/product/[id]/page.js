@@ -66,7 +66,12 @@ export default async function ProductPage({ params }) {
              offerPrice: dbProduct.offerPrice,
              showSizeGuide: dbProduct.showSizeGuide,
              showWashCare: dbProduct.showWashCare,
-             details: dbProduct.details
+             details: dbProduct.details,
+             wholesalerDescription: dbProduct.wholesalerDescription,
+             variants: dbProduct.variants,
+             mrp: dbProduct.mrp,
+             discountPercent: dbProduct.discountPercent,
+             allowToBuy: dbProduct.allowToBuy
          };
 
          const mappedRelated = relatedDb.map(p => ({

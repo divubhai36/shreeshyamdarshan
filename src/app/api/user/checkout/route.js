@@ -34,9 +34,11 @@ export async function POST(req) {
               productId: item.id,
               quantity: item.quantity,
               price: item.price,
+              variantName: item.variantName,
             })),
           },
         },
+        include: { wholesaler: true }
       });
       return order;
     });

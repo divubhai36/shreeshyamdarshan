@@ -168,7 +168,10 @@ export default function OrdersPage() {
                       </div>
                       <div>
                         <p className="font-bold text-brand-primary">{item.product?.name}</p>
-                        <p className="text-[10px] text-brand-primary/40 uppercase font-bold tracking-widest mt-1">₹{item.price.toLocaleString()} per unit</p>
+                        <p className="text-[10px] text-brand-primary/40 uppercase font-bold tracking-widest mt-1">
+                            ₹{item.price.toLocaleString()} per unit 
+                            {item.variantName && <span className="text-brand-secondary ml-2">({item.variantName})</span>}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">

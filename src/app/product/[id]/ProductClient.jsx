@@ -19,6 +19,13 @@ export default function ProductClient({ product, navCategory, subCategory, inner
   const [activeVideo, setActiveVideo] = useState(null);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const [isZooming, setIsZooming] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
+  useEffect(() => {
+    if (isAuthenticated && product.variants && product.variants.length > 0) {
+      setSelectedVariant(product.variants[0]);
+    }
+  }, [isAuthenticated, product.variants]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -62,7 +69,12 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
   const handleWhatsApp = () => {
     const phone = "917383699199";
-    const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Product:* ${product.name}\n*Quantity:* ${quantity} pcs\n------------------\nPlease help me with the details.`;
+    const discount = product.isOfferProduct ? (product.discountPercent || 0) : 0;
+    const variantInfo = selectedVariant ? `\n*Variant:* ${selectedVariant.name}` : "";
+    const rawPrice = selectedVariant ? selectedVariant.price : (product.price);
+    const finalPrice = discount > 0 ? (rawPrice * (1 - discount / 100)).toFixed(2) : rawPrice;
+
+    const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Product:* ${product.name}${variantInfo}\n*Price:* ₹${finalPrice}\n*Quantity:* ${quantity} pcs\n------------------\nPlease help me with the details.`;
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, "_blank");
   };
@@ -218,7 +230,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-start">
               <div className="space-y-6 lg:sticky lg:top-24">
-                <div 
+                <div
                   onMouseMove={handleMouseMove}
                   onMouseEnter={() => setIsZooming(true)}
                   onMouseLeave={() => setIsZooming(false)}
@@ -246,41 +258,6 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     </div>
                   )}
 
-                  {/* Cinema Floating Like Button */}
-                  {isAuthenticated && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="absolute top-1 right-1 z-30"
-                    >
-                      <motion.button
-                        whileHover={{ scale: 1.1, y: -4 }}
-                        whileTap={{ scale: 0.85 }}
-                        onClick={() => toggleSave(product)}
-                        className={`w-16 h-16 rounded-[24px] flex items-center justify-center transition-all duration-300 relative overflow-hidden ${saved ? "text-rose-500" : "text-white"
-                          }`}
-                      >
-                        {/* ✅ Single element (NO re-mount) */}
-                        <motion.div
-                          animate={{
-                            scale: saved ? [1, 1.25, 1] : 1,
-                          }}
-                          transition={{
-                            duration: 0.25,
-                            ease: "easeOut",
-                          }}
-                        >
-                          <Icon
-                            icon={saved ? "solar:heart-bold" : "solar:heart-linear"}
-                            className={`w-8 h-8 ${saved
-                              ? "drop-shadow-[0_0_15px_rgba(244,63,94,0.6)]"
-                              : "drop-shadow-[0_0_15px_rgba(26,67,50,0.4)]"
-                              }`}
-                          />
-                        </motion.div>
-                      </motion.button>
-                    </motion.div>
-                  )}
                 </div>
 
                 {productImages.length > 1 && (
@@ -316,12 +293,65 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     </span>
                   </div> */}
 
-                  <h1 className="text-3xl lg:text-5xl font-serif font-bold text-brand-primary leading-tight mb-6 lg:mb-8 tracking-tight text-left capitalize">
-                    {product.name}
-                  </h1>
+                  <div className="flex justify-between items-start gap-4 mb-6 lg:mb-8 text-left">
+                    <h1 className="text-3xl lg:text-5xl font-serif font-bold text-brand-primary leading-tight tracking-tight text-left capitalize grow">
+                      {product.name}
+                    </h1>
+                    {isAuthenticated && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="shrink-0"
+                      >
+                        <motion.button
+                          whileHover={{ scale: 1.1, y: -2 }}
+                          whileTap={{ scale: 0.85 }}
+                          onClick={() => toggleSave(product)}
+                          className={`transition-all duration-300 relative ${saved ? "text-rose-500" : "text-brand-primary hover:scale-95"
+                            }`}
+                        >
+                          <motion.div
+                            animate={{
+                              scale: saved ? [1, 1.25, 1] : 1,
+                            }}
+                            transition={{
+                              duration: 0.25,
+                              ease: "easeOut",
+                            }}
+                          >
+                            <Icon
+                              icon={saved ? "solar:heart-bold" : "solar:heart-linear"}
+                              className={`w-8 h-8 lg:w-10 lg:h-10 ${saved
+                                ? "drop-shadow-[0_0_15px_rgba(244,63,94,0.3)]"
+                                : ""
+                                }`}
+                            />
+                          </motion.div>
+                        </motion.button>
+                      </motion.div>
+                    )}
+                  </div>
 
-                  <div className="flex items-center gap-6 mb-8 lg:mb-12 text-left">
-                    {product.isOfferProduct && product.offerPrice ? (
+                  <div className="flex items-center gap-6 mb-8 lg:mb-10 text-left">
+                    {isAuthenticated ? (
+                       <div className="flex flex-col">
+                          <span className="text-3xl lg:text-4xl font-serif font-bold text-brand-primary">
+                            ₹{selectedVariant
+                                ? (product.isOfferProduct ? (selectedVariant.price * (1 - product.discountPercent / 100)).toFixed(2) : selectedVariant.price)
+                                : (product.isOfferProduct ? (product.price * (1 - product.discountPercent / 100)).toFixed(2) : product.price)
+                            }
+                          </span>
+                          {product.isOfferProduct && (
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[10px] font-bold text-brand-primary/30 line-through">₹{selectedVariant ? selectedVariant.price : product.price}</span>
+                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{product.discountPercent}% OFF Partner Deal</span>
+                            </div>
+                          )}
+                          {!selectedVariant && product.variants?.length > 0 && (
+                             <span className="text-[8px] font-bold text-brand-secondary uppercase tracking-widest mt-1 italic">Please select size/variant</span>
+                          )}
+                       </div>
+                    ) : product.isOfferProduct && product.offerPrice ? (
                       <div className="flex flex-col">
                         <span className="text-3xl lg:text-4xl font-serif font-bold text-red-600">
                           ₹{product.offerPrice}
@@ -345,6 +375,32 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                       </span>
                     </div>
                   </div>
+
+                  {/* Variant Selection UI */}
+                  {Array.isArray(product.variants) && product.variants.length > 0 && (
+                    <div className="mb-8">
+                      <p className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-[0.2em] mb-4">Select Variant</p>
+                      <div className="flex flex-wrap gap-3">
+                        {product.variants.map((v, i) => {
+                          const discountedPrice = product.isOfferProduct ? (v.price * (1 - product.discountPercent / 100)).toFixed(2) : v.price;
+                          return (
+                            <button
+                              key={i}
+                              onClick={() => setSelectedVariant(selectedVariant?.name === v.name ? null : v)}
+                              className={`px-5 py-3 rounded-xl border-2 font-bold text-[11px] transition-all flex flex-col items-center ${
+                                selectedVariant?.name === v.name
+                                  ? "border-brand-primary bg-brand-primary text-white shadow-lg"
+                                  : "border-brand-primary/10 hover:border-brand-primary/40 text-brand-primary bg-white"
+                              }`}
+                            >
+                              <span>{v.name}</span>
+                              <span className={`text-[9px] mt-0.5 ${selectedVariant?.name === v.name ? 'text-brand-secondary' : 'text-brand-primary/40'}`}>₹{discountedPrice}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="mb-6 text-left">
                     <p className="text-brand-primary/60 text-[14px] lg:text-[16px] leading-relaxed font-serif italic mb-4">
@@ -403,14 +459,62 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                         ))}
                       </div>
                     )}
+
+                    {/* Wholesaler Description */}
+                    {isAuthenticated && product.wholesalerDescription && (
+                      <div className="my-8 p-6 bg-brand-secondary/5 rounded-3xl border border-brand-secondary/20 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-all">
+                          <Icon icon="solar:medal-star-bold" className="w-12 h-12 text-brand-secondary" />
+                        </div>
+                        <h4 className="text-[10px] font-bold text-brand-secondary uppercase tracking-[0.3em] mb-3 flex items-center gap-2">
+                          <Icon icon="solar:crown-bold" className="w-4 h-4" />
+                          Wholesaler Exclusive info
+                        </h4>
+                        <p className="text-brand-primary/80 text-[13px] font-serif leading-relaxed italic">
+                          {product.wholesalerDescription}
+                        </p>
+                      </div>
+                    )}
                   </div>
+
+                  {product.allowToBuy !== false && (
+                    <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                      <div className="flex items-center bg-white border border-brand-primary/10 rounded-2xl p-1 shrink-0 w-full sm:w-auto">
+                        <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 flex items-center justify-center text-brand-primary hover:bg-brand-primary/5 rounded-xl transition-all">
+                          <Icon icon="lucide:minus" />
+                        </button>
+                        <input
+                          type="number"
+                          value={quantity}
+                          onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-16 text-center font-bold text-brand-primary focus:outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                          <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 flex items-center justify-center text-brand-primary hover:bg-brand-primary/5 rounded-xl transition-all">
+                          <Icon icon="lucide:plus" />
+                        </button>
+                      </div>
+
+                    <button
+                      onClick={() => {
+                        const discount = product.isOfferProduct ? (product.discountPercent || 0) : 0;
+                        const rawPrice = selectedVariant ? selectedVariant.price : product.price;
+                        const finalPrice = discount > 0 ? (rawPrice * (1 - discount / 100)).toFixed(2) : rawPrice;
+                        addToCart(product, quantity, selectedVariant?.name, finalPrice);
+                      }}
+                      className="grow bg-brand-primary text-white py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-xl hover:bg-brand-secondary transition-all active:scale-[0.98] group"
+                    >
+                      <Icon icon="solar:cart-large-bold" className="w-5 h-5" />
+                      <span>Add To Cart</span>
+                    </button>
+                    </div>
+                  )}
 
                   <button
                     onClick={handleWhatsApp}
-                    className="w-full bg-brand-primary text-white py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-[0_20px_40px_-10px_rgba(26,67,50,0.3)] hover:bg-brand-secondary hover:translate-y-[-4px] transition-all active:scale-[0.98] group"
+                    className="w-full bg-white text-brand-primary border border-brand-primary/10 py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-sm hover:shadow-lg hover:border-brand-primary/20 transition-all active:scale-[0.98] group"
                   >
                     <Icon icon="logos:whatsapp-icon" className="w-6 h-6" />
-                    <span>Order On Whatsapp</span>
+                    <span>Inquiry On Whatsapp</span>
                   </button>
 
                   <div className="mt-8 space-y-0 text-left">
