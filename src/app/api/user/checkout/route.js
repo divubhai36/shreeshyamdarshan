@@ -19,6 +19,9 @@ export async function POST(req) {
       return NextResponse.json({ error: "Cannot process empty registry" }, { status: 400 });
     }
 
+    // Calculate original total from items
+    const originalTotal = items.reduce((acc, it) => acc + (it.originalPrice || it.price) * it.quantity, 0);
+
     // Generate unique order number
     const orderNumber = `SSD-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000).toString().padStart(3, "0")}`;
 
@@ -28,12 +31,14 @@ export async function POST(req) {
           orderNumber,
           wholesalerId: session.userId,
           totalAmount,
+          originalTotal,
           status: "PENDING",
           items: {
             create: items.map((item) => ({
               productId: item.id,
               quantity: item.quantity,
               price: item.price,
+              originalPrice: item.originalPrice || item.price,
               variantName: item.variantName,
             })),
           },

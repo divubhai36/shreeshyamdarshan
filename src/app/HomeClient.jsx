@@ -190,7 +190,7 @@ export default function HomeClient({ products, categories, reviews }) {
                {/* 2. Ready Stock Section */}
                <section className="py-12 lg:py-24 bg-white border-b border-brand-primary/5 relative">
                   <div className="container mx-auto px-4 max-w-7xl">
-                     <div className="flex flex-col items-center text-center space-y-10">
+                     <div className="flex flex-col items-center text-center space-y-10 pb-12 sm:pb-16">
                         <motion.div
                            initial={{ opacity: 0, scale: 0.9 }}
                            whileInView={{ opacity: 1, scale: 1 }}
@@ -215,28 +215,59 @@ export default function HomeClient({ products, categories, reviews }) {
                               whileInView={{ opacity: 1 }}
                               viewport={{ once: true }}
                               transition={{ delay: 0.2 }}
-                              className="text-brand-primary/40 text-[10px] lg:text-xs font-bold uppercase tracking-[0.4em] max-w-2xl mx-auto"
+                              className="text-brand-primary/40 text-[10px] lg:text-xs font-bold uppercase tracking-[0.4em] max-w-2xl mx-auto px-4"
                            >
                               Skip the weaving timeline. Access the immediate dispatch vault featuring our most revered designs ready to ship within 24 hours of confirmation.
                            </motion.p>
                         </div>
-
-                        <motion.div
-                           initial={{ opacity: 0, y: 30 }}
-                           whileInView={{ opacity: 1, y: 0 }}
-                           viewport={{ once: true }}
-                           transition={{ delay: 0.4 }}
-                        >
-                           <Link
-                              href="/wholesalers/dashboard/collection/ready-stock"
-                              className="px-16 py-6 bg-brand-primary text-white rounded-[30px] font-bold uppercase tracking-[0.3em] text-xs hover:bg-brand-secondary transition-all shadow-[0_25px_50px_-12px_rgba(26,67,50,0.4)] flex items-center gap-4 group"
-                           >
-                              Open Vault
-                              <Icon icon="solar:box-minimalistic-bold-duotone" className="w-5 h-5 group-hover:scale-125 transition-transform" />
-                           </Link>
-                        </motion.div>
                      </div>
                   </div>
+
+                  {/* Full Width Strip */}
+                  <motion.div
+                     initial={{ opacity: 0 }}
+                     whileInView={{ opacity: 1 }}
+                     viewport={{ once: true }}
+                     className="w-full relative group"
+                  >
+                     <Link
+                        href="/wholesalers/dashboard/collection/ready-stock"
+                        className="flex items-center justify-center gap-6 sm:gap-12 py-10 sm:py-16 bg-brand-primary text-white hover:bg-brand-primary transition-all duration-700 relative overflow-hidden"
+                     >
+                        {/* Animated Patterns */}
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity">
+                           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/silk.png')]" />
+                        </div>
+
+                        <div className="hidden sm:block shrink-0 translate-x-12 group-hover:translate-x-0 opacity-0 group-hover:opacity-20 transition-all duration-700">
+                           <Icon icon="solar:box-minimalistic-bold-duotone" className="w-16 h-16 sm:w-24 sm:h-24" />
+                        </div>
+
+                        <div className="relative z-10 flex flex-col items-center gap-2 sm:gap-4">
+                           <span className="text-xs sm:text-xl font-bold uppercase tracking-[0.4em] text-white/50 ">Premium Customer Collection</span>
+                           <span className="text-lg sm:text-3xl lg:text-4xl font-serif font-bold uppercase tracking-[0.2em] sm:tracking-[0.2em] flex items-center gap-4 sm:gap-10">
+                              <Icon icon="lucide:minus" className="w-10 h-1 hidden sm:block opacity-20" />
+                              Check Out Our Ready Stock
+                              <Icon icon="lucide:minus" className="w-10 h-1 hidden sm:block opacity-20" />
+                           </span>
+                           <motion.div
+                              animate={{ x: [0, 10, 0] }}
+                              transition={{ repeat: Infinity, duration: 2 }}
+                              className="flex items-center gap-3 text-brand-secondary font-bold text-[10px] sm:text-xl tracking-[0.14em] mt-2"
+                           >
+                              Click Here to Check it out
+                              <Icon icon="lucide:arrow-right" className="w-4 h-4" />
+                           </motion.div>
+                        </div>
+
+                        <div className="hidden sm:block shrink-0 -translate-x-12 group-hover:translate-x-0 opacity-0 group-hover:opacity-20 transition-all duration-700">
+                           <Icon icon="solar:cart-3-bold-duotone" className="w-16 h-16 sm:w-24 sm:h-24 rotate-12" />
+                        </div>
+
+                        {/* Shine Effect */}
+                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[2s] bg-gradient-to-r from-transparent via-white/5 to-transparent shadow-2xl" />
+                     </Link>
+                  </motion.div>
 
                   {/* Decorative Elements */}
                   <div className="absolute bottom-0 left-0 w-full h-[1px] bg-linear-to-r from-transparent via-brand-secondary/20 to-transparent" />
@@ -246,10 +277,24 @@ export default function HomeClient({ products, categories, reviews }) {
 
          {/* Featured Cinematic Reel Section */}
          <section className="py-12 lg:py-10 container mx-auto px-4 max-w-7xl">
-            <div className="flex flex-col items-center mb-10 lg:mb-16 text-center">
+            <div className="flex flex-col items-center mb-4 lg:mb-16 text-center">
                <div className="text-brand-secondary font-bold text-[10px] lg:text-xs tracking-[0.4em] uppercase mb-3 text-center">Live From Surat</div>
-               <h2 className="text-2xl sm:text-4xl lg:text-6xl font-serif font-bold text-brand-primary uppercase text-center whitespace-nowrap">Experience <span className="italic font-normal">Our World</span></h2>
-               <div className="w-20 lg:w-32 h-[1px] bg-brand-primary/10 mt-6 lg:mt-8"></div>
+               <h2 className="text-2xl sm:text-4xl lg:text-6xl font-serif font-bold text-brand-primary uppercase text-center whitespace-nowrap">See <span className="italic font-normal">Who We Are</span></h2>
+
+               <div className="w-full overflow-hidden py-4 mt-4 border-y border-brand-primary/5 bg-brand-primary/[0.01]">
+                  <motion.div
+                     animate={{ x: [0, -1030] }}
+                     transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
+                     className="flex whitespace-nowrap gap-12 sm:gap-20 items-center"
+                  >
+                     {[...Array(8)].map((_, i) => (
+                        <div key={i} className="flex items-center gap-12 sm:gap-20">
+                           <span className="text-sm sm:text-lg font-serif font-bold text-brand-primary uppercase tracking-[0.3em]">Watch Our Exclusive Video</span>
+                           <Icon icon="solar:star-ring-bold-duotone" className="w-4 h-4 text-brand-secondary" />
+                        </div>
+                     ))}
+                  </motion.div>
+               </div>
             </div>
 
             <motion.div

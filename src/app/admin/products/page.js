@@ -20,7 +20,7 @@ export default function ProductsPage() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
 
-    const initForm = { productId: "", name: "", slug: "", description: "", wholesalerDescription: "", mrp: 0, price: 0, offerPrice: 0, discountPercent: 0, categoryId: "", subCategoryId: "", innerSubId: null, images: [], videos: [], isBestSeller: false, isOfferProduct: false, isReadyStock: false, showSizeGuide: false, showWashCare: false, allowToBuy: true, details: [], variants: [] };
+    const initForm = { productId: "", name: "", slug: "", description: "", wholesalerDescription: "", mrp: 0, price: 0, offerPrice: 0, discountPercent: 0, categoryId: "", subCategoryId: "", innerSubId: null, images: [], videos: [], isBestSeller: false, isOfferProduct: false, isReadyStock: false, showSizeGuide: false, showWashCare: false, allowToBuy: true, details: [], variants: [], unit: "PIECE", isVisible: true };
     const [form, setForm] = useState(initForm);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [uploadingVideo, setUploadingVideo] = useState(false);
@@ -80,6 +80,16 @@ export default function ProductsPage() {
         } finally {
             if (type === 'image') setUploadingImage(false);
             else setUploadingVideo(false);
+        }
+    };
+
+    const handleToggleVisibility = async (p) => {
+        try {
+            await updateProduct(p.id, { ...p, isVisible: !p.isVisible });
+            loadData();
+            toast.success(`Product ${!p.isVisible ? 'Visible' : 'Hidden'}`);
+        } catch (err) {
+            toast.error("Failed to toggle visibility");
         }
     };
 
@@ -150,7 +160,9 @@ export default function ProductsPage() {
             showSizeGuide: !!form.showSizeGuide,
             showWashCare: !!form.showWashCare,
             isReadyStock: !!form.isReadyStock,
-            allowToBuy: !!form.allowToBuy
+            allowToBuy: !!form.allowToBuy,
+            isVisible: !!form.isVisible,
+            unit: form.unit || "PIECE"
         };
         if (!payload.innerSubId) payload.innerSubId = null;
 
@@ -260,8 +272,16 @@ export default function ProductsPage() {
                                         </div>
                                     </td>
                                     <td className="p-5 text-right">
-                                        <button onClick={() => {
-                                            setEditingId(p.id);
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={() => handleToggleVisibility(p)}
+                                                className={`p-2 rounded-lg transition-all ${p.isVisible ? 'text-emerald-500 hover:bg-emerald-50' : 'text-gray-300 hover:bg-gray-100'}`}
+                                                title={p.isVisible ? "Visible on Website" : "Hidden from Website"}
+                                            >
+                                                <Icon icon={p.isVisible ? "solar:eye-bold" : "solar:eye-closed-bold"} className="w-5 h-5" />
+                                            </button>
+                                            <button onClick={() => {
+                                                setEditingId(p.id);
                                             setForm({
                                                 ...p,
                                                 innerSubId: p.innerSubId || "",
@@ -270,14 +290,16 @@ export default function ProductsPage() {
                                                 isReadyStock: !!p.isReadyStock,
                                                 wholesalerDescription: p.wholesalerDescription || "",
                                                 allowToBuy: p.allowToBuy !== undefined ? p.allowToBuy : true,
-                                                variants: Array.isArray(p.variants) ? p.variants : []
+                                                variants: Array.isArray(p.variants) ? p.variants : [],
+                                                unit: p.unit || "PIECE",
+                                                isVisible: p.isVisible !== undefined ? p.isVisible : true
                                             });
                                             setOfferType(p.discountPercent > 0 ? "percentage" : "price");
                                             setStep(1);
                                             setIsOpen(true);
                                         }} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg mr-2"><Icon icon="lucide:edit-2" /></button>
                                         <button onClick={() => { setItemToDelete(p); setIsDeleteModalOpen(true); }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Icon icon="lucide:trash-2" /></button>
-
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -419,20 +441,20 @@ export default function ProductsPage() {
                                                                 <div className="flex-1">
                                                                     <label className="text-[10px] uppercase tracking-widest font-black text-brand-primary/40 block mb-2 px-1">Discount (%)</label>
                                                                     <div className="relative">
-                                                                        <input 
-                                                                            type="number" 
-                                                                            min="0" 
-                                                                            max="100" 
-                                                                            onWheel={(e) => e.target.blur()} 
-                                                                            value={form.discountPercent} 
+                                                                        <input
+                                                                            type="number"
+                                                                            min="0"
+                                                                            max="100"
+                                                                            onWheel={(e) => e.target.blur()}
+                                                                            value={form.discountPercent}
                                                                             onChange={e => {
                                                                                 let val = e.target.value;
                                                                                 if (val > 100) val = 100;
                                                                                 if (val < 0) val = 0;
                                                                                 setForm({ ...form, discountPercent: val });
-                                                                            }} 
-                                                                            className="w-full p-5 border border-brand-primary/10 rounded-[24px] bg-brand-primary/5 font-serif font-black text-2xl text-brand-primary outline-none focus:border-brand-primary/40 transition-all" 
-                                                                            placeholder="0" 
+                                                                            }}
+                                                                            className="w-full p-5 border border-brand-primary/10 rounded-[24px] bg-brand-primary/5 font-serif font-black text-2xl text-brand-primary outline-none focus:border-brand-primary/40 transition-all"
+                                                                            placeholder="0"
                                                                         />
                                                                         <span className="absolute right-5 top-1/2 -translate-y-1/2 text-brand-primary/30 text-xl font-bold">%</span>
                                                                     </div>
@@ -440,24 +462,27 @@ export default function ProductsPage() {
                                                                 {/* <span className="font-serif font-black text-xl text-brand-primary">₹{(form.price * (1 - form.discountPercent/100)).toFixed(0)}</span> */}
                                                                 <div className="  flex flex-col items-center justify-center mt-5">
                                                                     <span className="text-[8px] font-black uppercase text-brand-primary/30 mb-1">Price</span>
-                                                                    <span className="font-serif font-black text-xl text-brand-primary">₹{(form.price * (1 - form.discountPercent/100)).toFixed(0)}</span>
+                                                                    <span className="font-serif font-black text-xl text-brand-primary">₹{(form.price * (1 - form.discountPercent / 100)).toFixed(0)}</span>
                                                                 </div>
                                                             </div>
                                                         </motion.div>
                                                     )}
                                                 </div>
 
-                                                <div className={`p-8 rounded-[32px] border transition-all duration-700 ${form.allowToBuy ? 'bg-emerald-500/5 border-emerald-500/20 shadow-xl shadow-emerald-500/5' : 'bg-brand-primary/5 border-transparent'}`}>
-                                                    <label className="flex items-center justify-between cursor-pointer">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className={`w-12 h-12 rounded-[18px] flex items-center justify-center transition-all ${form.allowToBuy ? 'bg-emerald-500 text-white shadow-lg' : 'bg-brand-primary/10 text-brand-primary'}`}>
-                                                                <Icon icon="solar:cart-large-bold" className="w-6 h-6" />
-                                                            </div>
-                                                            <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${form.allowToBuy ? 'text-emerald-700' : 'text-brand-primary/30'}`}>Allow to Buy</span>
-                                                        </div>
-                                                        <input type="checkbox" checked={form.allowToBuy} onChange={e => setForm({ ...form, allowToBuy: e.target.checked })} className="sr-only peer" />
-                                                        <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-[28px] after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 relative"></div>
-                                                    </label>
+                                                <div className={`p-8 rounded-[32px] border transition-all duration-700 bg-brand-primary/5 border-transparent`}>
+                                                    <label className="text-[10px] uppercase tracking-widest font-black text-brand-primary/40 block mb-4 ml-1">Accept Order In</label>
+                                                    <div className="flex gap-4">
+                                                        {["PIECE", "DOZEN"].map((u) => (
+                                                            <button
+                                                                key={u}
+                                                                type="button"
+                                                                onClick={() => setForm({ ...form, unit: u })}
+                                                                className={`grow py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${form.unit === u ? 'bg-brand-primary text-white shadow-lg' : 'bg-white text-brand-primary/40 border border-brand-primary/10'}`}
+                                                            >
+                                                                {u}
+                                                            </button>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -481,8 +506,8 @@ export default function ProductsPage() {
                                                         type="button"
                                                         title="Quick Inject Sizes (00-6)"
                                                         onClick={() => {
-                                                            const q = ["00","0","1","2","3","4","5","6"];
-                                                            setForm({...form, variants: [...form.variants, ...q.map(s=>({name:s, price: form.price}))]});
+                                                            const q = ["00", "0", "1", "2", "3", "4", "5", "6"];
+                                                            setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ name: s, price: form.price }))] });
                                                             toast.success("Injected common sizes");
                                                         }}
                                                         className="w-10 h-10 bg-brand-secondary/10 text-brand-secondary rounded-[12px] flex items-center justify-center border border-brand-secondary/20 hover:bg-brand-secondary hover:text-white transition-all active:scale-90"
@@ -495,7 +520,7 @@ export default function ProductsPage() {
                                                         title="Quick Inject Dimensions (1ft-3ft)"
                                                         onClick={() => {
                                                             const q = ["1ft", "1.5ft", "2ft", "2.5ft", "3ft"];
-                                                            setForm({...form, variants: [...form.variants, ...q.map(s=>({name:s, price: form.price}))]});
+                                                            setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ name: s, price: form.price }))] });
                                                             toast.success("Injected common dimensions");
                                                         }}
                                                         className="w-10 h-10 bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -509,10 +534,48 @@ export default function ProductsPage() {
 
                                             <div className="space-y-3 flex-grow overflow-y-auto no-scrollbar max-h-[400px]">
                                                 {form.variants.map((v, i) => (
-                                                    <div key={i} className="flex gap-3 items-center px-3 h-12 rounded-2xl bg-brand-accent/10 border border-brand-primary/5 group transition-all hover:bg-white hover:border-brand-primary/10">
-                                                        <input type="text" placeholder="Size" value={v.name} onChange={e => { const nv = [...form.variants]; nv[i].name = e.target.value; setForm({ ...form, variants: nv }); }} className="h-12 flex-1 bg-transparent border-none text-[14px] font-bold text-brand-primary outline-none" required />
-                                                        <input type="number" min="0" onWheel={(e) => e.target.blur()} placeholder="0" value={v.price} onChange={e => { const nv = [...form.variants]; nv[i].price = e.target.value; setForm({ ...form, variants: nv }); }} className="h-12 w-20 bg-transparent border-none text-[16px] font-serif font-bold text-brand-secondary text-right outline-none" required />
-                                                        <button type="button" onClick={() => setForm({ ...form, variants: form.variants.filter((_, idx) => idx !== i) })} className="text-red-500/20 hover:text-red-500 transition-colors"><Icon icon="solar:trash-bin-trash-bold" className="w-4 h-4" /></button>
+                                                    <div key={i} className="flex gap-3 items-center">
+                                                        <div className="flex-1">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Size (e.g. S, M, L, XL)"
+                                                                value={v.name}
+                                                                onChange={e => {
+                                                                    const nv = [...form.variants];
+                                                                    nv[i].name = e.target.value;
+                                                                    setForm({ ...form, variants: nv });
+                                                                }}
+                                                                className="w-full h-12 px-4 rounded-2xl bg-white border border-brand-primary/10 focus:border-brand-primary outline-none text-[14px] font-bold text-brand-primary transition-all"
+                                                                required
+                                                            />
+                                                        </div>
+                                                        <div className="w-28">
+                                                            <input
+                                                                type="number"
+                                                                min="0"
+                                                                onWheel={(e) => e.target.blur()}
+                                                                placeholder="0"
+                                                                value={v.price}
+                                                                onChange={e => {
+                                                                    const nv = [...form.variants];
+                                                                    nv[i].price = e.target.value;
+                                                                    setForm({ ...form, variants: nv });
+                                                                }}
+                                                                className="w-full h-12 px-4 rounded-2xl bg-white border border-brand-primary/10 focus:border-brand-primary outline-none text-[16px] font-serif font-bold text-brand-secondary text-right transition-all"
+                                                                required
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setForm({
+                                                                ...form,
+                                                                variants: form.variants.filter((_, idx) => idx !== i)
+                                                            })}
+                                                            className="h-12 w-12 flex items-center justify-center rounded-2xl border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-400 hover:text-red-500 transition-all"
+                                                        >
+                                                            <Icon icon="solar:trash-bin-trash-bold" className="w-5 h-5" />
+                                                        </button>
+
                                                     </div>
                                                 ))}
                                                 {form.variants.length === 0 && (
@@ -539,24 +602,52 @@ export default function ProductsPage() {
                                                 <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest mt-0.5">Visibility Logic</p>
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-2 gap-4 mb-8">
                                             {[
                                                 { id: 'isBestSeller', label: 'Best Seller', icon: 'solar:star-bold', color: 'text-yellow-500' },
                                                 { id: 'isReadyStock', label: 'Ready Stock', icon: 'solar:box-bold', color: 'text-brand-secondary' },
                                                 { id: 'showSizeGuide', label: 'Size Guide', icon: 'solar:ruler-bold', color: 'text-blue-500' },
                                                 { id: 'showWashCare', label: 'Wash Care', icon: 'ic:twotone-wash', color: 'text-emerald-500' }
                                             ].map((item) => (
-                                                <label key={item.id} className={`flex flex-col gap-4 p-6 rounded-[32px] cursor-pointer border transition-all duration-500 ${form[item.id] ? 'bg-white border-brand-primary/20 shadow-xl' : 'bg-brand-primary/5 border-transparent hover:bg-brand-primary/10'}`}>
+                                                <label key={item.id} className={`flex flex-col gap-4 p-6 rounded-[32px] cursor-pointer border transition-all duration-500 ${form[item.id] ? 'bg-brand-primary/90 border-transparent hover:bg-brand-primary' : 'bg-white border-brand-primary/20'}`}>
                                                     <div className="flex justify-between items-start">
-                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${form[item.id] ? 'bg-brand-primary/5' : 'bg-white/50'}`}>
-                                                            <Icon icon={item.icon} className={`w-5 h-5 ${form[item.id] ? item.color : 'text-brand-primary/10'}`} />
+                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${form[item.id] ? 'bg-white' : 'bg-white/50'}`}>
+                                                            <Icon icon={item.icon} className={`w-5 h-5 ${form[item.id] ? item.color : 'text-brand-primary'}`} />
                                                         </div>
                                                         <input type="checkbox" checked={form[item.id]} onChange={e => setForm({ ...form, [item.id]: e.target.checked })} className="sr-only" />
-                                                        <div className={`w-4 h-4 rounded-full border-2 transition-all ${form[item.id] ? 'bg-brand-primary border-brand-primary' : 'border-brand-primary/10'}`} />
+                                                        <div className={`w-4 h-4 rounded-full border-2 transition-all ${form[item.id] ? 'bg-white border-brand-primary' : 'border-brand-primary/10'}`} />
                                                     </div>
-                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${form[item.id] ? 'text-brand-primary' : 'text-brand-primary/20'}`}>{item.label}</span>
+                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${form[item.id] ? 'text-white' : 'text-brand-primary/70'}`}>{item.label}</span>
                                                 </label>
                                             ))}
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className={`p-8 rounded-[32px] border transition-all duration-700 ${form.isVisible ? 'bg-blue-500/5 border-blue-500/20 shadow-xl shadow-blue-500/5' : 'bg-brand-primary/5 border-transparent'}`}>
+                                                <label className="flex items-center justify-between cursor-pointer">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={`w-12 h-12 rounded-[18px] flex items-center justify-center transition-all ${form.isVisible ? 'bg-blue-500 text-white shadow-lg' : 'bg-brand-primary/10 text-brand-primary'}`}>
+                                                            <Icon icon="solar:eye-bold" className="w-6 h-6" />
+                                                        </div>
+                                                        <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${form.isVisible ? 'text-blue-700' : 'text-brand-primary/30'}`}>Show on Website</span>
+                                                    </div>
+                                                    <input type="checkbox" checked={form.isVisible} onChange={e => setForm({ ...form, isVisible: e.target.checked })} className="sr-only peer" />
+                                                    <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-[28px] after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500 relative"></div>
+                                                </label>
+                                            </div>
+
+                                            <div className={`p-8 rounded-[32px] border transition-all duration-700 ${form.allowToBuy ? 'bg-emerald-500/5 border-emerald-500/20 shadow-xl shadow-emerald-500/5' : 'bg-brand-primary/5 border-transparent'}`}>
+                                                <label className="flex items-center justify-between cursor-pointer">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={`w-12 h-12 rounded-[18px] flex items-center justify-center transition-all ${form.allowToBuy ? 'bg-emerald-500 text-white shadow-lg' : 'bg-brand-primary/10 text-brand-primary'}`}>
+                                                            <Icon icon="solar:cart-large-bold" className="w-6 h-6" />
+                                                        </div>
+                                                        <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${form.allowToBuy ? 'text-emerald-700' : 'text-brand-primary/30'}`}>Allow to Buy</span>
+                                                    </div>
+                                                    <input type="checkbox" checked={form.allowToBuy} onChange={e => setForm({ ...form, allowToBuy: e.target.checked })} className="sr-only peer" />
+                                                    <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-[28px] after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 relative"></div>
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -730,9 +821,9 @@ export default function ProductsPage() {
                         <div className="w-20 h-20 bg-red-50 rounded-[28px] flex items-center justify-center text-red-500 mx-auto mb-8 shadow-inner">
                             <Icon icon="solar:trash-bin-trash-bold-duotone" className="w-10 h-10" />
                         </div>
-                        <h3 className="text-2xl font-serif font-bold text-brand-primary mb-3">Redact Masterpiece?</h3>
-                        <p className="text-[11px] text-brand-primary/40 uppercase font-black tracking-[0.2em] mb-10 leading-relaxed px-4">
-                            "{itemToDelete?.name}" will be permanently expunged from the registry.
+                        <h3 className="text-2xl font-serif font-bold text-brand-primary mb-3">Delete Product?</h3>
+                        <p className="text-[11px] text-brand-primary/40  font-black tracking-[0.2em] mb-10 leading-relaxed px-4">
+                            "{itemToDelete?.name}" will be permanently deleted from the registry.
                         </p>
 
                         <div className="flex gap-4">
@@ -740,7 +831,7 @@ export default function ProductsPage() {
                                 onClick={() => setIsDeleteModalOpen(false)}
                                 className="grow py-5 rounded-[24px] font-black text-[10px] uppercase tracking-widest text-brand-primary hover:bg-gray-50 transition-all border border-brand-primary/10 cursor-pointer"
                             >
-                                Archive
+                                Cancel
                             </button>
                             <button
                                 onClick={async () => {
@@ -751,7 +842,7 @@ export default function ProductsPage() {
                                 }}
                                 className="grow py-5 rounded-[24px] font-black text-[10px] uppercase tracking-widest bg-red-500 text-white hover:bg-red-600 transition-all shadow-xl shadow-red-500/20 cursor-pointer"
                             >
-                                Expunge
+                                Delete
                             </button>
                         </div>
                     </motion.div>

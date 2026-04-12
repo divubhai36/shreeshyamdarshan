@@ -8,35 +8,77 @@ import { Icon } from "@iconify/react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { toast } from "react-hot-toast";
 
 export default function ProductClient({ product, navCategory, subCategory, innerSubCategory, relatedProducts }) {
-  const { addToCart, toggleSave, isProductSaved, isAuthenticated } = useCart();
+  const { addToCart, addMultipleToCart, toggleSave, isProductSaved, isAuthenticated } = useCart();
   const saved = isProductSaved(product.id);
+
   // State Management
-  const [quantity, setQuantity] = useState(1);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [activeAccordion, setActiveAccordion] = useState(null);
   const [activeVideo, setActiveVideo] = useState(null);
-  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
-  const [isZooming, setIsZooming] = useState(false);
-  const [selectedVariant, setSelectedVariant] = useState(null);
 
-  useEffect(() => {
-    if (isAuthenticated && product.variants && product.variants.length > 0) {
-      setSelectedVariant(product.variants[0]);
-    }
-  }, [isAuthenticated, product.variants]);
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [variantQuantities, setVariantQuantities] = useState({}); // { variantName: quantity }
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [product.id]);
 
-  const handleMouseMove = (e) => {
-    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
-    setZoomPos({ x, y });
+  // Handle single product quantity (if no variants)
+  useEffect(() => {
+    if (!product.variants || product.variants.length === 0) {
+      setVariantQuantities({ [product.name]: 0 });
+    } else {
+      const initial = {};
+      product.variants.forEach(v => initial[v.name] = 0);
+      setVariantQuantities(initial);
+    }
+  }, [product]);
+
+  const handleAddToCartConfirm = () => {
+    const unitMultiplier = product.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
+    const itemsToAdd = [];
+
+    Object.entries(variantQuantities).forEach(([vName, qty]) => {
+      const numQty = parseInt(qty) || 0;
+      if (numQty > 0) {
+        const actualQty = numQty * unitMultiplier;
+        const basePrice = product.isOfferProduct ? product.offerPrice : product.price;
+
+        // Find variant price if it exists
+        const variantObj = product.variants?.find(v => v.name === vName);
+        const rawItemPrice = variantObj ? variantObj.price : basePrice;
+
+        // Apply discount to variant price if offer product
+        const finalItemPrice = product.isOfferProduct
+          ? parseFloat((rawItemPrice * (1 - (product.discountPercent || 0) / 100)).toFixed(2))
+          : rawItemPrice;
+
+        itemsToAdd.push({
+          product,
+          quantity: actualQty,
+          variantName: vName === product.name ? null : vName,
+          variantPrice: finalItemPrice,
+          originalPrice: variantObj?.price || product.price
+        });
+      }
+    });
+
+    if (itemsToAdd.length > 0) {
+      addMultipleToCart(itemsToAdd);
+      toast.success(`${itemsToAdd.length} items added to cart successfully`);
+      setIsCartModalOpen(false);
+      // Reset quantities
+      const reset = {};
+      Object.keys(variantQuantities).forEach(k => reset[k] = 0);
+      setVariantQuantities(reset);
+    }
   };
+
+
+
 
   // Enhanced product images stack
   const productImages = (product.images && product.images.length > 0)
@@ -70,11 +112,12 @@ export default function ProductClient({ product, navCategory, subCategory, inner
   const handleWhatsApp = () => {
     const phone = "917383699199";
     const discount = product.isOfferProduct ? (product.discountPercent || 0) : 0;
-    const variantInfo = selectedVariant ? `\n*Variant:* ${selectedVariant.name}` : "";
-    const rawPrice = selectedVariant ? selectedVariant.price : (product.price);
-    const finalPrice = discount > 0 ? (rawPrice * (1 - discount / 100)).toFixed(2) : rawPrice;
+    const finalPrice = product.isOfferProduct ? product.offerPrice : product.price;
 
-    const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Product:* ${product.name}${variantInfo}\n*Price:* ₹${finalPrice}\n*Quantity:* ${quantity} pcs\n------------------\nPlease help me with the details.`;
+    const totalQty = Object.values(variantQuantities).reduce((a, b) => a + (parseInt(b) || 0), 0);
+    const unitText = product.unit?.toUpperCase() === "DOZEN" ? "Dozens" : "Pieces";
+
+    const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Product:* ${product.name}\n*Price:* ₹${finalPrice}\n*Order Unit:* ${product.unit}\n------------------\nPlease help me with the details.`;
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, "_blank");
   };
@@ -201,6 +244,16 @@ export default function ProductClient({ product, navCategory, subCategory, inner
           })
         }}
       />
+      <style jsx global>{`
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type="number"] {
+          -moz-appearance: textfield;
+        }
+      `}</style>
       <div className="min-h-screen bg-brand-accent/30 overflow-x-hidden text-left">
         <main className="grow">
           <div className="container mx-auto px-4 pt-20 lg:pt-28 mb-5 max-w-7xl">
@@ -231,15 +284,9 @@ export default function ProductClient({ product, navCategory, subCategory, inner
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-start">
               <div className="space-y-6 lg:sticky lg:top-24">
                 <div
-                  onMouseMove={handleMouseMove}
-                  onMouseEnter={() => setIsZooming(true)}
-                  onMouseLeave={() => setIsZooming(false)}
-                  className="relative aspect-square overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5 cursor-zoom-in"
+                  className="relative aspect-square overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5"
                 >
-                  <div className="relative w-full h-full transition-transform duration-300 ease-out" style={{
-                    transform: isZooming ? 'scale(1.8)' : 'scale(1)',
-                    transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`
-                  }}>
+                  <div className="relative w-full h-full">
                     <Image
                       src={productImages[activeImageIdx]}
                       alt={product.name}
@@ -266,8 +313,8 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                       <button
                         key={idx}
                         onClick={() => setActiveImageIdx(idx)}
-                        className={`relative cursor-pointer shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 ease-in-out hover:border-brand-secondary/50 ${activeImageIdx === idx
-                          ? "border-brand-secondary shadow-md scale-105"
+                        className={`relative cursor-pointer shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border transition-all duration-300 ease-in-out hover:border-brand-primary/50 ${activeImageIdx === idx
+                          ? "border-brand-primary shadow-md scale-105"
                           : "border-transparent opacity-60 hover:opacity-100"
                           }`}
                       >
@@ -332,75 +379,42 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     )}
                   </div>
 
-                  <div className="flex items-center gap-6 mb-8 lg:mb-10 text-left">
-                    {isAuthenticated ? (
-                       <div className="flex flex-col">
-                          <span className="text-3xl lg:text-4xl font-serif font-bold text-brand-primary">
-                            ₹{selectedVariant
-                                ? (product.isOfferProduct ? (selectedVariant.price * (1 - product.discountPercent / 100)).toFixed(2) : selectedVariant.price)
-                                : (product.isOfferProduct ? (product.price * (1 - product.discountPercent / 100)).toFixed(2) : product.price)
-                            }
-                          </span>
-                          {product.isOfferProduct && (
-                            <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[10px] font-bold text-brand-primary/30 line-through">₹{selectedVariant ? selectedVariant.price : product.price}</span>
-                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{product.discountPercent}% OFF Partner Deal</span>
-                            </div>
-                          )}
-                          {!selectedVariant && product.variants?.length > 0 && (
-                             <span className="text-[8px] font-bold text-brand-secondary uppercase tracking-widest mt-1 italic">Please select size/variant</span>
-                          )}
-                       </div>
-                    ) : product.isOfferProduct && product.offerPrice ? (
+                  <div className="flex items-center gap-6 mb-2 lg:mb-10 text-left">
+                    <div className="min-w-[200px] lg:min-w-[180px]">
                       <div className="flex flex-col">
-                        <span className="text-3xl lg:text-4xl font-serif font-bold text-red-600">
-                          ₹{product.offerPrice}
-                        </span>
-                        <span className="text-sm font-bold text-brand-primary/40 line-through">
-                          ₹{product.price}
-                        </span>
+                        <div className="flex items-baseline gap-3">
+                          <span className={`text-3xl lg:text-4xl font-bold ${product.isOfferProduct ? 'text-red-600' : 'text-brand-primary'}`}>
+                            ₹{product.isOfferProduct ? product.offerPrice : product.price}
+                          </span>
+                          {(product.mrp && product.mrp > (product.isOfferProduct ? product.offerPrice : product.price)) && (
+                            <span className="text-[12px] lg:text-[18px] font-bold text-brand-primary/30 line-through">
+                              ₹{product.mrp}
+                            </span>
+                          )}
+                        </div>
+
+                        {(product.mrp && product.mrp > (product.isOfferProduct ? product.offerPrice : product.price)) && (
+                          <div className="flex items-center gap-3 mt-1">
+                            <span className="text-[12px] lg:text-[12px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
+                              Save ₹{Math.round(parseFloat(product.mrp) - (product.isOfferProduct ? product.offerPrice : product.price))}
+                            </span>
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <span className="text-3xl lg:text-4xl font-serif font-bold text-brand-primary">
-                        ₹{product.price}
-                      </span>
-                    )}
-                    <div className="h-8 w-px bg-brand-primary/10"></div>
-                    <div className="flex flex-col text-left">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary underline decoration-brand-secondary decoration-2 underline-offset-4">
-                        Direct Inquiry
-                      </span>
-                      <span className="text-[8px] font-bold text-brand-secondary uppercase tracking-[0.2em] mt-1 italic">
-                        Best Quality at Direct Factory Price
+                    </div>
+                    <div className="hidden lg:block h-8 w-px bg-brand-primary/10"></div>
+                    <div className="hidden lg:flex flex-col text-left">
+                      <span className="text-[10px] lg:text-[13px] font-bold text-brand-secondary uppercase tracking-[0.2em] mt-1 italic">
+                        Our prices are lowest because we are India's largest manufacturer
                       </span>
                     </div>
                   </div>
+                  <div className="lg:hidden flex flex-col text-left border-t border-brand-primary/10 mb-4">
+                    <span className="text-[10px] lg:text-[13px] font-bold text-brand-secondary uppercase tracking-[0.2em] mt-1 italic">
+                      Our prices are lowest because we are India's largest manufacturer
+                    </span>
+                  </div>
 
-                  {/* Variant Selection UI */}
-                  {Array.isArray(product.variants) && product.variants.length > 0 && (
-                    <div className="mb-8">
-                      <p className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-[0.2em] mb-4">Select Variant</p>
-                      <div className="flex flex-wrap gap-3">
-                        {product.variants.map((v, i) => {
-                          const discountedPrice = product.isOfferProduct ? (v.price * (1 - product.discountPercent / 100)).toFixed(2) : v.price;
-                          return (
-                            <button
-                              key={i}
-                              onClick={() => setSelectedVariant(selectedVariant?.name === v.name ? null : v)}
-                              className={`px-5 py-3 rounded-xl border-2 font-bold text-[11px] transition-all flex flex-col items-center ${
-                                selectedVariant?.name === v.name
-                                  ? "border-brand-primary bg-brand-primary text-white shadow-lg"
-                                  : "border-brand-primary/10 hover:border-brand-primary/40 text-brand-primary bg-white"
-                              }`}
-                            >
-                              <span>{v.name}</span>
-                              <span className={`text-[9px] mt-0.5 ${selectedVariant?.name === v.name ? 'text-brand-secondary' : 'text-brand-primary/40'}`}>₹{discountedPrice}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
 
                   <div className="mb-6 text-left">
                     <p className="text-brand-primary/60 text-[14px] lg:text-[16px] leading-relaxed font-serif italic mb-4">
@@ -408,6 +422,38 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                       generations of craftsmanship. Individually tailored with soul,
                       using only the finest threads for true divinity."
                     </p>
+
+                    {product.variants && product.variants.length > 0 && (
+                      <div className="mb-10 text-left">
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className="text-[9px] font-black text-brand-primary/30 uppercase tracking-[0.3em] whitespace-nowrap">Inventory & Pricing</span>
+                          <div className="h-px grow bg-brand-primary/5"></div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 sm:gap-3">
+                          {product.variants.map((v, i) => {
+                            const originalP = parseFloat(v.price || 0);
+                            const discountedPrice = product.isOfferProduct
+                              ? (originalP * (1 - (product.discountPercent || 0) / 100))
+                              : originalP;
+                            const hasDiscount = product.isOfferProduct && originalP > discountedPrice;
+
+                            return (
+                              <div key={i} className="flex items-center gap-3 px-4 py-2 bg-white rounded-full border border-brand-primary/5 shadow-sm hover:border-brand-secondary/30 transition-all group">
+                                <span className="text-[12px] font-black text-brand-primary/40 uppercase tracking-widest">{v.name}</span>
+                                <div className="w-px h-3 bg-brand-primary/10"></div>
+                                <div className="flex items-center gap-2">
+                                  {hasDiscount && (
+                                    <span className="text-[14px] font-bold text-brand-primary/20 line-through">₹{originalP.toLocaleString()}</span>
+                                  )}
+                                  <span className="text-[14px] font-bold text-brand-secondary">₹{discountedPrice.toLocaleString()}</span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
 
                     {((Array.isArray(product.details) && product.details.length > 0) || product.category) && (
                       <div className="grid grid-cols-2 gap-y-8 gap-x-6 py-4 border-y border-brand-primary/5 text-left">
@@ -477,35 +523,33 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     )}
                   </div>
 
-                  {product.allowToBuy !== false && (
+                  {/* Purchase Section */}
+                  {isAuthenticated === true && product.allowToBuy !== false && (
                     <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                      <div className="flex items-center bg-white border border-brand-primary/10 rounded-2xl p-1 shrink-0 w-full sm:w-auto">
-                        <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 flex items-center justify-center text-brand-primary hover:bg-brand-primary/5 rounded-xl transition-all">
-                          <Icon icon="lucide:minus" />
-                        </button>
-                        <input
-                          type="number"
-                          value={quantity}
-                          onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                          className="w-16 text-center font-bold text-brand-primary focus:outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        />
-                          <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 flex items-center justify-center text-brand-primary hover:bg-brand-primary/5 rounded-xl transition-all">
-                          <Icon icon="lucide:plus" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => setIsCartModalOpen(true)}
+                        className="grow bg-brand-primary text-white py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-xl hover:bg-brand-secondary transition-all active:scale-[0.98] group"
+                      >
+                        <Icon icon="solar:cart-large-bold" className="w-5 h-5" />
+                        <span>Add To Cart</span>
+                      </button>
+                    </div>
+                  )}
 
-                    <button
-                      onClick={() => {
-                        const discount = product.isOfferProduct ? (product.discountPercent || 0) : 0;
-                        const rawPrice = selectedVariant ? selectedVariant.price : product.price;
-                        const finalPrice = discount > 0 ? (rawPrice * (1 - discount / 100)).toFixed(2) : rawPrice;
-                        addToCart(product, quantity, selectedVariant?.name, finalPrice);
-                      }}
-                      className="grow bg-brand-primary text-white py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-xl hover:bg-brand-secondary transition-all active:scale-[0.98] group"
-                    >
-                      <Icon icon="solar:cart-large-bold" className="w-5 h-5" />
-                      <span>Add To Cart</span>
-                    </button>
+                  {/* Unauthorized Guest Section */}
+                  {isAuthenticated === false && (
+                    <div className="mb-8 p-6 bg-brand-primary/5 rounded-[32px] border border-brand-primary/10 text-center group hover:bg-brand-primary/[0.07] transition-all">
+                      <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-brand-primary mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
+                        <Icon icon="solar:lock-keyhole-minimalistic-bold" className="w-6 h-6" />
+                      </div>
+                      <p className="text-[10px] lg:text-[13px] font-bold text-brand-primary uppercase tracking-[0.3em] mb-2">Wholesaler Exclusive</p>
+                      <p className="text-[12px] lg:text-[15px] text-brand-primary/40 font-serif italic mb-6">Log in to view wholesale details, select variants, and place orders.</p>
+                      <Link
+                        href="/login"
+                        className="inline-flex items-center gap-2 text-[10px] lg:text-[12px] font-black uppercase tracking-widest text-brand-secondary hover:underline"
+                      >
+                        Become Authorized Wholesaler <Icon icon="lucide:arrow-right" className="w-3 h-3" />
+                      </Link>
                     </div>
                   )}
 
@@ -691,6 +735,139 @@ export default function ProductClient({ product, navCategory, subCategory, inner
         </main>
 
         <AnimatePresence>
+          {isCartModalOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] bg-brand-primary/95 flex items-center justify-center p-4 backdrop-blur-3xl"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                className="bg-white w-full max-w-2xl rounded-[40px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+              >
+                {/* Modal Header */}
+                <div className="p-8 pb-4 border-b border-brand-primary/5 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-serif font-bold text-brand-primary">Select Quantities</h3>
+                    <p className="text-[10px] font-bold text-brand-secondary uppercase tracking-[0.2em] mt-1">
+                      Order in {product.unit?.toUpperCase() === "DOZEN" ? "Dozen" : "Piece"}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIsCartModalOpen(false)}
+                    className="w-10 h-10 rounded-full bg-brand-primary/5 flex items-center justify-center text-brand-primary hover:bg-brand-primary/10 transition-all"
+                  >
+                    <Icon icon="lucide:x" className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Modal Content */}
+                <div className="p-4 sm:p-8 pt-6 overflow-y-auto no-scrollbar grow">
+                  <div className="space-y-4">
+                    {(product.variants && product.variants.length > 0 ? product.variants : [{ name: product.name, price: product.price }]).map((v, i) => {
+                      const qty = variantQuantities[v.name] || 0;
+                      const unitMultiplier = product.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
+
+                      const originalP = parseFloat(v.price || 0);
+                      const basePrice = product.isOfferProduct
+                        ? (originalP * (1 - (product.discountPercent || 0) / 100))
+                        : originalP;
+
+                      const hasDiscount = product.isOfferProduct && originalP > basePrice;
+
+                      return (
+                        <div key={i} className="flex flex-col sm:grid sm:grid-cols-3 items-center gap-4 p-4 rounded-2xl bg-brand-primary/[0.02] border border-brand-primary/5 hover:bg-brand-primary/[0.04] transition-all">
+                          {/* Left: Info */}
+                          <div className="w-full text-left">
+                            <p className="font-bold text-brand-primary text-lg">{v.name}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              {hasDiscount && (
+                                <span className="text-sm text-brand-primary/60 line-through">₹{originalP.toLocaleString()}</span>
+                              )}
+                              <p className="text-sm text-brand-primary font-bold">₹{basePrice.toLocaleString()} / pc</p>
+                            </div>
+                          </div>
+
+                          {/* Center: Quantity */}
+                          <div className="flex flex-col items-center w-full">
+                            <span className="text-[10px] sm:text-xs font-bold text-brand-primary/30 uppercase tracking-widest mb-1.5">Qty ({product.unit?.toUpperCase() === "DOZEN" ? "Dozen" : "Piece"})</span>
+                            <input
+                              type="number"
+                              min="0"
+                              value={qty === 0 ? "" : qty}
+                              onChange={(e) => setVariantQuantities({
+                                ...variantQuantities,
+                                [v.name]: e.target.value === "" ? 0 : parseInt(e.target.value)
+                              })}
+                              placeholder="0"
+                              className="w-16 h-12 bg-white rounded-xl border border-brand-primary/10 text-center font-bold text-brand-primary focus:border-brand-secondary outline-none transition-all px-0"
+                            />
+                          </div>
+
+                          {/* Right: Total */}
+                          <div className="w-full flex flex-col items-end">
+                            <p className="text-[10px] sm:text-xs font-bold text-brand-primary/30 uppercase tracking-widest mb-1.5">Total Value</p>
+                            <div className="flex flex-col items-end">
+                              <div className="flex items-center justify-end gap-2">
+                                {product.isOfferProduct && qty > 0 && (
+                                  <span className="text-sm font-bold text-brand-primary/20 line-through">₹{(qty * unitMultiplier * v.price).toLocaleString()}</span>
+                                )}
+                                <p className="font-bold text-brand-primary text-xl tracking-tight">₹{(qty * unitMultiplier * basePrice).toLocaleString()}</p>
+                              </div>
+                              {product.unit?.toUpperCase() === "DOZEN" && qty > 0 && (
+                                <p className="text-[10px] text-brand-secondary font-bold">({qty * 12} pcs)</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="p-6 sm:p-8 pt-4 border-t border-brand-primary/5 bg-brand-primary/[0.02]">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-4 text-center sm:text-left">
+                    <div className="w-full sm:w-auto">
+                      <p className="text-[10px] font-bold text-brand-primary/30 uppercase tracking-widest">Total Order Amount</p>
+                      <div className="flex flex-col">
+                        <p className="text-2xl sm:text-3xl font-bold text-brand-primary">
+                          ₹{Object.entries(variantQuantities).reduce((acc, [vName, qty]) => {
+                            const v = (product.variants || []).find(v => v.name === vName) || { price: product.price };
+                            const basePrice = product.isOfferProduct
+                              ? (v.price * (1 - (product.discountPercent || 0) / 100))
+                              : v.price;
+                            const multiplier = product.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
+                            return acc + (qty * multiplier * basePrice);
+                          }, 0).toLocaleString()}
+                          {product.isOfferProduct && Object.values(variantQuantities).some(q => q > 0) && (
+                            <span className="text-base sm:text-lg font-bold text-brand-primary/50 line-through mb-1 ml-2">
+                              ₹{Object.entries(variantQuantities).reduce((acc, [vName, qty]) => {
+                                const v = (product.variants || []).find(v => v.name === vName) || { price: product.price };
+                                const multiplier = product.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
+                                return acc + (qty * multiplier * v.price);
+                              }, 0).toLocaleString()}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleAddToCartConfirm}
+                      disabled={Object.values(variantQuantities).every(q => !q || q <= 0)}
+                      className="w-full sm:w-auto bg-brand-primary text-white py-4 sm:py-5 px-10 rounded-2xl font-bold uppercase tracking-[0.2em] text-[10px] sm:text-xs shadow-xl hover:bg-brand-secondary transition-all disabled:opacity-50 disabled:grayscale"
+                    >
+                      Add To Cart
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+
           {activeVideo && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-100 bg-brand-primary/95 flex items-center justify-center p-4 backdrop-blur-3xl" onClick={() => setActiveVideo(null)}>
               <button onClick={() => setActiveVideo(null)} className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white z-20"><Icon icon="lucide:x" className="w-6 h-6" /></button>
