@@ -14,7 +14,7 @@ export default function WholesalerCollectionClient({ title, subtitle, products, 
     const cookies = document.cookie.split(';');
     const hasUserSession = cookies.some((item) => item.trim().startsWith('ssd_wholesale_logged=true'));
     const storedUser = localStorage.getItem('ssd_user');
-    
+
     if (!hasUserSession && !storedUser) {
       router.push(`/login?callbackUrl=/wholesalers/dashboard/collection/${type}`);
       return;
@@ -50,8 +50,8 @@ export default function WholesalerCollectionClient({ title, subtitle, products, 
               </div>
               <span className="text-brand-secondary text-[8px] font-bold uppercase tracking-widest">{subtitle}</span>
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-4xl lg:text-7xl font-serif font-black text-brand-primary uppercase tracking-tighter leading-none"
@@ -60,14 +60,14 @@ export default function WholesalerCollectionClient({ title, subtitle, products, 
             </motion.h1>
           </div>
 
-          <motion.div 
+          <motion.div
              initial={{ opacity: 0 }}
              animate={{ opacity: 1 }}
              className="flex items-center gap-4 bg-white/50 backdrop-blur-md px-6 py-4 rounded-2xl border border-brand-primary/5"
           >
              <div className="text-right">
-                <p className="text-[9px] font-bold text-brand-primary/30 uppercase tracking-widest">Available Selection</p>
-                <p className="text-xl font-serif font-bold text-brand-primary">{products.length} Masterpieces</p>
+                <p className="text-[9px] font-bold text-brand-primary/30 uppercase tracking-widest">Available Collection</p>
+                <p className="text-xl font-serif font-bold text-brand-primary">{products.length} Products</p>
              </div>
              <div className="w-10 h-10 rounded-xl bg-brand-primary/5 flex items-center justify-center text-brand-primary">
                 <Icon icon="solar:shop-bold-duotone" className="w-6 h-6" />

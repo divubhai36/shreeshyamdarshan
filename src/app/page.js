@@ -21,7 +21,11 @@ export default async function Home() {
      name: p.name,
      category: p.category?.name || "Unknown",
      price: p.price,
+     offerPrice: p.offerPrice,
+     isOfferProduct: p.isOfferProduct,
+     mrp: p.mrp,
      description: p.description,
+     images: p.images,
      image: p.images[0] || "/hero.png",
      isBestSeller: p.isBestSeller
    }));

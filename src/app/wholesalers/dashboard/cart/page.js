@@ -4,6 +4,7 @@ import { Icon } from '@iconify/react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
+import { roundToTwo } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function CartPage() {
@@ -40,8 +41,8 @@ export default function CartPage() {
     }
     acc[item.id].variants.push(item);
     acc[item.id].totalQty += item.quantity;
-    acc[item.id].totalPrice += (item.price * item.quantity);
-    acc[item.id].originalTotalPrice += ((item.originalPrice || item.price) * item.quantity);
+    acc[item.id].totalPrice = roundToTwo(acc[item.id].totalPrice + (item.price * item.quantity));
+    acc[item.id].originalTotalPrice = roundToTwo(acc[item.id].originalTotalPrice + ((item.originalPrice || item.price) * item.quantity));
     return acc;
   }, {});
 
@@ -162,7 +163,7 @@ export default function CartPage() {
             <p className="text-[9px] sm:text-[10px] font-bold text-brand-secondary tracking-[0.2em] sm:tracking-[0.3em] uppercase mt-1">B2B Wholesaler Choice</p>
           </div>
 
-          <div className="flex bg-white px-5 py-3 rounded-2xl border border-brand-primary/5 shadow-sm items-center gap-3 w-fit sm:w-auto">
+          <div className="flex bg-white px-4 py-2 rounded-2xl border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)] items-center gap-3 w-fit sm:w-auto">
             <div className="w-8 h-8 sm:w-10 sm:h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white font-bold text-sm sm:text-base">
               {groupedItems.length}
             </div>
@@ -197,7 +198,7 @@ export default function CartPage() {
                     exit={{ opacity: 0, scale: 0.95 }}
                     key={product.id}
                     onClick={() => setSelectedProduct(product)}
-                    className="bg-white p-4 rounded-[24px] sm:rounded-[32px] border border-brand-primary/5 shadow-sm hover:shadow-xl hover:border-brand-secondary/20 transition-all flex items-center gap-4 sm:gap-6 cursor-pointer group relative overflow-hidden"
+                    className="bg-white p-4 rounded-[24px] sm:rounded-[32px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)] transition-all flex items-center gap-4 sm:gap-6 cursor-pointer group relative overflow-hidden"
                   >
                     <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-brand-secondary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
@@ -205,7 +206,7 @@ export default function CartPage() {
                       <img src={product.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={product.name} />
                     </div>
 
-                    <div className="flex-grow relative z-10 min-w-0">
+                    <div className="grow relative z-10 min-w-0">
                       <p className="text-[8px] sm:text-[9px] font-bold text-brand-secondary uppercase tracking-widest mb-0.5 sm:mb-1">{product.category}</p>
                       <h3 className="text-base sm:text-xlg sm:text-xl font-serif font-bold text-brand-primary leading-tight group-hover:text-brand-secondary transition-colors truncate">{product.name}</h3>
 
@@ -238,7 +239,7 @@ export default function CartPage() {
               <motion.div
                 initial={{ y: 100 }}
                 animate={{ y: 0 }}
-                className="container mx-auto max-w-lg bg-white p-4 sm:p-6 rounded-[28px] sm:rounded-[40px] shadow-[0_20px_60px_rgba(0,0,0,0.4)] flex items-center justify-between gap-4 pointer-events-auto border border-brand-primary/5 backdrop-blur-md"
+                className="container mx-auto max-w-lg bg-white p-4 sm:p-4 rounded-[28px] sm:rounded-4xl border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)] flex items-center justify-between gap-4 pointer-events-auto backdrop-blur-md"
               >
                 <div className="flex items-center gap-3 sm:gap-6 border-r border-brand-primary/5 pr-4 sm:pr-8 min-w-0">
                   <div className="hidden sm:block">
@@ -246,8 +247,8 @@ export default function CartPage() {
                     <p className="text-lg sm:text-xl font-bold text-brand-primary">{cartCount}</p>
                   </div>
                   <div className="min-w-0 flex-grow">
-                    <p className="text-[8px] sm:text-[10px] font-bold text-brand-primary/80 uppercase tracking-widest mb-1 sm:mb-1.5 opacity-60">Total Value</p>
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-[8px] sm:text-[10px] font-bold text-brand-primary/80 uppercase tracking-widest mb-1 sm:mb-1.5 opacity-60">Total Amount</p>
+                    <div className="flex items-center sm:gap-2 flex-wrap">
                       <p className="text-xl sm:text-3xl font-bold text-brand-primary tracking-tight">₹{(cartTotal || 0).toLocaleString()}</p>
                       {originalCartTotal > cartTotal && (
                         <div className="flex flex-col">
@@ -264,14 +265,14 @@ export default function CartPage() {
                 <button
                   onClick={handleCheckout}
                   disabled={isProcessing}
-                  className="shrink-0 sm:px-8 px-5 py-4 sm:py-5 bg-brand-secondary text-white font-bold rounded-2xl sm:rounded-3xl uppercase tracking-[0.2em] text-[10px] sm:text-xs shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2 sm:gap-3 group disabled:opacity-50 disabled:grayscale"
+                  className="shrink-0 sm:px-8 px-5 py-4 sm:py-5 bg-brand-secondary text-white font-bold rounded-2xl sm:rounded-3xl uppercase tracking-[0.2em] text-[10px] sm:text-xs shadow-xl hover:scale-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 sm:gap-3 group disabled:opacity-50 disabled:grayscale cursor-pointer"
                 >
                   {isProcessing ? (
                     <Icon icon="line-md:loading-loop" className="w-5 h-5 sm:w-6 sm:h-6" />
                   ) : (
-                    <Icon icon="solar:shield-check-bold" className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <Icon icon="material-symbols:shopping-cart-checkout-rounded" className="w-5 h-5 sm:w-6 sm:h-6 hidden sm:block" />
                   )}
-                  <span className="hidden xs:inline">{isProcessing ? "Processing..." : "Place Order"}</span>
+                  <span className="inline">{isProcessing ? "Processing..." : "Checkout"}</span>
                 </button>
               </motion.div>
             </div>

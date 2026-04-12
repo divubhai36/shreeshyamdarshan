@@ -47,7 +47,6 @@ export default function OrdersPage() {
                   </button>
                   <h2 className="text-3xl font-serif font-bold text-brand-primary">Order History</h2>
                </div>
-               <p className="text-[10px] font-bold text-brand-primary/30 uppercase tracking-[0.2em]">Procurement Registry</p>
             </div>
 
             {loading ? (
@@ -112,7 +111,7 @@ export default function OrdersPage() {
                                  <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto pt-6 sm:pt-0 border-t sm:border-t-0 border-brand-primary/5">
                                     <div className="text-right flex flex-col items-end">
                                        <p className="text-[9px] font-black text-brand-primary/30 uppercase tracking-widest mb-1">Total Units</p>
-                                       <p className="text-xl sm:text-2xl font-bold text-brand-primary italic leading-none">{order.items.reduce((acc, it) => acc + it.quantity, 0)} <span className="text-xs sm:text-sm not-italic opacity-40 lowercase">units</span></p>
+                                       <p className="text-xl sm:text-2xl font-bold text-brand-primary leading-none">{order.items.reduce((acc, it) => acc + it.quantity, 0)} <span className="text-xs sm:text-sm not-italic opacity-40 lowercase">units</span></p>
                                     </div>
                                     <div className={`p-4 rounded-2xl bg-brand-primary/5 text-brand-primary transition-all ${activeOrder === order.id ? 'rotate-180 bg-brand-secondary text-white' : ''}`}>
                                        <Icon icon="solar:alt-arrow-down-bold" className="w-5 h-5" />

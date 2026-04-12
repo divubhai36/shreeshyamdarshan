@@ -80,6 +80,10 @@ export default async function ProductPage({ params }) {
              id: p.id,
              name: p.name,
              price: p.price,
+             offerPrice: p.offerPrice,
+             isOfferProduct: p.isOfferProduct,
+             category: dbProduct.category?.name || "Unknown",
+             images: p.images,
              image: p.images[0] || "/hero.png"
          }));
 

@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -64,16 +64,16 @@ export default function ProductCard({ product }) {
               {product.category}
             </p>
           </Link>
-          
+
           <div className="flex justify-between items-start gap-2 mb-2 lg:mb-6">
             <Link href={`/product/${product.id}`} className="grow">
               <h3 className="text-xs lg:text-xl font-serif text-brand-primary font-bold group-hover:text-brand-secondary transition-colors line-clamp-2 leading-tight text-left">
                 {product.name}
               </h3>
             </Link>
-            
+
             {isAuthenticated && (
-              <button 
+              <button
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -83,9 +83,9 @@ export default function ProductCard({ product }) {
                   saved ? "text-rose-500" : "text-brand-primary/10 hover:text-brand-primary"
                 }`}
               >
-                <Icon 
-                  icon={saved ? "solar:heart-bold" : "solar:heart-linear"} 
-                  className={`w-5 h-5 lg:w-6 lg:h-6 ${saved ? "drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : ""}`} 
+                <Icon
+                  icon={saved ? "solar:heart-bold" : "solar:heart-linear"}
+                  className={`w-5 h-5 lg:w-6 lg:h-6 ${saved ? "drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : ""}`}
                 />
               </button>
             )}

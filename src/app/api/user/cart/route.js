@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/session";
 import prisma from "@/lib/prisma";
+import { roundToTwo } from "@/lib/utils";
 
 export async function GET() {
   try {
@@ -49,16 +50,16 @@ export async function POST(req) {
     const body = await req.json();
     const { productId, quantity, variantName, price, originalPrice, action } = body;
     const vName = variantName || "BASE";
-    const numPrice = parseFloat(price) || 0;
-    const numOriginalPrice = originalPrice ? parseFloat(originalPrice) : null;
+    const numPrice = roundToTwo(price) || 0;
+    const numOriginalPrice = originalPrice ? roundToTwo(originalPrice) : null;
     const numQuantity = parseInt(quantity) || 0;
 
     // Handle "BULK_ADD" action from multiple variant selection
     if (action === "BULK_ADD") {
       const { items } = body;
       for (const item of items) {
-        const itemPrice = parseFloat(item.price) || 0;
-        const itemOriginalPrice = item.originalPrice ? parseFloat(item.originalPrice) : null;
+        const itemPrice = roundToTwo(item.price) || 0;
+        const itemOriginalPrice = item.originalPrice ? roundToTwo(item.originalPrice) : null;
         const itemQty = parseInt(item.quantity) || 0;
 
         await prisma.cartItem.upsert({

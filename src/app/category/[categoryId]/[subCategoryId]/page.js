@@ -52,6 +52,7 @@ export default async function SubCategoryPage({ params }) {
        category: p.category?.name || "Unknown", 
        price: p.price,
        description: p.description, 
+       images: p.images,
        image: p.images[0] || "/hero.png", 
        isBestSeller: p.isBestSeller,
        isOfferProduct: p.isOfferProduct,

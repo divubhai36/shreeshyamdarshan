@@ -22,7 +22,9 @@ export async function GET() {
     // Map the products to match the frontend expectations (e.g., adding singular 'image' property)
     const mappedSaved = savedProducts.map(s => ({
       ...s.product,
-      image: s.product.images[0] || "/hero.png"
+      id: s.product.id,
+      image: s.product.images[0] || "/hero.png",
+      variantName: s.variantName === "BASE" ? null : s.variantName
     }));
 
     return NextResponse.json({ success: true, saved: mappedSaved });
@@ -42,7 +44,30 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const { productId } = await req.json();
+    const { productId, variantName, action, items } = await req.json();
+    const vName = variantName || "BASE";
+
+    // Handle BULK SAVE
+    if (action === "BULK_SAVE" && Array.isArray(items)) {
+      for (const item of items) {
+        await prisma.savedProduct.upsert({
+          where: {
+            wholesalerId_productId_variantName: {
+              wholesalerId: session.userId,
+              productId: item.productId,
+              variantName: item.variantName || "BASE",
+            },
+          },
+          update: {}, // No updates needed if already exists
+          create: {
+            wholesalerId: session.userId,
+            productId: item.productId,
+            variantName: item.variantName || "BASE",
+          },
+        });
+      }
+      return NextResponse.json({ success: true, message: "Bulk items saved" });
+    }
 
     if (!productId) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
@@ -51,9 +76,10 @@ export async function POST(req) {
     // Toggle logic
     const existing = await prisma.savedProduct.findUnique({
       where: {
-        wholesalerId_productId: {
+        wholesalerId_productId_variantName: {
           wholesalerId: session.userId,
           productId: productId,
+          variantName: vName,
         },
       },
     });
@@ -70,6 +96,7 @@ export async function POST(req) {
         data: {
           wholesalerId: session.userId,
           productId: productId,
+          variantName: vName,
         },
       });
       return NextResponse.json({ success: true, action: "added" });

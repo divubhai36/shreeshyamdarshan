@@ -164,7 +164,7 @@ export default function HomeClient({ products, categories, reviews }) {
                            >
                               <Link
                                  href="/wholesalers/dashboard/collection/offers"
-                                 className="inline-flex items-center gap-4 bg-white text-brand-primary px-10 py-5 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs hover:bg-brand-secondary hover:text-white transition-all shadow-2xl group"
+                                 className="inline-flex items-center gap-4 bg-white text-brand-primary px-6 py-3 md:px-10 md:py-5 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs hover:bg-brand-secondary hover:text-white transition-all shadow-2xl group"
                               >
                                  Explore Offers
                                  <Icon icon="lucide:arrow-up-right" className="w-4 h-4 group-hover:rotate-45 transition-transform" />
@@ -215,7 +215,7 @@ export default function HomeClient({ products, categories, reviews }) {
                               whileInView={{ opacity: 1 }}
                               viewport={{ once: true }}
                               transition={{ delay: 0.2 }}
-                              className="text-brand-primary/40 text-[10px] lg:text-xs font-bold uppercase tracking-[0.4em] max-w-2xl mx-auto px-4"
+                              className="text-brand-primary/40 text-[10px] lg:text-xs font-bold uppercase tracking-[0.2em] md:tracking-[0.4em] max-w-2xl mx-auto px-4"
                            >
                               Skip the weaving timeline. Access the immediate dispatch vault featuring our most revered designs ready to ship within 24 hours of confirmation.
                            </motion.p>
@@ -243,7 +243,7 @@ export default function HomeClient({ products, categories, reviews }) {
                            <Icon icon="solar:box-minimalistic-bold-duotone" className="w-16 h-16 sm:w-24 sm:h-24" />
                         </div>
 
-                        <div className="relative z-10 flex flex-col items-center gap-2 sm:gap-4">
+                        <div className="relative z-10 flex flex-col items-center gap-2 sm:gap-4 px-4">
                            <span className="text-xs sm:text-xl font-bold uppercase tracking-[0.4em] text-white/50 ">Premium Customer Collection</span>
                            <span className="text-lg sm:text-3xl lg:text-4xl font-serif font-bold uppercase tracking-[0.2em] sm:tracking-[0.2em] flex items-center gap-4 sm:gap-10">
                               <Icon icon="lucide:minus" className="w-10 h-1 hidden sm:block opacity-20" />
@@ -253,7 +253,7 @@ export default function HomeClient({ products, categories, reviews }) {
                            <motion.div
                               animate={{ x: [0, 10, 0] }}
                               transition={{ repeat: Infinity, duration: 2 }}
-                              className="flex items-center gap-3 text-brand-secondary font-bold text-[10px] sm:text-xl tracking-[0.14em] mt-2"
+                              className="flex items-center gap-3 text-brand-secondary font-bold text-xs sm:text-lg tracking-[0.14em] mt-2"
                            >
                               Click Here to Check it out
                               <Icon icon="lucide:arrow-right" className="w-4 h-4" />
@@ -440,7 +440,7 @@ export default function HomeClient({ products, categories, reviews }) {
                      className="flex items-center justify-center gap-4 mb-6"
                   >
                      <div className="h-[1px] w-12 bg-brand-secondary/30"></div>
-                     <span className="text-brand-secondary font-bold text-[10px] lg:text-xs tracking-[0.5em] uppercase">Showroom Experience</span>
+                     <span className="text-brand-secondary font-bold text-[10px] lg:text-xs tracking-[0.1em] md:tracking-[0.5em] uppercase">Showroom Experience</span>
                      <div className="h-[1px] w-12 bg-brand-secondary/30"></div>
                   </motion.div>
 

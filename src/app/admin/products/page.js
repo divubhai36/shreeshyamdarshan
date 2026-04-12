@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { getProducts, createProduct, updateProduct, deleteProduct, getCategories, getSubCategories, getInnerSubCategories } from "../actions";
 import CustomSelect from "@/components/CustomSelect";
 import toast from "react-hot-toast";
+import { roundToTwo } from "@/lib/utils";
 
 
 export default function ProductsPage() {
@@ -153,9 +154,10 @@ export default function ProductsPage() {
 
         const payload = {
             ...form,
-            mrp: parseFloat(form.mrp),
-            price: parseFloat(form.price),
-            offerPrice: form.isOfferProduct ? parseFloat(form.price * (1 - form.discountPercent / 100)) : parseFloat(form.price),
+            mrp: roundToTwo(form.mrp),
+            price: roundToTwo(form.price),
+            offerPrice: form.isOfferProduct ? roundToTwo(form.price * (1 - form.discountPercent / 100)) : roundToTwo(form.price),
+            variants: form.variants.map(v => ({ ...v, price: roundToTwo(v.price) })),
             discountPercent: parseInt(form.discountPercent),
             showSizeGuide: !!form.showSizeGuide,
             showWashCare: !!form.showWashCare,
@@ -462,7 +464,7 @@ export default function ProductsPage() {
                                                                 {/* <span className="font-serif font-black text-xl text-brand-primary">₹{(form.price * (1 - form.discountPercent/100)).toFixed(0)}</span> */}
                                                                 <div className="  flex flex-col items-center justify-center mt-5">
                                                                     <span className="text-[8px] font-black uppercase text-brand-primary/30 mb-1">Price</span>
-                                                                    <span className="font-serif font-black text-xl text-brand-primary">₹{(form.price * (1 - form.discountPercent / 100)).toFixed(0)}</span>
+                                                                    <span className="font-serif font-black text-xl text-brand-primary">₹{roundToTwo(form.price * (1 - form.discountPercent / 100)).toFixed(2)}</span>
                                                                 </div>
                                                             </div>
                                                         </motion.div>

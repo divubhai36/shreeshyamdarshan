@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { roundToTwo } from '@/lib/utils';
 
 const CartContext = createContext({
   cart: [],
@@ -33,10 +34,32 @@ export function CartProvider({ children }) {
     setIsAuthenticated(hasSession);
     
     if (hasSession && !isCartFetched.current) {
-      // Force fetch from backend on first load/login
-      fetchSavedFromBackend();
-      fetchCartFromBackend();
-      isCartFetched.current = true;
+      // If we have local items, sync them before fetching
+      const localSaved = JSON.parse(localStorage.getItem('ssd_saved') || '[]');
+      const localCart = JSON.parse(localStorage.getItem('ssd_cart') || '[]');
+      
+      const performSync = async () => {
+        if (localSaved.length > 0) {
+          await syncLocalSavedWithBackend(localSaved);
+        }
+        // Cart bulk sync is already handled by syncBulkItems if we trigger it,
+        // but here we want to merge local guest cart into database.
+        if (localCart.length > 0) {
+            await syncBulkItems(localCart.map(it => ({
+                product: it,
+                quantity: it.quantity,
+                variantName: it.variantName,
+                variantPrice: it.price,
+                originalPrice: it.originalPrice
+            })));
+        }
+        
+        await fetchSavedFromBackend();
+        await fetchCartFromBackend();
+        isCartFetched.current = true;
+      };
+
+      performSync();
     }
   }, [pathname]);
 
@@ -73,6 +96,21 @@ export function CartProvider({ children }) {
       }
     } catch (err) {
       console.error("Error fetching saved products:", err);
+    }
+  };
+
+  const syncLocalSavedWithBackend = async (localItems) => {
+    try {
+      await fetch('/api/user/saved', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          action: "BULK_SAVE", 
+          items: localItems.map(it => ({ productId: it.id, variantName: it.variantName })) 
+        })
+      });
+    } catch (err) {
+      console.error("Error bulk syncing saved items:", err);
     }
   };
 
@@ -113,12 +151,12 @@ export function CartProvider({ children }) {
     const finalQty = existing ? existing.quantity + quantity : quantity;
     
     const priceToUse = (variantPrice !== null && variantPrice !== undefined) 
-      ? parseFloat(variantPrice) 
-      : (product.price || 0);
+      ? roundToTwo(variantPrice) 
+      : roundToTwo(product.price || 0);
     
     const oldPrice = (originalPrice !== null && originalPrice !== undefined)
-      ? parseFloat(originalPrice)
-      : (product.mrp || product.price || 0);
+      ? roundToTwo(originalPrice)
+      : roundToTwo(product.mrp || product.price || 0);
 
     setCart(prev => {
       if (existing) {
@@ -138,8 +176,8 @@ export function CartProvider({ children }) {
     setCart(prev => {
       let nextCart = [...prev];
       items.forEach(({ product, quantity, variantName, variantPrice, originalPrice }) => {
-        const priceToUse = variantPrice ?? product.price ?? 0;
-        const oldPrice = originalPrice ?? product.mrp ?? product.price ?? 0;
+        const priceToUse = roundToTwo(variantPrice ?? product.price ?? 0);
+        const oldPrice = roundToTwo(originalPrice ?? product.mrp ?? product.price ?? 0);
         
         const existingIdx = nextCart.findIndex(item => item.id === product.id && item.variantName === variantName);
         if (existingIdx > -1) {
@@ -181,8 +219,8 @@ export function CartProvider({ children }) {
             productId: it.product.id,
             quantity: it.quantity, // This is the increment
             variantName: it.variantName,
-            price: it.variantPrice,
-            originalPrice: it.originalPrice
+            price: roundToTwo(it.variantPrice),
+            originalPrice: roundToTwo(it.originalPrice)
           }))
         })
       });
@@ -222,13 +260,14 @@ export function CartProvider({ children }) {
     }
   };
 
-  const toggleSave = async (product) => {
+  const toggleSave = async (product, variantName = null) => {
     // Optimistic update
-    const isSaved = saved.some(item => item.id === product.id);
+    const vName = variantName || product.variantName || null;
+    const isSaved = saved.some(item => item.id === product.id && item.variantName === vName);
     if (isSaved) {
-      setSaved(prev => prev.filter(item => item.id !== product.id));
+      setSaved(prev => prev.filter(item => !(item.id === product.id && item.variantName === vName)));
     } else {
-      setSaved(prev => [product, ...prev]);
+      setSaved(prev => [{ ...product, variantName: vName }, ...prev]);
     }
 
     // Sync with backend if authenticated
@@ -237,7 +276,7 @@ export function CartProvider({ children }) {
         await fetch('/api/user/saved', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productId: product.id })
+          body: JSON.stringify({ productId: product.id, variantName: vName })
         });
       } catch (err) {
         console.error("Error syncing saved product:", err);
@@ -245,10 +284,10 @@ export function CartProvider({ children }) {
     }
   };
 
-  const isProductSaved = (id) => saved.some(item => item.id === id);
+  const isProductSaved = (id, variantName = null) => saved.some(item => item.id === id && (variantName ? item.variantName === variantName : true));
 
-  const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const originalCartTotal = cart.reduce((sum, item) => sum + ((item.originalPrice || item.price) * item.quantity), 0);
+  const cartTotal = roundToTwo(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0));
+  const originalCartTotal = roundToTwo(cart.reduce((sum, item) => sum + ((item.originalPrice || item.price) * item.quantity), 0));
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (

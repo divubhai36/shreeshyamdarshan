@@ -19,7 +19,7 @@ export default async function ReadyStockCollectionPage() {
   return (
     <WholesalerCollectionClient
       title="Ready-Stock"
-      subtitle="Immediate Dispatch Vault"
+      subtitle="Immediate Dispatch Collection"
       products={products}
       type="ready-stock"
     />
