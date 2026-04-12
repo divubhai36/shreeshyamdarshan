@@ -17,8 +17,8 @@ export default async function ReadyStockCollectionPage() {
   });
 
   return (
-    <WholesalerCollectionClient 
-      title="Ready-Stock Registry"
+    <WholesalerCollectionClient
+      title="Ready-Stock"
       subtitle="Immediate Dispatch Vault"
       products={products}
       type="ready-stock"

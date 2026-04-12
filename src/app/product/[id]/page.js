@@ -71,6 +71,8 @@ export default async function ProductPage({ params }) {
              variants: dbProduct.variants,
              mrp: dbProduct.mrp,
              discountPercent: dbProduct.discountPercent,
+             unit: dbProduct.unit,
+             isVisible: dbProduct.isVisible,
              allowToBuy: dbProduct.allowToBuy
          };
 

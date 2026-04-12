@@ -60,6 +60,8 @@ model Product {
   
   wholesalerDescription String?
   variants          Json?             // Array of objects: { name: string, price: number }
+  unit              String            @default("PIECE") // PIECE | DOZEN
+  isVisible         Boolean           @default(true)
   allowToBuy        Boolean           @default(true)
 
   productId         String            @unique
@@ -74,6 +76,7 @@ model Product {
   updatedAt         DateTime          @updatedAt
   orderItems        OrderItem[]
   savedBy           SavedProduct[]
+  cartItems         CartItem[]
 }
 
 model AdminUser {
@@ -98,7 +101,24 @@ model Wholesaler {
   updatedAt     DateTime       @updatedAt
   orders        Order[]
   savedProducts SavedProduct[]
+  cartItems     CartItem[]
   review        Review?
+}
+
+model CartItem {
+  id           String     @id @default(cuid())
+  wholesalerId String
+  wholesaler   Wholesaler @relation(fields: [wholesalerId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity     Int
+  variantName  String     @default("BASE")
+  price        Float      @default(0)
+  originalPrice Float?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([wholesalerId, productId, variantName])
 }
 
 enum OrderStatus {
@@ -110,15 +130,16 @@ enum OrderStatus {
 }
 
 model Order {
-  id           String      @id @default(cuid())
-  orderNumber  String      @unique
-  wholesalerId String
-  wholesaler   Wholesaler  @relation(fields: [wholesalerId], references: [id])
-  totalAmount  Float
-  status       OrderStatus @default(PENDING)
-  items        OrderItem[]
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique
+  wholesalerId  String
+  wholesaler    Wholesaler  @relation(fields: [wholesalerId], references: [id])
+  totalAmount   Float
+  originalTotal Float       @default(0)
+  status        OrderStatus @default(PENDING)
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model OrderItem {
@@ -129,6 +150,7 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
   quantity  Int
   price     Float
+  originalPrice Float?
   variantName String?
 }
 
@@ -138,7 +160,7 @@ model SavedProduct {
   wholesaler   Wholesaler @relation(fields: [wholesalerId], references: [id], onDelete: Cascade)
   productId    String
   product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
-  variantName  String?
+  variantName  String     @default("BASE")
   createdAt    DateTime   @default(now())
 
   @@unique([wholesalerId, productId, variantName])

@@ -87,18 +87,16 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-1 lg:space-x-0 text-[9px] uppercase tracking-widest font-bold text-brand-primary/70 scale-95 origin-center">
             {isLogged && (
-              <>
-                <Link href="/wholesalers/dashboard/collection/offers" className="px-3 py-2 text-brand-secondary flex items-center gap-2 group relative">
-                  {/* <Icon icon="solar:ticket-sale-bold-duotone" className="w-4 h-4" /> */}
+              <div className="flex items-center gap-2">
+                <Link href="/wholesalers/dashboard/collection/offers" className="px-3 py-2 text-white bg-brand-primary rounded-full flex items-center gap-2 group relative">
                   Discount Offers
-                  <span className="absolute -bottom-1 left-3 right-3 h-0.5 bg-brand-secondary scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300 rounded-full"></span>
+                  <span className="absolute -bottom-1 left-3 right-3 h-0.5 bg-brand-secondary  scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300 rounded-full"></span>
                 </Link>
-                <Link href="/wholesalers/dashboard/collection/ready-stock" className="px-3 py-2 text-brand-secondary flex items-center gap-2 group relative">
-                  {/* <Icon icon="solar:box-minimalistic-bold-duotone" className="w-4 h-4" /> */}
+                <Link href="/wholesalers/dashboard/collection/ready-stock" className="px-3 py-2 text-white bg-brand-primary rounded-full flex items-center gap-2 group relative">
                   Ready Stock
                   <span className="absolute -bottom-1 left-3 right-3 h-0.5 bg-brand-secondary scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300 rounded-full"></span>
                 </Link>
-              </>
+              </div>
             )}
             {navigationData.map((cat) => (
               <div
@@ -303,21 +301,21 @@ export default function Header() {
         {isMobileMenuOpen && (
           <>
              {/* Glassmorphic Backdrop */}
-             <motion.div 
-               initial={{ opacity: 0 }} 
-               animate={{ opacity: 1 }} 
-               exit={{ opacity: 0 }} 
-               onClick={() => setIsMobileMenuOpen(false)} 
-               className="fixed inset-0 bg-brand-primary/40 backdrop-blur-md z-[100]" 
+             <motion.div
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               onClick={() => setIsMobileMenuOpen(false)}
+               className="fixed inset-0 bg-brand-primary/40 backdrop-blur-md z-[100]"
              />
-             
+
              {/* Minimalist Side Drawer */}
-             <motion.div 
-               initial={{ x: '-100%' }} 
-               animate={{ x: 0 }} 
-               exit={{ x: '-100%' }} 
-               transition={{ type: 'spring', damping: 30, stiffness: 300 }} 
-               className="fixed top-0 left-0 h-full w-[80%] max-w-[320px] bg-white z-[110] shadow-2xl flex flex-col" 
+             <motion.div
+               initial={{ x: '-100%' }}
+               animate={{ x: 0 }}
+               exit={{ x: '-100%' }}
+               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+               className="fixed top-0 left-0 h-full w-[80%] max-w-[320px] bg-white z-[110] shadow-2xl flex flex-col"
              >
                {/* Unified Header */}
                <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
@@ -358,27 +356,27 @@ export default function Header() {
                  <div className="px-2">
                    {navigationData.map((cat) => (
                      <div key={cat.id} className="mb-1">
-                       <button 
-                         onClick={() => setExpandedMobileCat(expandedMobileCat === cat.id ? null : cat.id)} 
+                       <button
+                         onClick={() => setExpandedMobileCat(expandedMobileCat === cat.id ? null : cat.id)}
                          className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 rounded-xl transition-colors"
                        >
                          <span className={`text-[11px] font-bold tracking-[0.1em] uppercase ${expandedMobileCat === cat.id ? 'text-brand-secondary' : 'text-brand-primary/70'}`}>{cat.name}</span>
                          <Icon icon="lucide:chevron-down" className={`w-3 h-3 transition-transform ${expandedMobileCat === cat.id ? 'rotate-180 text-brand-secondary' : 'text-brand-primary/20'}`} />
                        </button>
-                       
+
                        <AnimatePresence>
                          {expandedMobileCat === cat.id && (
-                           <motion.div 
-                             initial={{ height: 0, opacity: 0 }} 
-                             animate={{ height: 'auto', opacity: 1 }} 
-                             exit={{ height: 0, opacity: 0 }} 
+                           <motion.div
+                             initial={{ height: 0, opacity: 0 }}
+                             animate={{ height: 'auto', opacity: 1 }}
+                             exit={{ height: 0, opacity: 0 }}
                              className="overflow-hidden"
                            >
                              <div className="py-2 pl-4 space-y-1">
                                {cat.subCategories.map((sub) => (
-                                 <Link 
-                                   key={sub.name} 
-                                   href={`/category/${cat.id}/${sub.id}`} 
+                                 <Link
+                                   key={sub.name}
+                                   href={`/category/${cat.id}/${sub.id}`}
                                    onClick={() => setIsMobileMenuOpen(false)}
                                    className="block px-4 py-2 text-[10px] font-medium text-brand-primary/50 uppercase tracking-widest hover:text-brand-secondary"
                                  >
@@ -398,7 +396,7 @@ export default function Header() {
                    <Link href="/contact-us" onClick={() => setIsMobileMenuOpen(false)} className="block text-[10px] font-bold tracking-[0.2em] text-brand-primary/40 uppercase">
                      Contact Us
                    </Link>
-                   
+
                    <button
                      onClick={async () => {
                        const res = await fetch(isAdmin ? '/api/admin/logout' : '/api/user/logout', { method: 'POST' });

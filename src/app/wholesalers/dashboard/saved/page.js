@@ -135,7 +135,7 @@ export default function SavedPage() {
                        <div className="mt-auto pt-6 border-t border-brand-primary/5 flex items-center justify-between gap-4">
                           <div className="text-left">
                              <p className="text-[8px] font-bold text-brand-primary/30 uppercase tracking-widest mb-1 italic font-serif">Procurement Price</p>
-                             <p className="text-xl font-serif font-bold text-brand-primary">₹{product.price?.toLocaleString()}</p>
+                             <p className="text-xl font-serif font-bold text-brand-primary">₹{(product.price || 0).toLocaleString()}</p>
                           </div>
 
                           {isAuthenticated && (
