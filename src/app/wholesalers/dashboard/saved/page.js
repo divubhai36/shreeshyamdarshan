@@ -48,16 +48,16 @@ export default function SavedPage() {
               <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Dashboard</span>
             </button>
             <h1 className="text-4xl lg:text-5xl font-serif font-bold text-brand-primary">Saved Products</h1>
-            <p className="text-[10px] font-bold text-brand-secondary tracking-[0.3em] uppercase mt-2">Your Curated B2B Registry</p>
+            <p className="text-[10px] font-bold text-brand-secondary tracking-[0.3em] uppercase mt-2">Your Choice Is Here</p>
           </div>
 
-          <div className="bg-white px-6 py-3 rounded-2xl border border-brand-primary/5 shadow-sm flex items-center gap-3">
+          <div className="bg-white px-3 py-2 rounded-2xl border border-brand-primary/5 shadow-sm flex items-center gap-3">
              <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white font-bold">
                 {saved.length}
              </div>
              <div>
                 <p className="text-[8px] font-bold text-brand-primary/30 uppercase tracking-widest">Total Saved</p>
-                <p className="text-xs font-bold text-brand-primary uppercase tracking-tight">Masterpieces</p>
+                <p className="text-xs font-bold text-brand-primary uppercase tracking-tight">Product</p>
              </div>
           </div>
         </div>
@@ -80,14 +80,14 @@ export default function SavedPage() {
 
              <div className="relative z-10">
                 <div className="w-24 h-24 bg-brand-accent rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
-                   <Icon icon="solar:heart-add-bold-duotone" className="w-12 h-12 text-brand-primary/20" />
+                   <Icon icon="solar:chat-square-like-line-duotone" className="w-12 h-12 text-brand-primary/20" />
                 </div>
-                <h2 className="text-3xl font-serif font-bold text-brand-primary mb-4">Your registry is empty</h2>
+                <h2 className="text-3xl font-serif font-bold text-brand-primary mb-4">Your Wish List is empty</h2>
                 <p className="text-sm text-brand-primary/40 mb-10 max-w-md mx-auto leading-relaxed">
                    Explore our divine collection and curate the pieces that define your elite inventory. Save them here for quick procurement and registry management.
                 </p>
                 <Link href="/" className="inline-flex items-center gap-4 bg-brand-primary text-white px-12 py-5 rounded-[24px] text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-brand-secondary transition-all shadow-xl hover:translate-y-[-4px] active:scale-95 group">
-                   <span>Explore Divine Boutique</span>
+                   <span>Explore Divine Collection</span>
                    <Icon icon="solar:alt-arrow-right-linear" className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
              </div>
@@ -124,7 +124,7 @@ export default function SavedPage() {
                              <p className="text-[9px] font-bold text-brand-secondary uppercase tracking-[0.2em] mb-2">{product.category}</p>
                              <h3 className="text-xl font-serif font-bold text-brand-primary line-clamp-2 leading-tight group-hover:text-brand-secondary transition-colors text-left">{product.name}</h3>
                           </div>
-                          <button 
+                          <button
                             onClick={() => toggleSave(product)}
                             className="shrink-0 text-rose-500 hover:scale-110 transition-all mt-4"
                           >

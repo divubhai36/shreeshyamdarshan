@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 
 export default function LeadPopup() {
    const [show, setShow] = useState(false);
-   const [formData, setFormData] = useState({ name: '', mobile: '', product: '', pieces: '1', state: '' });
+   const [formData, setFormData] = useState({ name: '', mobile: '', product: '', pieces: '1', state: '', city: '' });
    const pathname = usePathname();
 
    useEffect(() => {
@@ -47,7 +47,7 @@ export default function LeadPopup() {
    const handleSubmit = (e) => {
       e.preventDefault();
       const phone = "917383699199";
-      const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Name:* ${formData.name}\n*Mobile:* ${formData.mobile}\n*Interested In:* ${formData.product}\n*Quantity:* ${formData.pieces} pcs\n------------------\nPlease help me with the details.`;
+      const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Name:* ${formData.name}\n*Mobile:* ${formData.mobile}\n*City:* ${formData.city}\n*State:* ${formData.state}\n*Interested In:* ${formData.product}\n*Quantity:* ${formData.pieces} pcs\n------------------\nPlease help me with the details.`;
 
       const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
       window.open(whatsappUrl, '_blank');
@@ -137,20 +137,38 @@ export default function LeadPopup() {
                            />
                         </div>
                      </div>
-                     <div className="text-left group">
-                        <label className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest mb-1.5 block ml-1 text-left">State</label>
-                        <div className="relative text-left">
-                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-secondary text-left">
-                              <Icon icon="solar:cart-large-bold" className="w-4 h-4 text-left" />
-                           </span>
-                           <input
-                              required
-                              type="text"
-                              value={formData.state}
-                              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                              className="w-full bg-white border border-brand-primary/5 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-brand-primary placeholder:text-brand-primary/20 shadow-sm focus:ring-4 focus:ring-brand-secondary/10 outline-none transition-all text-left"
-                              placeholder="Enter your State"
-                           />
+                     <div className="grid grid-cols-2 gap-3.5 text-left">
+                        <div className="text-left group">
+                           <label className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest mb-1.5 block ml-1 text-left">City</label>
+                           <div className="relative text-left">
+                              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-secondary text-left">
+                                 <Icon icon="solar:city-bold" className="w-4 h-4 text-left" />
+                              </span>
+                              <input
+                                 required
+                                 type="text"
+                                 value={formData.city}
+                                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                 className="w-full bg-white border border-brand-primary/5 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-brand-primary placeholder:text-brand-primary/20 shadow-sm focus:ring-4 focus:ring-brand-secondary/10 outline-none transition-all text-left"
+                                 placeholder="Enter City"
+                              />
+                           </div>
+                        </div>
+                        <div className="text-left group">
+                           <label className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest mb-1.5 block ml-1 text-left">State</label>
+                           <div className="relative text-left">
+                              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-secondary text-left">
+                                 <Icon icon="solar:map-point-bold" className="w-4 h-4 text-left" />
+                              </span>
+                              <input
+                                 required
+                                 type="text"
+                                 value={formData.state}
+                                 onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                                 className="w-full bg-white border border-brand-primary/5 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-brand-primary placeholder:text-brand-primary/20 shadow-sm focus:ring-4 focus:ring-brand-secondary/10 outline-none transition-all text-left"
+                                 placeholder="Enter State"
+                              />
+                           </div>
                         </div>
                      </div>
                      <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-3.5 text-left">

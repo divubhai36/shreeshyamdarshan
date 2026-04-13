@@ -2,6 +2,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
+import { roundToTwo } from "@/lib/utils";
 
 // Category Actions
 export async function getCategories() { return await prisma.category.findMany({ orderBy: { createdAt: 'desc' } }); }
@@ -81,6 +82,12 @@ export async function createProduct(data) {
     
     const prismaData = {
       ...scalars,
+      mrp: roundToTwo(scalars.mrp),
+      price: roundToTwo(scalars.price),
+      offerPrice: roundToTwo(scalars.offerPrice),
+      variants: Array.isArray(scalars.variants) 
+        ? scalars.variants.map(v => ({ ...v, price: roundToTwo(v.price) }))
+        : scalars.variants,
       category: { connect: { id: categoryId } },
       subCategory: { connect: { id: subCategoryId } }
     };
@@ -122,6 +129,12 @@ export async function updateProduct(id, data) {
     
     const prismaData = {
       ...scalars,
+      mrp: roundToTwo(scalars.mrp),
+      price: roundToTwo(scalars.price),
+      offerPrice: roundToTwo(scalars.offerPrice),
+      variants: Array.isArray(scalars.variants) 
+        ? scalars.variants.map(v => ({ ...v, price: roundToTwo(v.price) }))
+        : scalars.variants,
       category: { connect: { id: categoryId } },
       subCategory: { connect: { id: subCategoryId } }
     };

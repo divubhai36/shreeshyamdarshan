@@ -1,10 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
-import { motion } from "framer-motion";
+import { motion, Reorder } from "framer-motion";
 import { getProducts, createProduct, updateProduct, deleteProduct, getCategories, getSubCategories, getInnerSubCategories } from "../actions";
 import CustomSelect from "@/components/CustomSelect";
 import toast from "react-hot-toast";
+import { roundToTwo } from "@/lib/utils";
 
 
 export default function ProductsPage() {
@@ -20,8 +21,9 @@ export default function ProductsPage() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
 
-    const initForm = { productId: "", name: "", slug: "", description: "", wholesalerDescription: "", mrp: 0, price: 0, offerPrice: 0, discountPercent: 0, categoryId: "", subCategoryId: "", innerSubId: null, images: [], videos: [], isBestSeller: false, isOfferProduct: false, isReadyStock: false, showSizeGuide: false, showWashCare: false, allowToBuy: true, details: [], variants: [], unit: "PIECE", isVisible: true };
+    const initForm = { productId: "", name: "", slug: "", description: "", wholesalerDescription: "", mrp: 0, price: 0, offerPrice: 0, discountPercent: 0, categoryId: "", subCategoryId: "", innerSubId: null, images: [], videos: [], isBestSeller: false, isOfferProduct: false, isReadyStock: false, showWashCare: false, allowToBuy: true, details: [], variants: [], unit: "PIECE", isVisible: true };
     const [form, setForm] = useState(initForm);
+    const [errors, setErrors] = useState({});
     const [uploadingImage, setUploadingImage] = useState(false);
     const [uploadingVideo, setUploadingVideo] = useState(false);
     const [isDraggingImage, setIsDraggingImage] = useState(false);
@@ -96,49 +98,58 @@ export default function ProductsPage() {
 
     const slugify = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
-    const handleSubmit = async () => {
-        // PER-STEP VALIDATION LOGIC
-        if (step === 1) {
-            if (!form.name || !form.productId) {
-                toast.error("Identity: Product Name and ID are mandatory");
-                return;
-            }
-            if (!form.categoryId || !form.subCategoryId) {
-                toast.error("Taxonomy: Please select a valid Category and Sub-category");
-                return;
-            }
+    const validateStep = (s) => {
+        let newErrors = {};
+        if (s === 1) {
+            if (!form.productId) newErrors.productId = "Product ID / SKU is required";
+            if (!form.name) newErrors.name = "Product Display Name is required";
+            if (!form.categoryId) newErrors.categoryId = "Primary Category is required";
+            if (!form.subCategoryId) newErrors.subCategoryId = "Sub-category is required";
         }
 
-        if (step === 2) {
+        if (s === 2) {
             const mrp = parseFloat(form.mrp) || 0;
             const price = parseFloat(form.price) || 0;
-            if (mrp <= 0 || price <= 0) {
-                toast.error("Economics: MRP and Sale Price must be positive values");
-                return;
-            }
-            if (price > mrp) {
-                toast.error("Economics: Sale Price cannot exceed MRP Basis");
-                return;
-            }
+            if (mrp <= 0) newErrors.mrp = "MRP must be positive";
+            if (price <= 0) newErrors.price = "Sale Price must be positive";
+            if (price > mrp) newErrors.price = "Sale Price cannot exceed MRP";
+
             if (form.isOfferProduct) {
                 const discount = parseFloat(form.discountPercent) || 0;
                 if (discount < 0 || discount > 100) {
-                    toast.error("Economics: Discount must be between 0% and 100%");
-                    return;
+                    newErrors.discountPercent = "Discount must be between 0 and 100";
                 }
             }
+
             if (form.variants.length > 0) {
-                const invalidVariant = form.variants.find(v => !v.name || parseFloat(v.price) <= 0);
-                if (invalidVariant) {
-                    toast.error("Architecture: Every variant requires a name and positive price");
-                    return;
+                const vErrs = form.variants.map(v => ({
+                    name: !v.name ? "Required" : "",
+                    price: (!v.price || parseFloat(v.price) <= 0) ? "Required" : ""
+                }));
+                if (vErrs.some(e => e.name || e.price)) {
+                    newErrors.variants = vErrs;
                 }
             }
         }
 
-        if (step === 3) {
-            // Registry is usually optional, but we check if it proceeds
+        if (s === 4) {
+            if (form.images.length === 0) {
+                newErrors.images = "At least one visual masterpiece (image) is required";
+            }
         }
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            const firstErr = Object.values(newErrors)[0];
+            toast.error(typeof firstErr === 'string' ? firstErr : "Please check required fields");
+            return false;
+        }
+        return true;
+    };
+
+    const handleSubmit = async () => {
+        if (!validateStep(step)) return;
 
         if (step < 4) {
             setStep(s => s + 1);
@@ -153,11 +164,11 @@ export default function ProductsPage() {
 
         const payload = {
             ...form,
-            mrp: parseFloat(form.mrp),
-            price: parseFloat(form.price),
-            offerPrice: form.isOfferProduct ? parseFloat(form.price * (1 - form.discountPercent / 100)) : parseFloat(form.price),
+            mrp: roundToTwo(form.mrp),
+            price: roundToTwo(form.price),
+            offerPrice: form.isOfferProduct ? roundToTwo(form.price * (1 - form.discountPercent / 100)) : roundToTwo(form.price),
+            variants: form.variants.map(v => ({ ...v, price: roundToTwo(v.price) })),
             discountPercent: parseInt(form.discountPercent),
-            showSizeGuide: !!form.showSizeGuide,
             showWashCare: !!form.showWashCare,
             isReadyStock: !!form.isReadyStock,
             allowToBuy: !!form.allowToBuy,
@@ -214,7 +225,7 @@ export default function ProductsPage() {
                             className="w-full bg-white border border-brand-primary/5 rounded-xl p-4 pl-11 text-[11px] font-bold text-brand-primary focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider"
                         />
                     </div>
-                    <button onClick={() => { setEditingId(null); setForm(initForm); setIsOpen(true); setStep(1); setOfferType("price"); }} className="bg-brand-primary text-white px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:shadow-2xl transition-all shadow-xl whitespace-nowrap flex items-center gap-2">
+                    <button onClick={() => { setEditingId(null); setForm(initForm); setErrors({}); setIsOpen(true); setStep(1); setOfferType("price"); }} className="bg-brand-primary text-white px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:shadow-2xl transition-all shadow-xl whitespace-nowrap flex items-center gap-2">
                         <Icon icon="lucide:plus" className="w-4 h-4" /> Add Product
                     </button>
                 </div>
@@ -282,23 +293,24 @@ export default function ProductsPage() {
                                             </button>
                                             <button onClick={() => {
                                                 setEditingId(p.id);
-                                            setForm({
-                                                ...p,
-                                                innerSubId: p.innerSubId || "",
-                                                details: Array.isArray(p.details) ? p.details : [],
-                                                showWashCare: !!p.showWashCare,
-                                                isReadyStock: !!p.isReadyStock,
-                                                wholesalerDescription: p.wholesalerDescription || "",
-                                                allowToBuy: p.allowToBuy !== undefined ? p.allowToBuy : true,
-                                                variants: Array.isArray(p.variants) ? p.variants : [],
-                                                unit: p.unit || "PIECE",
-                                                isVisible: p.isVisible !== undefined ? p.isVisible : true
-                                            });
-                                            setOfferType(p.discountPercent > 0 ? "percentage" : "price");
-                                            setStep(1);
-                                            setIsOpen(true);
-                                        }} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg mr-2"><Icon icon="lucide:edit-2" /></button>
-                                        <button onClick={() => { setItemToDelete(p); setIsDeleteModalOpen(true); }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Icon icon="lucide:trash-2" /></button>
+                                                setForm({
+                                                    ...p,
+                                                    innerSubId: p.innerSubId || "",
+                                                    details: Array.isArray(p.details) ? p.details : [],
+                                                    showWashCare: !!p.showWashCare,
+                                                    isReadyStock: !!p.isReadyStock,
+                                                    wholesalerDescription: p.wholesalerDescription || "",
+                                                    allowToBuy: p.allowToBuy !== undefined ? p.allowToBuy : true,
+                                                    variants: (Array.isArray(p.variants) ? p.variants : []).map(v => ({ ...v, id: v.id || Math.random().toString(36).substr(2, 9) })),
+                                                    unit: p.unit || "PIECE",
+                                                    isVisible: p.isVisible !== undefined ? p.isVisible : true
+                                                });
+                                                setOfferType(p.discountPercent > 0 ? "percentage" : "price");
+                                                setStep(1);
+                                                setErrors({});
+                                                setIsOpen(true);
+                                            }} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg mr-2"><Icon icon="lucide:edit-2" /></button>
+                                            <button onClick={() => { setItemToDelete(p); setIsDeleteModalOpen(true); }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Icon icon="lucide:trash-2" /></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -341,12 +353,14 @@ export default function ProductsPage() {
                                             </div>
                                             <div className="space-y-6">
                                                 <div className="group">
-                                                    <label className="text-[10px] uppercase tracking-[0.2em] font-black block mb-2 ml-1 text-brand-primary/40 group-focus-within:text-brand-primary transition-colors">Product ID / SKU</label>
-                                                    <input type="text" value={form.productId} onChange={e => setForm({ ...form, productId: e.target.value.toUpperCase() })} className="w-full p-5 border border-brand-primary/5 rounded-[24px] bg-white font-serif font-bold text-lg text-brand-primary focus:border-brand-secondary/40 transition-all outline-none shadow-inner" placeholder="E.G. VG A-517" required />
+                                                    <label className={`text-[10px] uppercase tracking-[0.2em] font-black block mb-2 ml-1 transition-colors ${errors.productId ? 'text-red-500' : 'text-brand-primary/40 group-focus-within:text-brand-primary'}`}>Product ID / SKU</label>
+                                                    <input type="text" value={form.productId} onChange={e => { setForm({ ...form, productId: e.target.value.toUpperCase() }); if(errors.productId) setErrors(prev => ({...prev, productId: null})); }} className={`w-full p-5 border rounded-[24px] bg-white font-serif font-bold text-lg transition-all outline-none shadow-inner ${errors.productId ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-primary/5 focus:border-brand-secondary/40 text-brand-primary'}`} placeholder="E.G. VG A-517" required />
+                                                    {errors.productId && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-2 ml-1">{errors.productId}</p>}
                                                 </div>
                                                 <div className="group">
-                                                    <label className="text-[10px] uppercase tracking-[0.2em] font-black block mb-2 ml-1 text-brand-primary/40 group-focus-within:text-brand-primary transition-colors">Product Display Name</label>
-                                                    <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: slugify(e.target.value) })} className="w-full p-5 border border-brand-primary/5 rounded-[24px] bg-white font-serif font-bold text-lg text-brand-primary focus:border-brand-secondary/40 transition-all outline-none shadow-inner" placeholder="Enter Product Name" required />
+                                                    <label className={`text-[10px] uppercase tracking-[0.2em] font-black block mb-2 ml-1 transition-colors ${errors.name ? 'text-red-500' : 'text-brand-primary/40 group-focus-within:text-brand-primary'}`}>Product Display Name</label>
+                                                    <input type="text" value={form.name} onChange={e => { setForm({ ...form, name: e.target.value, slug: slugify(e.target.value) }); if(errors.name) setErrors(prev => ({...prev, name: null})); }} className={`w-full p-5 border rounded-[24px] bg-white font-serif font-bold text-lg transition-all outline-none shadow-inner ${errors.name ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-primary/5 focus:border-brand-secondary/40 text-brand-primary'}`} placeholder="Enter Product Name" required />
+                                                    {errors.name && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-2 ml-1">{errors.name}</p>}
                                                 </div>
                                             </div>
                                         </div>
@@ -360,33 +374,39 @@ export default function ProductsPage() {
                                                 </div>
                                                 <h4 className="text-[11px] uppercase tracking-[0.2em] font-black text-brand-primary/60">Taxonomy Registry</h4>
                                             </div>
-                                            <div className="space-y-4">
-                                                <CustomSelect
-                                                    placeholder="1. Select Primary Category"
-                                                    options={cats.map(c => ({ value: c.id, label: c.name }))}
-                                                    value={form.categoryId}
-                                                    onChange={val => setForm({ ...form, categoryId: val, subCategoryId: '', innerSubId: null })}
-                                                    isSearchable={true}
-                                                    className="mb-2"
-                                                />
-                                                <CustomSelect
-                                                    placeholder="2. Select Luxury Sub-category"
-                                                    options={availableSubs.map(c => ({ value: c.id, label: c.name }))}
-                                                    value={form.subCategoryId}
-                                                    onChange={val => setForm({ ...form, subCategoryId: val, innerSubId: null })}
-                                                    isSearchable={true}
-                                                    disabled={!form.categoryId}
-                                                    className="mb-2"
-                                                />
-                                                <CustomSelect
-                                                    placeholder="3. Select Divine Variant (Optional)"
-                                                    options={availableInners.map(c => ({ value: c.id, label: c.name }))}
-                                                    value={form.innerSubId || ""}
-                                                    onChange={val => setForm({ ...form, innerSubId: val })}
-                                                    isSearchable={true}
-                                                    disabled={!form.subCategoryId || availableInners.length === 0}
-                                                />
-                                            </div>
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <CustomSelect
+                                                            placeholder="1. Select Primary Category"
+                                                            options={cats.map(c => ({ value: c.id, label: c.name }))}
+                                                            value={form.categoryId}
+                                                            onChange={val => { setForm({ ...form, categoryId: val, subCategoryId: '', innerSubId: null }); if(errors.categoryId) setErrors(prev => ({...prev, categoryId: null})); }}
+                                                            isSearchable={true}
+                                                            className={`mb-2 ${errors.categoryId ? 'ring-2 ring-red-500 rounded-xl' : ''}`}
+                                                        />
+                                                        {errors.categoryId && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1 ml-1">{errors.categoryId}</p>}
+                                                    </div>
+                                                    <div>
+                                                        <CustomSelect
+                                                            placeholder="2. Select Luxury Sub-category"
+                                                            options={availableSubs.map(c => ({ value: c.id, label: c.name }))}
+                                                            value={form.subCategoryId}
+                                                            onChange={val => { setForm({ ...form, subCategoryId: val, innerSubId: null }); if(errors.subCategoryId) setErrors(prev => ({...prev, subCategoryId: null})); }}
+                                                            isSearchable={true}
+                                                            disabled={!form.categoryId}
+                                                            className={`mb-2 ${errors.subCategoryId ? 'ring-2 ring-red-500 rounded-xl' : ''}`}
+                                                        />
+                                                        {errors.subCategoryId && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1 ml-1">{errors.subCategoryId}</p>}
+                                                    </div>
+                                                    <CustomSelect
+                                                        placeholder="3. Select Divine Variant (Optional)"
+                                                        options={availableInners.map(c => ({ value: c.id, label: c.name }))}
+                                                        value={form.innerSubId || ""}
+                                                        onChange={val => setForm({ ...form, innerSubId: val })}
+                                                        isSearchable={true}
+                                                        disabled={!form.subCategoryId || availableInners.length === 0}
+                                                    />
+                                                </div>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -409,18 +429,20 @@ export default function ProductsPage() {
                                             <div className="space-y-8">
                                                 <div className="grid grid-cols-2 gap-6">
                                                     <div className="space-y-3">
-                                                        <label className="text-[10px] uppercase tracking-widest font-black text-brand-primary/30 ml-2">MRP Basis</label>
+                                                        <label className={`text-[10px] uppercase tracking-widest font-black ml-2 transition-colors ${errors.mrp ? 'text-red-500' : 'text-brand-primary/30'}`}>MRP</label>
                                                         <div className="relative group">
-                                                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-brand-primary/20 font-serif text-xl">₹</span>
-                                                            <input type="number" min="0" onWheel={(e) => e.target.blur()} value={form.mrp} onChange={e => setForm({ ...form, mrp: e.target.value })} className="w-full p-5 pl-12 border border-brand-primary/5 rounded-[24px] bg-white font-serif font-black text-2xl text-brand-primary outline-none focus:border-brand-secondary/40 transition-all shadow-inner" placeholder="0" required />
+                                                            <span className={`absolute left-5 top-1/2 -translate-y-1/2 font-serif text-xl transition-colors ${errors.mrp ? 'text-red-400' : 'text-brand-primary/20'}`}>₹</span>
+                                                            <input type="number" min="0" onWheel={(e) => e.target.blur()} value={form.mrp} onChange={e => { setForm({ ...form, mrp: e.target.value }); if(errors.mrp) setErrors(prev => ({...prev, mrp: null})); }} className={`w-full p-5 pl-12 border rounded-[24px] bg-white font-serif font-black text-2xl transition-all outline-none shadow-inner ${errors.mrp ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-primary/5 focus:border-brand-secondary/40 text-brand-primary'}`} placeholder="0" required />
                                                         </div>
+                                                        {errors.mrp && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1 ml-2">{errors.mrp}</p>}
                                                     </div>
                                                     <div className="space-y-3">
-                                                        <label className="text-[10px] uppercase tracking-widest font-black text-brand-secondary/60 ml-2">Sale Price</label>
+                                                        <label className={`text-[10px] uppercase tracking-widest font-black ml-2 transition-colors ${errors.price ? 'text-red-500' : 'text-brand-secondary/60'}`}>Sale Price</label>
                                                         <div className="relative group">
-                                                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-brand-secondary/40 font-serif text-xl">₹</span>
-                                                            <input type="number" min="0" onWheel={(e) => e.target.blur()} value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full p-5 pl-12 border border-brand-secondary/10 rounded-[24px] bg-brand-secondary/5 font-serif font-black text-2xl text-brand-secondary outline-none focus:border-brand-secondary/40 transition-all shadow-inner" placeholder="0" required />
+                                                            <span className={`absolute left-5 top-1/2 -translate-y-1/2 font-serif text-xl transition-colors ${errors.price ? 'text-red-400' : 'text-brand-secondary/40'}`}>₹</span>
+                                                            <input type="number" min="0" onWheel={(e) => e.target.blur()} value={form.price} onChange={e => { setForm({ ...form, price: e.target.value }); if(errors.price) setErrors(prev => ({...prev, price: null})); }} className={`w-full p-5 pl-12 border rounded-[24px] font-serif font-black text-2xl transition-all outline-none shadow-inner ${errors.price ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-secondary/10 bg-brand-secondary/5 text-brand-secondary focus:border-brand-secondary/40'}`} placeholder="0" required />
                                                         </div>
+                                                        {errors.price && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1 ml-2">{errors.price}</p>}
                                                     </div>
                                                 </div>
 
@@ -439,7 +461,7 @@ export default function ProductsPage() {
                                                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-8 pt-8 border-t border-brand-primary/5">
                                                             <div className="flex items-center  gap-4">
                                                                 <div className="flex-1">
-                                                                    <label className="text-[10px] uppercase tracking-widest font-black text-brand-primary/40 block mb-2 px-1">Discount (%)</label>
+                                                                    <label className={`text-[10px] uppercase tracking-widest font-black block mb-2 px-1 transition-colors ${errors.discountPercent ? 'text-red-500' : 'text-brand-primary/40'}`}>Discount (%)</label>
                                                                     <div className="relative">
                                                                         <input
                                                                             type="number"
@@ -452,17 +474,18 @@ export default function ProductsPage() {
                                                                                 if (val > 100) val = 100;
                                                                                 if (val < 0) val = 0;
                                                                                 setForm({ ...form, discountPercent: val });
+                                                                                if(errors.discountPercent) setErrors(prev => ({...prev, discountPercent: null}));
                                                                             }}
-                                                                            className="w-full p-5 border border-brand-primary/10 rounded-[24px] bg-brand-primary/5 font-serif font-black text-2xl text-brand-primary outline-none focus:border-brand-primary/40 transition-all"
+                                                                            className={`w-full p-5 border rounded-[24px] bg-brand-primary/5 font-serif font-black text-2xl transition-all outline-none ${errors.discountPercent ? 'border-red-500 focus:border-red-600 bg-red-50/10 text-red-500' : 'border-brand-primary/10 text-brand-primary focus:border-brand-primary/40'}`}
                                                                             placeholder="0"
                                                                         />
-                                                                        <span className="absolute right-5 top-1/2 -translate-y-1/2 text-brand-primary/30 text-xl font-bold">%</span>
+                                                                        <span className={`absolute right-5 top-1/2 -translate-y-1/2 text-xl font-bold transition-colors ${errors.discountPercent ? 'text-red-400' : 'text-brand-primary/30'}`}>%</span>
                                                                     </div>
+                                                                    {errors.discountPercent && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-2 px-1">{errors.discountPercent}</p>}
                                                                 </div>
-                                                                {/* <span className="font-serif font-black text-xl text-brand-primary">₹{(form.price * (1 - form.discountPercent/100)).toFixed(0)}</span> */}
                                                                 <div className="  flex flex-col items-center justify-center mt-5">
                                                                     <span className="text-[8px] font-black uppercase text-brand-primary/30 mb-1">Price</span>
-                                                                    <span className="font-serif font-black text-xl text-brand-primary">₹{(form.price * (1 - form.discountPercent / 100)).toFixed(0)}</span>
+                                                                    <span className="font-serif font-black text-xl text-brand-primary">₹{roundToTwo(form.price * (1 - form.discountPercent / 100)).toFixed(2)}</span>
                                                                 </div>
                                                             </div>
                                                         </motion.div>
@@ -490,94 +513,261 @@ export default function ProductsPage() {
 
                                     {/* Column 2: Variants */}
                                     <div className="space-y-6 h-full flex flex-col">
-                                        <div className="bg-white rounded-[32px] p-8 border border-brand-primary/10 shadow-[0_20px_50_rgba(0,0,0,0.03)] h-full flex flex-col">
-                                            <div className="flex items-center justify-between gap-4 mb-8">
+                                        <div className="bg-white rounded-[32px] p-8 border border-brand-primary/10 shadow-[0_20px_50_rgba(0,0,0,0.03)] h-full flex flex-col gap-5">
+                                            <div className="flex items-center justify-between gap-4">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 bg-brand-primary/5 rounded-2xl flex items-center justify-center text-brand-primary shadow-sm">
                                                         <Icon icon="solar:layers-bold-duotone" className="w-6 h-6" />
                                                     </div>
                                                     <div>
-                                                        <h4 className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-primary">Architecture</h4>
-                                                        <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest">Multi-Pricing Registry</p>
+                                                        <h4 className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-primary">Product Variants</h4>
+                                                        <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest">Multi-Variants Registry</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-2">
-                                                    <button
-                                                        type="button"
-                                                        title="Quick Inject Sizes (00-6)"
-                                                        onClick={() => {
-                                                            const q = ["00", "0", "1", "2", "3", "4", "5", "6"];
-                                                            setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ name: s, price: form.price }))] });
-                                                            toast.success("Injected common sizes");
-                                                        }}
-                                                        className="w-10 h-10 bg-brand-secondary/10 text-brand-secondary rounded-[12px] flex items-center justify-center border border-brand-secondary/20 hover:bg-brand-secondary hover:text-white transition-all active:scale-90"
-                                                    >
-                                                        <Icon icon="mdi:size-s" className="w-8 h-8" />
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
-                                                        title="Quick Inject Dimensions (1ft-3ft)"
-                                                        onClick={() => {
-                                                            const q = ["1ft", "1.5ft", "2ft", "2.5ft", "3ft"];
-                                                            setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ name: s, price: form.price }))] });
-                                                            toast.success("Injected common dimensions");
-                                                        }}
-                                                        className="w-10 h-10 bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                                                    >
-                                                        <Icon icon="solar:ruler-bold" className="w-5 h-5" />
-                                                    </button>
-
-                                                    <button type="button" onClick={() => setForm({ ...form, variants: [...form.variants, { name: "", price: "" }] })} className="w-10 h-10 bg-brand-primary text-white rounded-[12px] flex items-center justify-center transition-all active:scale-90 shadow-lg shadow-brand-primary/20"><Icon icon="lucide:plus" className="w-5 h-5" /></button>
+                                                    <button type="button" onClick={() => setForm({ ...form, variants: [...form.variants, { id: Math.random().toString(36).substr(2, 9), name: "", price: "" }] })} className="w-10 h-10 bg-brand-primary text-white rounded-[12px] flex items-center justify-center transition-all active:scale-90 shadow-lg shadow-brand-primary/20"><Icon icon="lucide:plus" className="w-5 h-5" /></button>
                                                 </div>
                                             </div>
+                                            <div className="flex flex-wrap gap-2">
+                                                <button
+                                                    type="button"
+                                                    title="LADDU GOPAL"
+                                                    onClick={() => {
+                                                        const q = ["0", "1", "2", "3", "4", "5", "6"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    LG
+                                                </button>
 
-                                            <div className="space-y-3 flex-grow overflow-y-auto no-scrollbar max-h-[400px]">
-                                                {form.variants.map((v, i) => (
-                                                    <div key={i} className="flex gap-3 items-center">
-                                                        <div className="flex-1">
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Size (e.g. S, M, L, XL)"
-                                                                value={v.name}
-                                                                onChange={e => {
-                                                                    const nv = [...form.variants];
-                                                                    nv[i].name = e.target.value;
-                                                                    setForm({ ...form, variants: nv });
-                                                                }}
-                                                                className="w-full h-12 px-4 rounded-2xl bg-white border border-brand-primary/10 focus:border-brand-primary outline-none text-[14px] font-bold text-brand-primary transition-all"
-                                                                required
-                                                            />
-                                                        </div>
-                                                        <div className="w-28">
-                                                            <input
-                                                                type="number"
-                                                                min="0"
-                                                                onWheel={(e) => e.target.blur()}
-                                                                placeholder="0"
-                                                                value={v.price}
-                                                                onChange={e => {
-                                                                    const nv = [...form.variants];
-                                                                    nv[i].price = e.target.value;
-                                                                    setForm({ ...form, variants: nv });
-                                                                }}
-                                                                className="w-full h-12 px-4 rounded-2xl bg-white border border-brand-primary/10 focus:border-brand-primary outline-none text-[16px] font-serif font-bold text-brand-secondary text-right transition-all"
-                                                                required
-                                                            />
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setForm({
-                                                                ...form,
-                                                                variants: form.variants.filter((_, idx) => idx !== i)
-                                                            })}
-                                                            className="h-12 w-12 flex items-center justify-center rounded-2xl border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-400 hover:text-red-500 transition-all"
+                                                <button
+                                                    type="button"
+                                                    title="GM"
+                                                    onClick={() => {
+                                                        const q = ["Regular"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    GM
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="LP"
+                                                    onClick={() => {
+                                                        const q = ["2", "3", "4", "5", "6", "7", "9", "11"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    LP
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="DG"
+                                                    onClick={() => {
+                                                        const q = ["5", "6", "7", "9", "12", "15", "18", "21"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    DG
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="JAMA"
+                                                    onClick={() => {
+                                                        const q = ["00", "0", "1", "2", "3", "4", "5", "6", "7", "9"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    JAMA
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="Khesh"
+                                                    onClick={() => {
+                                                        const q = ["5", "8", "10", "13", "18", "24", "30", "38", "48", "78"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    Khesh
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="MUKUT"
+                                                    onClick={() => {
+                                                        const q = ["5", "8", "10", "13", "18", "24", "30", "38", "48", "78"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    MUKUT
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="RK"
+                                                    onClick={() => {
+                                                        const q = ["2", "3", "4", "5", "6", "7", "9", "12", "15", "18"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    RK
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="RD"
+                                                    onClick={() => {
+                                                        const q = ["2", "3", "4", "5", "6", "7", "9", "12", "15", "18"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    RD
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="HANJUMANJI"
+                                                    onClick={() => {
+                                                        const q = ["5", "6", "7", "9", "12", "15", "18", "21", "24", "27", "30"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    HANJUMANJI
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="SIHASAN"
+                                                    onClick={() => {
+                                                        const q = ["1", "2", "3", "4", "5"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    SIHASAN
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="ZULA"
+                                                    onClick={() => {
+                                                        const q = ["4", "6", "8"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    ZULA
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="AASAN"
+                                                    onClick={() => {
+                                                        const q = [
+                                                            "3x4",
+                                                            "4x6",
+                                                            "6x8",
+                                                            "8x10",
+                                                            "10x13",
+                                                            "12x15",
+                                                            "15x18",
+                                                            "6x12",
+                                                            "8x16",
+                                                            "10x20",
+                                                            "12x30",
+                                                            "15x36",
+                                                            "14x14",
+                                                            "16x16",
+                                                            "18x18",
+                                                            "20x20",
+                                                        ];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    AASAN
+                                                </button>
+                                            </div>
+                                            <div className="flex-grow overflow-y-auto no-scrollbar max-h-[400px]">
+                                                <Reorder.Group axis="y" values={form.variants} onReorder={(newOrder) => setForm({ ...form, variants: newOrder })} className="space-y-3">
+                                                    {form.variants.map((v, i) => (
+                                                        <Reorder.Item
+                                                            key={v.id || i}
+                                                            value={v}
+                                                            className="flex gap-3 items-center group/variant"
                                                         >
-                                                            <Icon icon="solar:trash-bin-trash-bold" className="w-5 h-5" />
-                                                        </button>
-
-                                                    </div>
-                                                ))}
+                                                            <div className="cursor-grab active:cursor-grabbing p-2 text-brand-primary/20 group-hover/variant:text-brand-primary/40 transition-colors">
+                                                                <Icon icon="solar:hamburger-menu-linear" className="w-5 h-5" />
+                                                            </div>
+                                                            <div className="flex-1 relative">
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Size (e.g. S, M, L, XL)"
+                                                                    value={v.name}
+                                                                    onChange={e => {
+                                                                        const nv = [...form.variants];
+                                                                        nv[i].name = e.target.value;
+                                                                        setForm({ ...form, variants: nv });
+                                                                        if (errors.variants?.[i]?.name) {
+                                                                            const newV = [...errors.variants];
+                                                                            newV[i].name = "";
+                                                                            setErrors(prev => ({ ...prev, variants: newV }));
+                                                                        }
+                                                                    }}
+                                                                    className={`w-full h-12 px-4 rounded-2xl bg-white border transition-all outline-none text-[14px] font-bold ${errors.variants?.[i]?.name ? 'border-red-500 focus:border-red-600 bg-red-50/20' : 'border-brand-primary/10 focus:border-brand-primary text-brand-primary'}`}
+                                                                    required
+                                                                />
+                                                            </div>
+                                                            <div className="w-28 relative">
+                                                                <input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    onWheel={(e) => e.target.blur()}
+                                                                    placeholder="0"
+                                                                    value={v.price}
+                                                                    onChange={e => {
+                                                                        const nv = [...form.variants];
+                                                                        nv[i].price = e.target.value;
+                                                                        setForm({ ...form, variants: nv });
+                                                                        if (errors.variants?.[i]?.price) {
+                                                                            const newV = [...errors.variants];
+                                                                            newV[i].price = "";
+                                                                            setErrors(prev => ({ ...prev, variants: newV }));
+                                                                        }
+                                                                    }}
+                                                                    className={`w-full h-12 px-4 rounded-2xl bg-white border transition-all outline-none text-[16px] font-serif font-bold text-right ${errors.variants?.[i]?.price ? 'border-red-500 focus:border-red-600 bg-red-50/20 text-red-500' : 'border-brand-primary/10 focus:border-brand-primary text-brand-secondary'}`}
+                                                                    required
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setForm({
+                                                                    ...form,
+                                                                    variants: form.variants.filter((_, idx) => idx !== i)
+                                                                })}
+                                                                className="h-12 w-12 flex items-center justify-center rounded-2xl border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-400 hover:text-red-500 transition-all"
+                                                            >
+                                                                <Icon icon="solar:trash-bin-trash-bold" className="w-5 h-5" />
+                                                            </button>
+                                                        </Reorder.Item>
+                                                    ))}
+                                                </Reorder.Group>
                                                 {form.variants.length === 0 && (
                                                     <div className="flex flex-col items-center justify-center py-10 opacity-10">
                                                         <Icon icon="solar:layers-broken" className="w-12 h-12 mb-2" />
@@ -606,7 +796,6 @@ export default function ProductsPage() {
                                             {[
                                                 { id: 'isBestSeller', label: 'Best Seller', icon: 'solar:star-bold', color: 'text-yellow-500' },
                                                 { id: 'isReadyStock', label: 'Ready Stock', icon: 'solar:box-bold', color: 'text-brand-secondary' },
-                                                { id: 'showSizeGuide', label: 'Size Guide', icon: 'solar:ruler-bold', color: 'text-blue-500' },
                                                 { id: 'showWashCare', label: 'Wash Care', icon: 'ic:twotone-wash', color: 'text-emerald-500' }
                                             ].map((item) => (
                                                 <label key={item.id} className={`flex flex-col gap-4 p-6 rounded-[32px] cursor-pointer border transition-all duration-500 ${form[item.id] ? 'bg-brand-primary/90 border-transparent hover:bg-brand-primary' : 'bg-white border-brand-primary/20'}`}>
@@ -742,23 +931,24 @@ export default function ProductsPage() {
                                             <div className="space-y-8">
                                                 <div>
                                                     <span className="text-[8px] font-black uppercase tracking-[0.3em] text-brand-primary/20 mb-4 block underline underline-offset-8">Imagery Stream</span>
-                                                    <div
-                                                        onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
-                                                        onDragLeave={() => setIsDraggingImage(false)}
-                                                        onDrop={(e) => { e.preventDefault(); setIsDraggingImage(false); handleUpload(null, 'image', Array.from(e.dataTransfer.files)); }}
-                                                        className={`grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 p-4 rounded-3xl border-2 border-dashed transition-all ${isDraggingImage ? 'border-brand-secondary bg-brand-secondary/5 scale-[1.02]' : 'border-gray-100 hover:border-brand-primary/20'}`}
-                                                    >
-                                                        {form.images.map((img, i) => (
-                                                            <div key={i} className="aspect-[3/4] rounded-2xl overflow-hidden border border-black/5 relative group shadow-sm transition-transform hover:scale-105">
-                                                                <img src={img} className="w-full h-full object-cover" />
-                                                                <button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="solar:trash-bin-trash-bold" className="text-white w-6 h-6" /></button>
+                                                        <div
+                                                            onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
+                                                            onDragLeave={() => setIsDraggingImage(false)}
+                                                            onDrop={(e) => { e.preventDefault(); setIsDraggingImage(false); handleUpload(null, 'image', Array.from(e.dataTransfer.files)); }}
+                                                            className={`grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 p-4 rounded-3xl border-2 border-dashed transition-all ${isDraggingImage ? 'border-brand-secondary bg-brand-secondary/5 scale-[1.02]' : errors.images ? 'border-red-500 bg-red-50/10' : 'border-gray-100 hover:border-brand-primary/20'}`}
+                                                        >
+                                                            {form.images.map((img, i) => (
+                                                                <div key={i} className="aspect-[3/4] rounded-2xl overflow-hidden border border-black/5 relative group shadow-sm transition-transform hover:scale-105">
+                                                                    <img src={img} className="w-full h-full object-cover" />
+                                                                    <button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="solar:trash-bin-trash-bold" className="text-white w-6 h-6" /></button>
+                                                                </div>
+                                                            ))}
+                                                            <div className={`aspect-[3/4] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingImage ? 'border-brand-secondary' : errors.images ? 'border-red-400 bg-red-50/20' : 'border-gray-200'}`}>
+                                                                {uploadingImage ? <Icon icon="line-md:loading-loop" className="text-brand-secondary w-8 h-8" /> : <><Icon icon="solar:camera-add-bold-duotone" className={`w-8 h-8 ${isDraggingImage ? 'text-brand-secondary' : errors.images ? 'text-red-400' : 'text-gray-300'}`} /><span className={`text-[7px] font-black uppercase mt-2 ${errors.images ? 'text-red-400' : 'text-gray-400'}`}>Capture Image</span></>}
+                                                                <input type="file" multiple disabled={uploadingImage} onChange={(e) => { handleUpload(e, 'image'); if(errors.images) setErrors(prev => ({...prev, images: null})); }} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
                                                             </div>
-                                                        ))}
-                                                        <div className={`aspect-[3/4] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingImage ? 'border-brand-secondary' : 'border-gray-200'}`}>
-                                                            {uploadingImage ? <Icon icon="line-md:loading-loop" className="text-brand-secondary w-8 h-8" /> : <><Icon icon="solar:camera-add-bold-duotone" className={`w-8 h-8 ${isDraggingImage ? 'text-brand-secondary' : 'text-gray-300'}`} /><span className="text-[7px] font-black uppercase mt-2 text-gray-400">Capture Image</span></>}
-                                                            <input type="file" multiple disabled={uploadingImage} onChange={(e) => handleUpload(e, 'image')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
                                                         </div>
-                                                    </div>
+                                                        {errors.images && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-2 ml-1">{errors.images}</p>}
                                                 </div>
 
                                                 <div>
@@ -792,11 +982,11 @@ export default function ProductsPage() {
 
                                 <div className="flex gap-4">
                                     {step > 1 && (
-                                        <button type="button" onClick={() => setStep(s => s - 1)} className="px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-gray-100 hover:bg-gray-200 transition-all text-[11px] flex items-center gap-3 text-brand-primary/60"> <Icon icon="lucide:arrow-left" className="w-5 h-5" /> Previous Stage</button>
+                                        <button type="button" onClick={() => { setStep(s => s - 1); setErrors({}); }} className="px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-gray-100 hover:bg-gray-200 transition-all text-[11px] flex items-center gap-3 text-brand-primary/60"> <Icon icon="lucide:arrow-left" className="w-5 h-5" /> Previous Stage</button>
                                     )}
 
                                     {step < 4 ? (
-                                        <button type="button" onClick={() => setStep(s => s + 1)} className="px-14 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/20 text-[11px] flex items-center gap-3">
+                                        <button type="button" onClick={handleSubmit} className="px-14 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/20 text-[11px] flex items-center gap-3">
                                             Proceed <Icon icon="lucide:arrow-right" className="w-5 h-5" />
                                         </button>
                                     ) : (

@@ -9,6 +9,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { toast } from "react-hot-toast";
+import { roundToTwo } from "@/lib/utils";
 
 export default function ProductClient({ product, navCategory, subCategory, innerSubCategory, relatedProducts }) {
   const { addToCart, addMultipleToCart, toggleSave, isProductSaved, isAuthenticated } = useCart();
@@ -53,8 +54,8 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
         // Apply discount to variant price if offer product
         const finalItemPrice = product.isOfferProduct
-          ? parseFloat((rawItemPrice * (1 - (product.discountPercent || 0) / 100)).toFixed(2))
-          : rawItemPrice;
+          ? roundToTwo(rawItemPrice * (1 - (product.discountPercent || 0) / 100))
+          : roundToTwo(rawItemPrice);
 
         itemsToAdd.push({
           product,
@@ -275,10 +276,8 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   <Link href={`/category/${navCategory.id}/${subCategory.id}`} className="hover:text-brand-secondary transition-colors shrink-0">
                     {subCategory.name}
                   </Link>
-                  <Icon icon="lucide:chevron-right" className="w-3 h-3 mt-px shrink-0" />
                 </>
               )}
-              <span className="text-brand-primary/60 truncate">{product.name}</span>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-start">
@@ -296,10 +295,10 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                       className="object-cover"
                     />
                   </div>
-                  {/* Brand Best Seller Ribbon Sash */}
+                  {/* Final Perfected Diagonal Sash */}
                   {product.isBestSeller && (
-                    <div className="absolute top-0 right-0 w-40 h-40 overflow-hidden z-20 pointer-events-none">
-                      <div className="bg-linear-to-r from-red-600 to-rose-700 text-white text-[10px] font-black uppercase tracking-[0.25em] py-2 w-[160%] absolute top-8 -right-16 rotate-45 shadow-[0_5px_15px_rgba(0,0,0,0.3)] border-y border-white/10 flex justify-center text-center">
+                    <div className="absolute top-[-10px] md:top-0 right-[-25px] md:right-[-10px] w-32 h-40 z-20 pointer-events-none">
+                      <div className="bg-linear-to-r from-red-600 to-rose-700 text-white text-[7px] md:text-[9px] font-black uppercase tracking-[0.3em] py-1 md:py-2 w-[160%] absolute top-10 -right-10 rotate-45 shadow-[0_5px_20px_rgba(220,38,38,0.5)] border-y border-white/10 flex justify-center items-center">
                         Best Seller
                       </div>
                     </div>
@@ -341,7 +340,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   </div> */}
 
                   <div className="flex justify-between items-start gap-4 mb-6 lg:mb-8 text-left">
-                    <h1 className="text-3xl lg:text-5xl font-serif font-bold text-brand-primary leading-tight tracking-tight text-left capitalize grow">
+                    <h1 className="text-2xl sm:text-3xl lg:text-5xl font-serif font-bold text-brand-primary leading-tight tracking-tight text-left capitalize grow">
                       {product.name}
                     </h1>
                     {isAuthenticated && (
@@ -381,9 +380,9 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
                   <div className="flex items-center gap-6 mb-2 lg:mb-10 text-left">
                     <div className="min-w-[200px] lg:min-w-[180px]">
-                      <div className="flex flex-col">
+                      <div className="flex flex-row sm:flex-col gap-2 sm:gap-1">
                         <div className="flex items-baseline gap-3">
-                          <span className={`text-3xl lg:text-4xl font-bold ${product.isOfferProduct ? 'text-red-600' : 'text-brand-primary'}`}>
+                          <span className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${product.isOfferProduct ? 'text-red-600' : 'text-brand-primary'}`}>
                             ₹{product.isOfferProduct ? product.offerPrice : product.price}
                           </span>
                           {(product.mrp && product.mrp > (product.isOfferProduct ? product.offerPrice : product.price)) && (
@@ -395,7 +394,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
                         {(product.mrp && product.mrp > (product.isOfferProduct ? product.offerPrice : product.price)) && (
                           <div className="flex items-center gap-3 mt-1">
-                            <span className="text-[12px] lg:text-[12px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
+                            <span className="text-[8px] lg:text-[12px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
                               Save ₹{Math.round(parseFloat(product.mrp) - (product.isOfferProduct ? product.offerPrice : product.price))}
                             </span>
                           </div>
@@ -410,7 +409,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     </div>
                   </div>
                   <div className="lg:hidden flex flex-col text-left border-t border-brand-primary/10 mb-4">
-                    <span className="text-[10px] lg:text-[13px] font-bold text-brand-secondary uppercase tracking-[0.2em] mt-1 italic">
+                    <span className="text-[10px] lg:text-[13px] font-bold text-brand-secondary uppercase tracking-[0.2em] mt-2 italic">
                       Our prices are lowest because we are India's largest manufacturer
                     </span>
                   </div>
@@ -424,7 +423,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     </p>
 
                     {product.variants && product.variants.length > 0 && (
-                      <div className="mb-10 text-left">
+                      <div className="mb-5 text-left">
                         <div className="flex items-center gap-3 mb-4">
                           <span className="text-[9px] font-black text-brand-primary/30 uppercase tracking-[0.3em] whitespace-nowrap">Inventory & Pricing</span>
                           <div className="h-px grow bg-brand-primary/5"></div>
@@ -434,20 +433,24 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                           {product.variants.map((v, i) => {
                             const originalP = parseFloat(v.price || 0);
                             const discountedPrice = product.isOfferProduct
-                              ? (originalP * (1 - (product.discountPercent || 0) / 100))
-                              : originalP;
+                              ? roundToTwo(originalP * (1 - (product.discountPercent || 0) / 100))
+                              : roundToTwo(originalP);
                             const hasDiscount = product.isOfferProduct && originalP > discountedPrice;
 
                             return (
-                              <div key={i} className="flex items-center gap-3 px-4 py-2 bg-white rounded-full border border-brand-primary/5 shadow-sm hover:border-brand-secondary/30 transition-all group">
+                              <div key={i} className="flex items-center gap-3 px-4 py-2 bg-white rounded-full border border-brand-primary/15 hover:border-brand-secondary/30 transition-all group">
                                 <span className="text-[12px] font-black text-brand-primary/40 uppercase tracking-widest">{v.name}</span>
-                                <div className="w-px h-3 bg-brand-primary/10"></div>
-                                <div className="flex items-center gap-2">
-                                  {hasDiscount && (
-                                    <span className="text-[14px] font-bold text-brand-primary/20 line-through">₹{originalP.toLocaleString()}</span>
-                                  )}
-                                  <span className="text-[14px] font-bold text-brand-secondary">₹{discountedPrice.toLocaleString()}</span>
-                                </div>
+                                {isAuthenticated && product.allowToBuy !== false && (
+                                  <>
+                                    <div className="w-px h-3 bg-brand-primary/10"></div>
+                                    <div className="flex items-center gap-2">
+                                      {hasDiscount && (
+                                        <span className="text-[14px] font-bold text-brand-primary/20 line-through">₹{originalP.toLocaleString()}</span>
+                                      )}
+                                      <span className="text-[14px] font-bold text-brand-secondary">₹{discountedPrice.toLocaleString()}</span>
+                                    </div>
+                                  </>
+                                )}
                               </div>
                             );
                           })}
@@ -562,38 +565,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   </button>
 
                   <div className="mt-8 space-y-0 text-left">
-                    {product.showSizeGuide && (
-                      <AccordionItem id="size" title="Size Guide" icon="lucide:ruler">
-                        <div className="bg-white/50 p-6 rounded-2xl border border-brand-primary/5 mt-0 overflow-x-auto">
-                          <table className="w-full text-left text-[10px] lg:text-[12px]">
-                            <thead>
-                              <tr className="border-b border-brand-primary/10">
-                                <th className="py-3 pr-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">No.</th>
-                                <th className="py-3 px-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">Height</th>
-                                <th className="py-3 pl-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">Dress</th>
-                              </tr>
-                            </thead>
-                            <tbody className="text-brand-primary/80">
-                              {[
-                                { n: "0", h: '1.75"', d: '4"' },
-                                { n: "1", h: '2.20"', d: '6"' },
-                                { n: "2", h: '2.75"', d: '6"' },
-                                { n: "3", h: '3.15"', d: '8"' },
-                                { n: "4", h: '3.40"', d: '8"' },
-                                { n: "5", h: '3.80"', d: '10"' },
-                                { n: "6", h: '4.40"', d: '12"' },
-                              ].map((row, i) => (
-                                <tr key={i} className="border-b border-brand-primary/5 last:border-0 hover:bg-brand-secondary/1">
-                                  <td className="py-3 pr-4 font-bold text-brand-secondary">{row.n} No.</td>
-                                  <td className="py-3 px-4">{row.h}</td>
-                                  <td className="py-3 pl-4 font-medium">{row.d}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </AccordionItem>
-                    )}
+
                     {product.showWashCare && (
                       <AccordionItem id="wash" title="Wash & Care" icon="lucide:droplets">
                         <div className="space-y-4 px-2 py-4 text-left">

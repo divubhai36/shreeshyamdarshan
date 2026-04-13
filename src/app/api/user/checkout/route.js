@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/session";
 import prisma from "@/lib/prisma";
+import { roundToTwo } from "@/lib/utils";
 
 export async function POST(req) {
   try {
@@ -20,7 +21,7 @@ export async function POST(req) {
     }
 
     // Calculate original total from items
-    const originalTotal = items.reduce((acc, it) => acc + (it.originalPrice || it.price) * it.quantity, 0);
+    const originalTotal = roundToTwo(items.reduce((acc, it) => acc + (it.originalPrice || it.price) * it.quantity, 0));
 
     // Generate unique order number
     const orderNumber = `SSD-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000).toString().padStart(3, "0")}`;
@@ -30,15 +31,15 @@ export async function POST(req) {
         data: {
           orderNumber,
           wholesalerId: session.userId,
-          totalAmount,
-          originalTotal,
+          totalAmount: roundToTwo(totalAmount),
+          originalTotal: roundToTwo(originalTotal),
           status: "PENDING",
           items: {
             create: items.map((item) => ({
               productId: item.id,
               quantity: item.quantity,
-              price: item.price,
-              originalPrice: item.originalPrice || item.price,
+              price: roundToTwo(item.price),
+              originalPrice: roundToTwo(item.originalPrice || item.price),
               variantName: item.variantName,
             })),
           },

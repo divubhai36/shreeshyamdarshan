@@ -241,53 +241,63 @@ export default function Header() {
                     className="absolute right-0 mt-4 w-72 bg-white border border-brand-primary/5 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-3xl z-50 overflow-hidden text-left"
                   >
                     <div className="p-6 border-b border-brand-primary/5 bg-brand-primary/2">
-                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-secondary mb-1">Account Control</p>
-                        <h4 className="text-sm font-serif font-bold text-brand-primary uppercase leading-1.5 tracking-wider">Wholseler Dashboard</h4>
-                      </div>
+                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-secondary mb-1">Account Control</p>
+                      <h4 className="text-sm font-serif font-bold text-brand-primary uppercase leading-1.5 tracking-wider">Wholseler Dashboard</h4>
+                    </div>
 
-                      <div className="p-2">
-                        <Link href="/wholesalers/dashboard" className="flex items-center gap-4 p-4 hover:bg-brand-accent rounded-2xl transition-all group">
+                    <div className="p-2">
+                      <Link href="/wholesalers/dashboard" className="flex items-center gap-4 p-4 hover:bg-brand-accent rounded-2xl transition-all group">
+                        <div className="w-10 h-10 rounded-xl bg-brand-primary/5 flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
+                          <Icon icon="solar:widget-bold-duotone" className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-brand-primary font-serif">Dashboard</p>
+                          <p className="text-[8px] text-brand-primary/40 font-medium"> Management</p>
+                        </div>
+                      </Link>
+
+                      <Link href="/wholesalers/dashboard/cart" className="flex items-center gap-4 p-4 hover:bg-brand-accent rounded-2xl transition-all group">
+                        <div className="w-10 h-10 rounded-xl bg-brand-primary/5 flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
+                          <Icon icon="solar:cart-3-bold-duotone" className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-brand-primary font-serif">Cart</p>
+                          <p className="text-[8px] text-brand-primary/40 font-medium"> Wish List</p>
+                        </div>
+                      </Link>
+
+                      <Link href="/wholesalers/dashboard/saved" className="flex items-center justify-between p-4 hover:bg-brand-accent rounded-2xl transition-all group">
+                        <div className="flex items-center gap-4">
                           <div className="w-10 h-10 rounded-xl bg-brand-primary/5 flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
-                            <Icon icon="solar:widget-bold-duotone" className="w-5 h-5" />
+                            <Icon icon="solar:heart-bold-duotone" className="w-5 h-5" />
                           </div>
                           <div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-brand-primary font-serif">Dashboard</p>
-                            <p className="text-[8px] text-brand-primary/40 font-medium"> Management</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-brand-primary font-serif">Favourites</p>
+                            <p className="text-[8px] text-brand-primary/40 font-medium">Saved Products</p>
                           </div>
-                        </Link>
+                        </div>
+                        {saved.length > 0 && (
+                          <span className="w-6 h-6 bg-brand-accent text-brand-secondary text-[10px] font-bold rounded-full flex items-center justify-center border border-brand-secondary/20 font-serif">
+                            {saved.length}
+                          </span>
+                        )}
+                      </Link>
+                    </div>
 
-                        <Link href="/wholesalers/dashboard/saved" className="flex items-center justify-between p-4 hover:bg-brand-accent rounded-2xl transition-all group">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-xl bg-brand-primary/5 flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
-                              <Icon icon="solar:heart-bold-duotone" className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-brand-primary font-serif">Favourites</p>
-                              <p className="text-[8px] text-brand-primary/40 font-medium">Saved Products</p>
-                            </div>
-                          </div>
-                          {saved.length > 0 && (
-                            <span className="w-6 h-6 bg-brand-accent text-brand-secondary text-[10px] font-bold rounded-full flex items-center justify-center border border-brand-secondary/20 font-serif">
-                              {saved.length}
-                            </span>
-                          )}
-                        </Link>
-                      </div>
-
-                      <div className="p-2 bg-brand-primary/2">
-                        <button
-                          onClick={async () => {
-                            await fetch(isAdmin ? '/api/admin/logout' : '/api/user/logout', { method: 'POST' });
-                            document.cookie = "ssd_wholesale_logged=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-                            localStorage.removeItem('ssd_user');
-                            window.location.href = '/';
-                          }}
-                          className="w-full flex items-center gap-4 p-4 hover:bg-red-50 rounded-2xl transition-all group text-red-500/60 hover:text-red-600"
-                        >
-                          <Icon icon="solar:logout-3-linear" className="w-5 h-5" />
-                          <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Sign Out</span>
-                        </button>
-                      </div>
+                    <div className="p-2 bg-brand-primary/2">
+                      <button
+                        onClick={async () => {
+                          await fetch(isAdmin ? '/api/admin/logout' : '/api/user/logout', { method: 'POST' });
+                          document.cookie = "ssd_wholesale_logged=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                          localStorage.removeItem('ssd_user');
+                          window.location.href = '/';
+                        }}
+                        className="w-full flex items-center gap-4 p-4 hover:bg-red-50 rounded-2xl transition-all group text-red-500/60 hover:text-red-600"
+                      >
+                        <Icon icon="solar:logout-3-linear" className="w-5 h-5" />
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Sign Out</span>
+                      </button>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -300,123 +310,123 @@ export default function Header() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-             {/* Glassmorphic Backdrop */}
-             <motion.div
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               exit={{ opacity: 0 }}
-               onClick={() => setIsMobileMenuOpen(false)}
-               className="fixed inset-0 bg-brand-primary/40 backdrop-blur-md z-[100]"
-             />
+            {/* Glassmorphic Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-brand-primary/40 backdrop-blur-md z-[100]"
+            />
 
-             {/* Minimalist Side Drawer */}
-             <motion.div
-               initial={{ x: '-100%' }}
-               animate={{ x: 0 }}
-               exit={{ x: '-100%' }}
-               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-               className="fixed top-0 left-0 h-full w-[80%] max-w-[320px] bg-white z-[110] shadow-2xl flex flex-col"
-             >
-               {/* Unified Header */}
-               <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-                 <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-bold tracking-[0.2em] text-brand-primary uppercase">
-                   SHREE SHYAM
-                 </Link>
-                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-brand-primary/40 hover:text-brand-primary">
-                   <Icon icon="lucide:x" className="w-5 h-5" />
-                 </button>
-               </div>
+            {/* Minimalist Side Drawer */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="fixed top-0 left-0 h-full w-[80%] max-w-[320px] bg-white z-[110] shadow-2xl flex flex-col"
+            >
+              {/* Unified Header */}
+              <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-bold tracking-[0.2em] text-brand-primary uppercase">
+                  SHREE SHYAM
+                </Link>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="text-brand-primary/40 hover:text-brand-primary">
+                  <Icon icon="lucide:x" className="w-5 h-5" />
+                </button>
+              </div>
 
-               <div className="flex-grow overflow-y-auto no-scrollbar py-4">
-                 {/* 1. Integrated Wholesaler Links (Small & Clean) */}
-                 {isLogged && (
-                   <div className="px-6 py-4 mb-4 bg-brand-accent/30 border-y border-brand-primary/5">
-                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-secondary mb-3">Partner Desk</p>
-                     <div className="space-y-3">
-                       {[
-                         { href: "/wholesalers/dashboard/collection/offers", label: "Discount Offers", icon: "solar:ticket-sale-linear" },
-                         { href: "/wholesalers/dashboard/collection/ready-stock", label: "Ready Stock", icon: "solar:box-minimalistic-linear" },
-                         { href: "/wholesalers/dashboard/cart", label: "My Cart", icon: "solar:cart-large-2-linear", badge: cartCount }
-                       ].map((item) => (
-                         <Link key={item.label} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between group">
-                           <div className="flex items-center gap-3">
-                             <Icon icon={item.icon} className="w-4 h-4 text-brand-primary/60 group-active:text-brand-secondary" />
-                             <span className="text-[10px] font-medium tracking-widest text-brand-primary/80 uppercase">{item.label}</span>
-                           </div>
-                           {item.badge > 0 && (
-                             <span className="px-1.5 py-0.5 bg-brand-secondary text-white text-[8px] font-bold rounded-full">{item.badge}</span>
-                           )}
-                         </Link>
-                       ))}
-                     </div>
-                   </div>
-                 )}
+              <div className="flex-grow overflow-y-auto no-scrollbar py-4">
+                {/* 1. Integrated Wholesaler Links (Small & Clean) */}
+                {isLogged && (
+                  <div className="px-6 py-4 mb-4 bg-brand-accent/30 border-y border-brand-primary/5">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-secondary mb-3">Partner Desk</p>
+                    <div className="space-y-3">
+                      {[
+                        { href: "/wholesalers/dashboard/collection/offers", label: "Discount Offers", icon: "solar:ticket-sale-linear" },
+                        { href: "/wholesalers/dashboard/collection/ready-stock", label: "Ready Stock", icon: "solar:box-minimalistic-linear" },
+                        { href: "/wholesalers/dashboard/cart", label: "My Cart", icon: "solar:cart-large-2-linear", badge: cartCount }
+                      ].map((item) => (
+                        <Link key={item.label} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between group">
+                          <div className="flex items-center gap-3">
+                            <Icon icon={item.icon} className="w-4 h-4 text-brand-primary/60 group-active:text-brand-secondary" />
+                            <span className="text-[10px] font-medium tracking-widest text-brand-primary/80 uppercase">{item.label}</span>
+                          </div>
+                          {item.badge > 0 && (
+                            <span className="px-1.5 py-0.5 bg-brand-secondary text-white text-[8px] font-bold rounded-full">{item.badge}</span>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-                 {/* 2. Main Navigation List */}
-                 <div className="px-2">
-                   {navigationData.map((cat) => (
-                     <div key={cat.id} className="mb-1">
-                       <button
-                         onClick={() => setExpandedMobileCat(expandedMobileCat === cat.id ? null : cat.id)}
-                         className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 rounded-xl transition-colors"
-                       >
-                         <span className={`text-[11px] font-bold tracking-[0.1em] uppercase ${expandedMobileCat === cat.id ? 'text-brand-secondary' : 'text-brand-primary/70'}`}>{cat.name}</span>
-                         <Icon icon="lucide:chevron-down" className={`w-3 h-3 transition-transform ${expandedMobileCat === cat.id ? 'rotate-180 text-brand-secondary' : 'text-brand-primary/20'}`} />
-                       </button>
+                {/* 2. Main Navigation List */}
+                <div className="px-2">
+                  {navigationData.map((cat) => (
+                    <div key={cat.id} className="mb-1">
+                      <button
+                        onClick={() => setExpandedMobileCat(expandedMobileCat === cat.id ? null : cat.id)}
+                        className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 rounded-xl transition-colors"
+                      >
+                        <span className={`text-[11px] font-bold tracking-[0.1em] uppercase ${expandedMobileCat === cat.id ? 'text-brand-secondary' : 'text-brand-primary/70'}`}>{cat.name}</span>
+                        <Icon icon="lucide:chevron-down" className={`w-3 h-3 transition-transform ${expandedMobileCat === cat.id ? 'rotate-180 text-brand-secondary' : 'text-brand-primary/20'}`} />
+                      </button>
 
-                       <AnimatePresence>
-                         {expandedMobileCat === cat.id && (
-                           <motion.div
-                             initial={{ height: 0, opacity: 0 }}
-                             animate={{ height: 'auto', opacity: 1 }}
-                             exit={{ height: 0, opacity: 0 }}
-                             className="overflow-hidden"
-                           >
-                             <div className="py-2 pl-4 space-y-1">
-                               {cat.subCategories.map((sub) => (
-                                 <Link
-                                   key={sub.name}
-                                   href={`/category/${cat.id}/${sub.id}`}
-                                   onClick={() => setIsMobileMenuOpen(false)}
-                                   className="block px-4 py-2 text-[10px] font-medium text-brand-primary/50 uppercase tracking-widest hover:text-brand-secondary"
-                                 >
-                                   {sub.name}
-                                 </Link>
-                               ))}
-                             </div>
-                           </motion.div>
-                         )}
-                       </AnimatePresence>
-                     </div>
-                   ))}
-                 </div>
+                      <AnimatePresence>
+                        {expandedMobileCat === cat.id && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="py-2 pl-4 space-y-1">
+                              {cat.subCategories.map((sub) => (
+                                <Link
+                                  key={sub.name}
+                                  href={`/category/${cat.id}/${sub.id}`}
+                                  onClick={() => setIsMobileMenuOpen(false)}
+                                  className="block px-4 py-2 text-[10px] font-medium text-brand-primary/50 uppercase tracking-widest hover:text-brand-secondary"
+                                >
+                                  {sub.name}
+                                </Link>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ))}
+                </div>
 
-                 {/* 3. Footer Links */}
-                 <div className="mt-6 px-6 pt-6 border-t border-gray-50 space-y-4">
-                   <Link href="/contact-us" onClick={() => setIsMobileMenuOpen(false)} className="block text-[10px] font-bold tracking-[0.2em] text-brand-primary/40 uppercase">
-                     Contact Us
-                   </Link>
+                {/* 3. Footer Links */}
+                <div className="mt-6 px-6 pt-6 border-t border-gray-50 space-y-4">
+                  <Link href="/contact-us" onClick={() => setIsMobileMenuOpen(false)} className="block text-[10px] font-bold tracking-[0.2em] text-brand-primary/40 uppercase">
+                    Contact Us
+                  </Link>
 
-                   <button
-                     onClick={async () => {
-                       const res = await fetch(isAdmin ? '/api/admin/logout' : '/api/user/logout', { method: 'POST' });
-                       document.cookie = "ssd_wholesale_logged=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-                       localStorage.removeItem('ssd_user');
-                       if (res.ok) window.location.href = '/';
-                     }}
-                     className="block text-[10px] font-bold tracking-[0.2em] text-red-400 uppercase"
-                   >
-                     Sign Out
-                   </button>
-                 </div>
-               </div>
+                  <button
+                    onClick={async () => {
+                      const res = await fetch(isAdmin ? '/api/admin/logout' : '/api/user/logout', { method: 'POST' });
+                      document.cookie = "ssd_wholesale_logged=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                      localStorage.removeItem('ssd_user');
+                      if (res.ok) window.location.href = '/';
+                    }}
+                    className="block text-[10px] font-bold tracking-[0.2em] text-red-400 uppercase"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </div>
 
-               <div className="p-6 bg-brand-accent/20 border-t border-brand-primary/5">
-                 <p className="text-[10px] font-serif italic text-brand-primary/40">"Divine Elegance for Every Occasion"</p>
-               </div>
-             </motion.div>
-           </>
-         )}
+              <div className="p-6 bg-brand-accent/20 border-t border-brand-primary/5">
+                <p className="text-[10px] font-serif italic text-brand-primary/40">"Divine Elegance for Every Occasion"</p>
+              </div>
+            </motion.div>
+          </>
+        )}
       </AnimatePresence>
 
       {/* Refined Minimalist Search Overlay */}
