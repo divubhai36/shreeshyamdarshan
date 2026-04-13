@@ -440,13 +440,17 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                             return (
                               <div key={i} className="flex items-center gap-3 px-4 py-2 bg-white rounded-full border border-brand-primary/15 hover:border-brand-secondary/30 transition-all group">
                                 <span className="text-[12px] font-black text-brand-primary/40 uppercase tracking-widest">{v.name}</span>
-                                <div className="w-px h-3 bg-brand-primary/10"></div>
-                                <div className="flex items-center gap-2">
-                                  {hasDiscount && (
-                                    <span className="text-[14px] font-bold text-brand-primary/20 line-through">₹{originalP.toLocaleString()}</span>
-                                  )}
-                                  <span className="text-[14px] font-bold text-brand-secondary">₹{discountedPrice.toLocaleString()}</span>
-                                </div>
+                                {isAuthenticated && product.allowToBuy !== false && (
+                                  <>
+                                    <div className="w-px h-3 bg-brand-primary/10"></div>
+                                    <div className="flex items-center gap-2">
+                                      {hasDiscount && (
+                                        <span className="text-[14px] font-bold text-brand-primary/20 line-through">₹{originalP.toLocaleString()}</span>
+                                      )}
+                                      <span className="text-[14px] font-bold text-brand-secondary">₹{discountedPrice.toLocaleString()}</span>
+                                    </div>
+                                  </>
+                                )}
                               </div>
                             );
                           })}
@@ -561,38 +565,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   </button>
 
                   <div className="mt-8 space-y-0 text-left">
-                    {product.showSizeGuide && (
-                      <AccordionItem id="size" title="Size Guide" icon="lucide:ruler">
-                        <div className="bg-white/50 p-6 rounded-2xl border border-brand-primary/5 mt-0 overflow-x-auto">
-                          <table className="w-full text-left text-[10px] lg:text-[12px]">
-                            <thead>
-                              <tr className="border-b border-brand-primary/10">
-                                <th className="py-3 pr-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">No.</th>
-                                <th className="py-3 px-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">Height</th>
-                                <th className="py-3 pl-4 font-bold text-brand-primary/30 uppercase tracking-[0.2em]">Dress</th>
-                              </tr>
-                            </thead>
-                            <tbody className="text-brand-primary/80">
-                              {[
-                                { n: "0", h: '1.75"', d: '4"' },
-                                { n: "1", h: '2.20"', d: '6"' },
-                                { n: "2", h: '2.75"', d: '6"' },
-                                { n: "3", h: '3.15"', d: '8"' },
-                                { n: "4", h: '3.40"', d: '8"' },
-                                { n: "5", h: '3.80"', d: '10"' },
-                                { n: "6", h: '4.40"', d: '12"' },
-                              ].map((row, i) => (
-                                <tr key={i} className="border-b border-brand-primary/5 last:border-0 hover:bg-brand-secondary/1">
-                                  <td className="py-3 pr-4 font-bold text-brand-secondary">{row.n} No.</td>
-                                  <td className="py-3 px-4">{row.h}</td>
-                                  <td className="py-3 pl-4 font-medium">{row.d}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </AccordionItem>
-                    )}
+
                     {product.showWashCare && (
                       <AccordionItem id="wash" title="Wash & Care" icon="lucide:droplets">
                         <div className="space-y-4 px-2 py-4 text-left">
