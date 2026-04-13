@@ -33,33 +33,15 @@ export function CartProvider({ children }) {
     const hasSession = document.cookie.split(';').some((item) => item.trim().startsWith('ssd_wholesale_logged=true'));
     setIsAuthenticated(hasSession);
     
-    if (hasSession && !isCartFetched.current) {
-      // If we have local items, sync them before fetching
-      const localSaved = JSON.parse(localStorage.getItem('ssd_saved') || '[]');
-      const localCart = JSON.parse(localStorage.getItem('ssd_cart') || '[]');
-      
-      const performSync = async () => {
-        if (localSaved.length > 0) {
-          await syncLocalSavedWithBackend(localSaved);
-        }
-        // Cart bulk sync is already handled by syncBulkItems if we trigger it,
-        // but here we want to merge local guest cart into database.
-        if (localCart.length > 0) {
-            await syncBulkItems(localCart.map(it => ({
-                product: it,
-                quantity: it.quantity,
-                variantName: it.variantName,
-                variantPrice: it.price,
-                originalPrice: it.originalPrice
-            })));
-        }
-        
-        await fetchSavedFromBackend();
-        await fetchCartFromBackend();
-        isCartFetched.current = true;
-      };
+    if (hasSession) {
+      // Re-fetch items on every navigation to ensure multi-device accuracy
+      // We no longer PUSH local storage to DB to avoid data corruption across devices
+      fetchSavedFromBackend();
+      fetchCartFromBackend();
 
-      performSync();
+      if (!isCartFetched.current) {
+        isCartFetched.current = true;
+      }
     }
   }, [pathname]);
 
@@ -99,20 +81,6 @@ export function CartProvider({ children }) {
     }
   };
 
-  const syncLocalSavedWithBackend = async (localItems) => {
-    try {
-      await fetch('/api/user/saved', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          action: "BULK_SAVE", 
-          items: localItems.map(it => ({ productId: it.id, variantName: it.variantName })) 
-        })
-      });
-    } catch (err) {
-      console.error("Error bulk syncing saved items:", err);
-    }
-  };
 
   const fetchCartFromBackend = async () => {
     try {
@@ -202,32 +170,18 @@ export function CartProvider({ children }) {
         // I will implement a bulk sync in the API.
       });
       
-      // Let's use a specialized bulk sync
-      syncBulkItems(items);
+      items.forEach((item) => {
+        syncCartItem(
+          item.product.id, 
+          item.quantity, 
+          item.variantName, 
+          item.variantPrice || item.product.price, 
+          item.originalPrice || item.product.mrp || item.product.price
+        );
+      });
     }
   };
 
-  const syncBulkItems = async (items) => {
-    if (!isAuthenticated) return;
-    try {
-      await fetch('/api/user/cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          action: "BULK_ADD", 
-          items: items.map(it => ({
-            productId: it.product.id,
-            quantity: it.quantity, // This is the increment
-            variantName: it.variantName,
-            price: roundToTwo(it.variantPrice),
-            originalPrice: roundToTwo(it.originalPrice)
-          }))
-        })
-      });
-    } catch (err) {
-      console.error("Error bulk syncing cart:", err);
-    }
-  };
 
   const removeFromCart = (id, variantName = null) => {
     setCart(prev => prev.filter(item => !(item.id === id && item.variantName === variantName)));

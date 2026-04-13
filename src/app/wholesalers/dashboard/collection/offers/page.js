@@ -17,8 +17,8 @@ export default async function OffersCollectionPage() {
   });
 
   return (
-    <WholesalerCollectionClient 
-      title="Discount Treasury"
+    <WholesalerCollectionClient
+      title="Discount Offer"
       subtitle="Exclusive B2B Margins"
       products={products}
       type="offers"
