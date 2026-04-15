@@ -184,3 +184,16 @@ model Review {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
+
+model Inquiry {
+  id        String   @id @default(cuid())
+  name      String
+  mobile    String
+  city      String?
+  state     String?
+  product   String?
+  pieces    String?
+  type      String   @default("GENERAL") // GENERAL, PRODUCT
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+}

@@ -45,7 +45,7 @@ export default async function CollectionsPage({ params }) {
   
   if (dbCategory) {
      const subCategoriesData = await Promise.all(dbCategory.subCategories.map(async (sub) => {
-        const count = await prisma.product.count({ where: { subCategoryId: sub.id } });
+        const count = await prisma.product.count({ where: { subCategoryId: sub.id, isVisible: true } });
         return {
            id: sub.slug,
            name: sub.name,
@@ -87,5 +87,21 @@ export default async function CollectionsPage({ params }) {
   return <CollectionsClient category={category} categoryId={categoryId} subCategories={subCategoriesData} />;
   */
 
-  return <div className="text-center py-40 font-bold text-2xl font-serif">Category not found in Database</div>;
+  return (
+    <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
+      <div className="w-24 h-24 bg-brand-primary/5 rounded-full flex items-center justify-center mb-8 animate-pulse text-brand-primary/20">
+        <Icon icon="solar:folder-error-bold-duotone" className="w-12 h-12" />
+      </div>
+      <h1 className="text-3xl md:text-4xl font-serif font-bold text-brand-primary mb-4">Registry Entry Missing</h1>
+      <p className="text-brand-primary/60 max-w-md mx-auto mb-10 leading-relaxed text-sm">
+        We couldn't locate this specific registry entry in our master catalog. Our curators may be updating the collection.
+      </p>
+      <a 
+        href="/" 
+        className="inline-flex items-center justify-center px-10 py-5 bg-brand-primary text-white rounded-full font-bold text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-brand-primary/30 hover:bg-brand-secondary transition-all active:scale-95"
+      >
+        Back to Master Catalog
+      </a>
+    </div>
+  );
 }

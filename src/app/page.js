@@ -10,6 +10,7 @@ export const metadata = {
 export default async function Home() {
    // 1. Fetch Dynamic Database Content
    const dbProducts = await prisma.product.findMany({ 
+      where: { isVisible: true },
       include: { category: true, subCategory: true },
       orderBy: { createdAt: 'desc' }
    });

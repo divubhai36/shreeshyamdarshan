@@ -201,3 +201,17 @@ export async function deleteReview(id) {
   });
   revalidatePath('/admin/reviews');
 }
+
+// Inquiry Actions
+export async function getInquiries() {
+  return await prisma.inquiry.findMany({
+    orderBy: { createdAt: 'desc' }
+  });
+}
+
+export async function deleteInquiry(id) {
+  await prisma.inquiry.delete({
+    where: { id }
+  });
+  revalidatePath('/admin/inquiries');
+}

@@ -10,6 +10,7 @@ export default async function ReadyStockCollectionPage() {
   const products = await prisma.product.findMany({
     where: {
       isReadyStock: true,
+      isVisible: true,
     },
     orderBy: {
       createdAt: 'desc',

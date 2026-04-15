@@ -7,7 +7,7 @@ export async function generateMetadata({ params }) {
   const { id } = await params;
 
   try {
-      const dbProduct = await prisma.product.findUnique({ where: { id } });
+      const dbProduct = await prisma.product.findUnique({ where: { id, isVisible: true } });
       if (dbProduct) {
           return {
             title: dbProduct.name,
@@ -37,14 +37,14 @@ export default async function ProductPage({ params }) {
 
   try {
       const dbProduct = await prisma.product.findUnique({
-          where: { id },
+          where: { id, isVisible: true },
           include: { category: true, subCategory: true, innerSubCategory: true }
       });
 
       if (dbProduct) {
          // Gather up to 10 random related products from the same subcategory
          const relatedDbPool = await prisma.product.findMany({
-             where: { subCategoryId: dbProduct.subCategoryId, id: { not: dbProduct.id } },
+             where: { subCategoryId: dbProduct.subCategoryId, id: { not: dbProduct.id }, isVisible: true },
              take: 20
          });
          const relatedDb = relatedDbPool.sort(() => 0.5 - Math.random()).slice(0, 10);
@@ -108,5 +108,23 @@ export default async function ProductPage({ params }) {
   return <ProductClient product={product} navCategory={navCategory} subCategory={subCategory} relatedProducts={relatedProducts} />;
   */
 
-  return <div className="text-center py-40 font-bold text-2xl font-serif">Product not found in Database</div>;
+  return (
+    <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
+      <div className="w-24 h-24 bg-brand-primary/5 rounded-full flex items-center justify-center mb-8 animate-pulse text-brand-primary/20">
+        <svg fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
+      </div>
+      <h1 className="text-2xl md:text-3xl font-serif font-bold text-brand-primary mb-4">Product Not Found</h1>
+      <p className="text-brand-primary/60 max-w-md mx-auto mb-10 leading-relaxed text-sm">
+        This Product is currently unavailable. Please check back later or explore our other divine collections.
+      </p>
+      <a
+        href="/"
+        className="inline-flex items-center justify-center px-10 py-5 bg-brand-primary text-white rounded-full font-bold text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-brand-primary/30 hover:bg-brand-secondary transition-all active:scale-95"
+      >
+        Continue Exploration
+      </a>
+    </div>
+  );
 }

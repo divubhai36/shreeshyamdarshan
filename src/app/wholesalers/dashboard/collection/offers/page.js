@@ -10,6 +10,7 @@ export default async function OffersCollectionPage() {
   const products = await prisma.product.findMany({
     where: {
       isOfferProduct: true,
+      isVisible: true,
     },
     orderBy: {
       createdAt: 'desc',
