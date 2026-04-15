@@ -573,7 +573,7 @@ export default function OrdersPage() {
             </aside>
 
             {/* Right Panel: Expanded Product List */}
-            <section className="flex-1 p-6 lg:p-8 overflow-y-auto custom-scrollbar bg-brand-primary/[0.01]">
+            <section className="flex-1 p-6 lg:p-8 overflow-y-auto custom-scrollbar bg-brand-primary/1">
               <div className="max-w-5xl mx-auto space-y-6">
                 <div className="flex items-center justify-between py-3 border-b border-brand-primary/5 mb-6">
                   <h3 className="text-sm font-black text-brand-primary uppercase tracking-[0.3em]">Order Product List</h3>
