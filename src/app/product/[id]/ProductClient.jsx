@@ -110,15 +110,38 @@ export default function ProductClient({ product, navCategory, subCategory, inner
     ],
   };
 
-  const handleWhatsApp = () => {
+  const handleWhatsApp = async () => {
     const phone = "917383699199";
     const discount = product.isOfferProduct ? (product.discountPercent || 0) : 0;
     const finalPrice = product.isOfferProduct ? product.offerPrice : product.price;
 
     const totalQty = Object.values(variantQuantities).reduce((a, b) => a + (parseInt(b) || 0), 0);
-    const unitText = product.unit?.toUpperCase() === "DOZEN" ? "Dozens" : "Pieces";
 
-    const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Product:* ${product.name}\n*Price:* ₹${finalPrice}\n*Order Unit:* ${product.unit}\n------------------\nPlease help me with the details.`;
+    try {
+      // LOG INQUIRY IN BACKGROUND
+      await fetch("/api/user/inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Wholesale Inquiry",
+          mobile: "WhatsApp Channel",
+          product: product.name,
+          pieces: totalQty.toString(),
+          type: "PRODUCT"
+        })
+      });
+    } catch (err) {
+      console.error("Inquiry log error:", err);
+    }
+
+    const unitLabel = product.unit?.toUpperCase() === "DOZEN" ? "Doz" : "Pcs";
+
+    const selectedVariants = Object.entries(variantQuantities)
+      .filter(([name, qty]) => qty > 0)
+      .map(([name, qty]) => `- ${name}: ${qty} ${unitLabel}`)
+      .join('\n');
+
+    const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Product:* ${product.name}\n*Product ID:* *[${product.productId || 'N/A'}]*\n*Price:* ₹${finalPrice.toLocaleString()}\n*Order Unit:* ${unitLabel}\n${selectedVariants ? `\n*Interested Variants:*\n${selectedVariants}\n` : ''}\n------------------\nPlease help me with the details.`;
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, "_blank");
   };

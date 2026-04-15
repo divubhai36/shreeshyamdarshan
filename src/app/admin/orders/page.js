@@ -237,6 +237,9 @@ export default function OrdersPage() {
 
   useEffect(() => { loadData(); }, []);
 
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [sortOrder, setSortOrder] = useState("DATE_DESC");
+
   const loadData = async () => {
     setLoading(true);
     const res = await getOrders();
@@ -249,60 +252,167 @@ export default function OrdersPage() {
     loadData();
   };
 
-  return (
-    <div className="max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
-        <div>
-          <h1 className="text-3xl font-serif font-bold text-brand-primary">Order List</h1>
-          <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase mt-1">B2B Wholselers Order</p>
-        </div>
-        <div className="relative group w-full md:w-80">
-          <Icon icon="solar:magnifer-linear" className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/20 w-4 h-4 group-focus-within:text-brand-secondary transition-colors" />
-          <input
-            suppressHydrationWarning
-            type="text"
-            placeholder="Search by ID, wholesaler or status..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white border border-brand-primary/5 rounded-xl p-3 pl-11 text-[11px] font-bold text-brand-primary focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider"
-          />
+  const counts = {
+    ALL: data?.length || 0,
+    PENDING: data?.filter(o => o.status === 'PENDING').length || 0,
+    APPROVED: data?.filter(o => o.status === 'APPROVED').length || 0,
+    DISPATCHED: data?.filter(o => o.status === 'DISPATCHED').length || 0,
+    COMPLETED: data?.filter(o => o.status === 'COMPLETED').length || 0,
+    CANCELLED: data?.filter(o => o.status === 'CANCELLED').length || 0,
+  };
 
+  const metrics = {
+    totalValue: data?.reduce((acc, o) => acc + o.totalAmount, 0) || 0,
+    activePipe: counts.PENDING + counts.APPROVED + counts.DISPATCHED,
+    completed: counts.COMPLETED,
+    totalDiscount: data?.reduce((acc, o) => acc + (o.originalTotal - o.totalAmount), 0) || 0
+  };
+
+  const filteredOrders = (data || []).filter(o => {
+    const matchesSearch = o.orderNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o.wholesaler?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o.wholesaler?.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o.status.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === "ALL" || o.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  }).sort((a, b) => {
+    if (sortOrder === "DATE_DESC") return new Date(b.createdAt) - new Date(a.createdAt);
+    if (sortOrder === "DATE_ASC") return new Date(a.createdAt) - new Date(b.createdAt);
+    if (sortOrder === "TOTAL_DESC") return b.totalAmount - a.totalAmount;
+    if (sortOrder === "TOTAL_ASC") return a.totalAmount - b.totalAmount;
+    return 0;
+  });
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+      {/* Unified Header & Search Command Row */}
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-8 mb-12 py-8 border-b border-brand-primary/5">
+        <div className="shrink-0">
+          <h1 className="text-4xl font-serif font-bold text-brand-primary tracking-tight">Order Registry</h1>
+          <p className="text-[10px] font-black text-brand-secondary uppercase tracking-[0.4em] mt-2">B2B Procurement Command</p>
+        </div>
+
+        <div className="flex flex-wrap items-end gap-6 w-full xl:w-auto">
+          {/* Search Control */}
+          <div className="flex flex-col gap-1.5 grow lg:grow-0 min-w-[320px]">
+             <label className="text-[10px] font-black text-brand-primary/30 uppercase tracking-[0.2em] ml-1">Search Orders</label>
+             <div className="relative group">
+                <Icon icon="solar:magnifer-linear" className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/20 w-4 h-4 group-focus-within:text-brand-secondary transition-colors" />
+                <input
+                   suppressHydrationWarning
+                   type="text"
+                   placeholder="Search ID or Wholesaler name..."
+                   value={searchTerm}
+                   onChange={(e) => setSearchTerm(e.target.value)}
+                   className="w-full bg-white border border-brand-primary/5 rounded-2xl p-3 pl-11 text-[11px] font-bold text-brand-primary focus:ring-8 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider h-[46px]"
+                />
+             </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5 grow lg:grow-0">
+             <label className="text-[10px] font-black text-brand-primary/30 uppercase tracking-[0.2em] ml-1">Order Status</label>
+             <CustomSelect
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={[
+                   { value: "ALL", label: `All Orders (${counts.ALL})` },
+                   { value: "PENDING", label: `Pending (${counts.PENDING})` },
+                   { value: "APPROVED", label: `Approved (${counts.APPROVED})` },
+                   { value: "DISPATCHED", label: `Dispatched (${counts.DISPATCHED})` },
+                   { value: "COMPLETED", label: `Completed (${counts.COMPLETED})` },
+                   { value: "CANCELLED", label: `Cancelled (${counts.CANCELLED})` },
+                ]}
+                className="w-full lg:w-56"
+             />
+          </div>
+
+          <div className="flex flex-col gap-1.5 grow lg:grow-0">
+             <label className="text-[10px] font-black text-brand-primary/30 uppercase tracking-[0.2em] ml-1">Sort Orders</label>
+             <CustomSelect
+                value={sortOrder}
+                onChange={setSortOrder}
+                options={[
+                   { value: "DATE_DESC", label: "Date (Newest)" },
+                   { value: "DATE_ASC", label: "Date (Oldest)" },
+                   { value: "TOTAL_DESC", label: "Value (Highest)" },
+                   { value: "TOTAL_ASC", label: "Value (Lowest)" },
+                ]}
+                className="w-full lg:w-48"
+             />
+          </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-brand-primary/5">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-brand-primary/5 text-[10px] uppercase font-bold text-brand-primary/60 tracking-widest border-b border-brand-primary/5">
-            <tr>
-              <th className="p-6 rounded-tl-[40px]">Order ID</th>
-              <th className="p-6">Wholesaler</th>
-              <th className="p-6">Valuation</th>
-              <th className="p-6">Fulfillment State</th>
-              <th className="p-6 text-right rounded-tr-[40px]">Fulfillment Control</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-brand-primary/5">
-            {loading ? (
+      {/* Intelligence Metrics Bar */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="bg-white p-6 rounded-[32px] border border-brand-primary/5 shadow-sm hover:shadow-xl transition-all group">
+          <p className="text-[10px] font-black text-brand-primary/30 uppercase tracking-widest mb-1">Processing</p>
+          <p className="text-2xl font-black text-brand-primary tracking-tighter">{metrics.activePipe}</p>
+          <div className="mt-3 inline-flex items-center px-2 py-0.5 bg-blue-50 text-[10px] font-bold text-blue-600 rounded-lg">
+             Orders in Progress
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-[32px] border border-brand-primary/5 shadow-sm hover:shadow-xl transition-all group">
+          <p className="text-[10px] font-black text-brand-primary/30 uppercase tracking-widest mb-1">Completed</p>
+          <p className="text-2xl font-black text-brand-primary tracking-tighter">{metrics.completed}</p>
+          <div className="mt-3 inline-flex items-center px-2 py-0.5 bg-indigo-50 text-[10px] font-bold text-indigo-600 rounded-lg">
+             Successfully Delivered
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-[32px] border border-brand-primary/5 shadow-sm hover:shadow-xl transition-all group lg:col-span-1">
+          <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Total Discount Given</p>
+          <p className="text-2xl font-black text-emerald-500 tracking-tighter">₹{metrics.totalDiscount.toLocaleString()}</p>
+          <div className="mt-3 inline-flex items-center px-2 py-0.5 bg-emerald-50 text-[10px] font-bold text-emerald-600 rounded-lg">
+             Wholesaler Discount
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-[32px] border border-brand-primary/5 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+            <Icon icon="solar:round-alt-arrow-up-bold-duotone" className="w-20 h-20 text-brand-primary" />
+          </div>
+          <p className="text-[10px] font-black text-brand-primary/30 uppercase tracking-widest mb-1">Total Order Value</p>
+          <p className="text-2xl font-black text-brand-primary tracking-tighter">₹{metrics.totalValue.toLocaleString()}</p>
+          <div className="mt-3 inline-flex items-center px-2 py-0.5 bg-emerald-50 text-[10px] font-bold text-emerald-600 rounded-lg">
+             All Orders Total
+          </div>
+        </div>
+
+      </div>
+
+      <div className="bg-white rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-brand-primary/5 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm min-w-[1000px]">
+            <thead className="bg-brand-primary/5 text-[10px] uppercase font-bold text-brand-primary/60 tracking-widest border-b border-brand-primary/5">
               <tr>
-                <td colSpan="5" className="p-20 text-center">
-                  <Icon icon="line-md:loading-loop" className="w-10 h-10 text-brand-secondary mx-auto" />
-                </td>
+                <th className="p-6">Order ID</th>
+                <th className="p-6">Wholesaler</th>
+                <th className="p-6">Amount</th>
+                <th className="p-6">Status</th>
+                <th className="p-6 text-right">Actions</th>
               </tr>
-            ) : data.filter(o =>
-              o.orderNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-              o.wholesaler?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              o.wholesaler?.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              o.status.toLowerCase().includes(searchTerm.toLowerCase())
-            ).length === 0 ? (
-              <tr>
-                <td colSpan="5" className="p-20 text-center text-brand-primary/30 italic font-serif">No orders matching your search criteria.</td>
-              </tr>
-            ) : data.filter(o =>
-              o.orderNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-              o.wholesaler?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              o.wholesaler?.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              o.status.toLowerCase().includes(searchTerm.toLowerCase())
-            ).map(o => (
+            </thead>
+            <tbody className="divide-y divide-brand-primary/5">
+              {loading ? (
+                <tr>
+                  <td colSpan="5" className="p-32 text-center">
+                    <Icon icon="line-md:loading-loop" className="w-12 h-12 text-brand-secondary mx-auto" />
+                    <p className="text-[10px] font-black text-brand-primary/20 uppercase tracking-widest mt-4">Syncing Registry...</p>
+                  </td>
+                </tr>
+              ) : filteredOrders.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="p-32 text-center">
+                    <div className="opacity-10 mb-4">
+                      <Icon icon="solar:clipboard-remove-broken" className="w-16 h-16 mx-auto" />
+                    </div>
+                    <p className="text-brand-primary/30 italic font-serif text-lg">No records found matching your current command filter.</p>
+                  </td>
+                </tr>
+              ) : filteredOrders.map(o => (
               <tr key={o.id} className="hover:bg-brand-primary/[0.02] transition-colors group">
                 <td className="p-6">
                   <p onClick={() => setViewOrder(o)} className="font-bold text-brand-primary group-hover:text-brand-secondary cursor-pointer transition-colors">#{o.orderNumber}</p>
@@ -323,6 +433,18 @@ export default function OrdersPage() {
                 </td>
                 <td className="p-6 text-right">
                   <div className="flex items-center justify-end gap-3">
+                    <CustomSelect
+                      value={o.status}
+                      onChange={(val) => handleStatusUpdate(o.id, val)}
+                      options={[
+                        { value: "PENDING", label: "Pending" },
+                        { value: "APPROVED", label: "Approved" },
+                        { value: "DISPATCHED", label: "Dispatched" },
+                        { value: "COMPLETED", label: "Completed" },
+                        { value: "CANCELLED", label: "Cancelled" },
+                      ]}
+                      className="w-44"
+                    />
                     <button
                       onClick={() => setViewOrder(o)}
                       className="p-3 bg-brand-primary/5 text-brand-primary rounded-xl hover:bg-brand-primary hover:text-white transition-all shadow-sm group/view"
@@ -330,18 +452,6 @@ export default function OrdersPage() {
                     >
                       <Icon icon="solar:eye-bold-duotone" className="w-5 h-5 group-hover/view:scale-110 transition-transform" />
                     </button>
-                    <CustomSelect
-                      value={o.status}
-                      onChange={(val) => handleStatusUpdate(o.id, val)}
-                      options={[
-                        { value: "PENDING", label: "Mark Pending" },
-                        { value: "APPROVED", label: "Authorize Fulfillment" },
-                        { value: "DISPATCHED", label: "Indicate Dispatched" },
-                        { value: "COMPLETED", label: "Finalize Handover" },
-                        { value: "CANCELLED", label: "Void Order" },
-                      ]}
-                      className="w-44"
-                    />
                   </div>
                 </td>
               </tr>
@@ -349,134 +459,181 @@ export default function OrdersPage() {
           </tbody>
         </table>
       </div>
+    </div>
 
-      {/* Order Manifest View (Detailed View) */}
+    {/* Order Manifest View (Detailed View) */}
       {viewOrder && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-primary/80 backdrop-blur-md p-4 overflow-y-auto pt-20 pb-10">
-          <div className="bg-white max-w-4xl w-full rounded-[40px] p-8 lg:p-12 shadow-2xl relative my-auto border border-white/20">
-            <div className="absolute top-8 right-8 flex items-center gap-3">
+        <div className="fixed inset-0 z-[100] bg-white flex flex-col animate-in fade-in slide-in-from-bottom-5 duration-300">
+          {/* Top Command Bar */}
+          <header className="h-20 border-b border-brand-primary/5 flex items-center justify-between px-8 lg:px-12 bg-white sticky top-0 z-20">
+            <div className="flex items-center gap-6">
+              <button
+                onClick={() => setViewOrder(null)}
+                className="flex items-center gap-2 text-brand-primary/40 hover:text-brand-primary transition-colors group"
+              >
+                <div className="w-10 h-10 rounded-full bg-brand-primary/5 flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all">
+                  <Icon icon="lucide:arrow-left" className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-bold uppercase tracking-widest hidden sm:block">Back to Registry</span>
+              </button>
+              <div className="h-10 w-px bg-brand-primary/5 hidden sm:block"></div>
+              <div>
+                <div className="flex items-center gap-4">
+                  <h2 className="text-xl font-serif font-bold text-brand-primary leading-none">Manifest #{viewOrder.orderNumber}</h2>
+                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-[8px] font-black uppercase tracking-widest shadow-sm ${STATUS_COLORS[viewOrder.status]}`}>
+                    <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></div>
+                    {viewOrder.status}
+                  </div>
+                </div>
+                <p className="text-[10px] font-bold text-brand-secondary uppercase tracking-[0.2em] mt-1.5">Registered: {new Date(viewOrder.createdAt).toLocaleString()}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
               <button
                 onClick={() => downloadPDF(viewOrder)}
-                className="flex items-center gap-2 px-6 py-2.5 bg-brand-secondary text-white rounded-xl font-bold uppercase tracking-widest text-[10px] shadow-lg hover:scale-105 transition-all"
+                className="flex items-center gap-3 px-8 py-3.5 bg-brand-primary text-white rounded-2xl font-bold uppercase tracking-widest text-[10px] shadow-xl hover:bg-brand-secondary hover:scale-105 transition-all active:scale-95"
               >
-                <Icon icon="solar:download-bold" className="w-4 h-4" />
-                Download PDF
+                <Icon icon="solar:file-download-bold-duotone" className="w-5 h-5" />
+                Generate Official PDF
               </button>
-              <button suppressHydrationWarning onClick={() => setViewOrder(null)} className="w-10 h-10 bg-brand-primary/5 rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
-                <Icon icon="lucide:x" className="w-5 h-5" />
+              <button
+                onClick={() => setViewOrder(null)}
+                className="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+              >
+                <Icon icon="lucide:x" className="w-6 h-6" />
               </button>
             </div>
+          </header>
 
-            <div className="mb-12">
-              <div className="flex items-center gap-2">
-                <h2 className="text-3xl font-serif font-bold text-brand-primary">Order Details</h2>
-                <div className={`flex items-center justify-center py-1 px-4 rounded-full border text-[10px] font-bold uppercase tracking-[0.3em] ${STATUS_COLORS[viewOrder.status]}`}>
-                  {viewOrder.status}
+          {/* Main Manifest Body */}
+          <main className="flex-1 overflow-hidden flex flex-col lg:flex-row bg-brand-primary/[0.01]">
+            {/* Left Sidebar: Client & Financial Stats */}
+            <aside className="w-full lg:w-80 border-r border-brand-primary/5 p-6 lg:p-8 overflow-y-auto bg-white/50 backdrop-blur-sm">
+              <div className="space-y-8">
+                {/* Client Profile */}
+                <div>
+                  <label className="text-[10px] font-black text-brand-primary/20 uppercase tracking-[0.3em] block mb-3">B2B Wholesaler Profile</label>
+                  <div className="p-5 bg-brand-primary/2 rounded-[24px] border border-brand-primary/5">
+                    <p className="text-xl font-serif font-bold text-brand-primary leading-tight">{viewOrder.wholesaler.name}</p>
+                    <p className="text-xs font-bold text-brand-secondary mt-2 uppercase tracking-widest">{viewOrder.wholesaler.companyName || 'Private Partner'}</p>
+
+                    <div className="mt-8 space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-brand-primary/5 flex items-center justify-center text-brand-primary/40 shadow-sm">
+                          <Icon icon="solar:phone-bold-duotone" className="w-4 h-4" />
+                        </div>
+                        <p className="text-[13px] font-bold text-brand-primary/70">{viewOrder.wholesaler.phone || 'N/A'}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-brand-primary/5 flex items-center justify-center text-brand-primary/40 shadow-sm">
+                          <Icon icon="solar:letter-bold-duotone" className="w-4 h-4" />
+                        </div>
+                        <p className="text-[13px] font-bold text-brand-primary/70 truncate">{viewOrder.wholesaler.email}</p>
+                      </div>
+                      <div className="flex items-start gap-4 pt-4 border-t border-brand-primary/5">
+                        <Icon icon="solar:map-point-bold-duotone" className="w-5 h-5 text-brand-primary/20 shrink-0" />
+                        <p className="text-[12px] font-medium text-brand-primary/40 leading-relaxed italic">
+                          {viewOrder.wholesaler.address || 'Logistics address not registered in profile.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Financial Summary */}
+                <div>
+                  <label className="text-[10px] font-black text-brand-primary/20 uppercase tracking-[0.3em] block mb-3">Payment Summary</label>
+                  <div className="p-6 bg-brand-primary text-white rounded-[32px] shadow-2xl relative overflow-hidden group">
+                     {/* Decorative background element */}
+                    <div className="absolute -right-8 -bottom-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
+                      <Icon icon="solar:wad-of-money-bold" className="w-48 h-48" />
+                    </div>
+
+                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Final Payable Amount</p>
+                    <p className="text-2xl font-black tracking-tight leading-none mb-6">₹{viewOrder.totalAmount.toLocaleString()}</p>
+
+                    <div className="pt-6 border-t border-white/10 space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Gross Value</span>
+                        <span className="text-sm font-bold opacity-60 line-through">₹{viewOrder.originalTotal?.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Total Discount</span>
+                        <span className="text-sm font-black text-emerald-400">₹{(viewOrder.originalTotal - viewOrder.totalAmount).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Items Allocated</span>
+                        <span className="text-sm font-black">{viewOrder.items.reduce((acc, it) => acc + it.quantity, 0)} Pcs</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <p className="text-sm text-brand-primary/40 mt-1 font-medium tracking-widest uppercase">ID: #{viewOrder.orderNumber} • {new Date(viewOrder.createdAt).toLocaleString()}</p>
-            </div>
+            </aside>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12 bg-brand-primary/2 p-8 rounded-[32px] border border-brand-primary/5">
-              <div>
-                <h3 className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 mb-4 ml-1">Client Information</h3>
-                <p className="text-lg font-serif font-bold text-brand-primary">{viewOrder.wholesaler.name}</p>
-                <p className="text-sm font-medium text-brand-primary/60 mt-1 uppercase tracking-widest">{viewOrder.wholesaler.companyName || 'B2B Client'}</p>
-                <p className="text-sm text-brand-primary/40 mt-3 font-medium leading-relaxed">{viewOrder.wholesaler.address || 'Standard Partner Logistics'}</p>
-              </div>
-              <div>
-                <h3 className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40 mb-4 ml-1">Contact Details</h3>
-                <p className="text-sm font-bold text-brand-primary">{viewOrder.wholesaler.email}</p>
-                <p className="text-sm font-bold text-brand-primary mt-2">{viewOrder.wholesaler.phone || 'Registry Phone Not Available'}</p>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-6 ml-1">
-                <h3 className="text-[10px] uppercase tracking-widest font-bold text-brand-primary/40">Allocated Inventory Items</h3>
-                <div className="flex items-center gap-2 px-3 py-1 bg-brand-secondary/5 rounded-lg border border-brand-secondary/10">
-                  <Icon icon="solar:box-minimalistic-bold-duotone" className="w-3 h-3 text-brand-secondary" />
-                  <span className="text-[9px] font-black text-brand-secondary uppercase tracking-widest leading-none">Packing Helper</span>
+            {/* Right Panel: Expanded Product List */}
+            <section className="flex-1 p-6 lg:p-8 overflow-y-auto custom-scrollbar bg-brand-primary/[0.01]">
+              <div className="max-w-5xl mx-auto space-y-6">
+                <div className="flex items-center justify-between py-3 border-b border-brand-primary/5 mb-6">
+                  <h3 className="text-sm font-black text-brand-primary uppercase tracking-[0.3em]">Order Product List</h3>
+                  <div className="flex items-center gap-3 px-4 py-2 bg-brand-secondary/5 rounded-2xl border border-brand-secondary/10">
+                    <Icon icon="solar:box-minimalistic-bold-duotone" className="w-5 h-5 text-brand-secondary" />
+                    <span className="text-[10px] font-black text-brand-secondary uppercase tracking-widest">Packing Helper</span>
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
-                {viewOrder.items.map((item, idx) => (
-                  <div key={idx} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 bg-white rounded-3xl border border-brand-primary/5 hover:border-brand-secondary/30 transition-all gap-4 shadow-sm">
-                    <div className="flex items-center gap-5 w-full sm:w-auto">
-                      <div className="w-16 h-20 rounded-2xl overflow-hidden bg-gray-50 border border-brand-primary/10 shrink-0 shadow-inner">
+
+                <div className="grid grid-cols-1 gap-4 pb-20">
+                  {viewOrder.items.map((item, idx) => (
+                    <div key={idx} className="flex items-center p-4 bg-white rounded-[24px] border border-brand-primary/5 hover:border-brand-secondary/30 transition-all gap-6 shadow-sm hover:shadow-lg group">
+                      {/* Product Visual */}
+                      <div className="w-20 h-20 rounded-xl overflow-hidden bg-brand-primary/5 border border-brand-primary/5 shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-500">
                         <img src={item.product?.images?.[0] || '/hero.png'} alt={item.product?.name} className="w-full h-full object-cover" />
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-bold text-brand-primary text-base leading-tight mb-1">{item.product?.name}</p>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-2 py-0.5 bg-brand-primary/5 text-brand-primary text-[9px] font-black uppercase tracking-widest rounded-lg border border-brand-primary/5 shadow-sm">Product_ID: {item.product?.productId || 'N/A'}</span>
-                          {item.variantName && (
-                            <span className="px-2 py-0.5 bg-brand-secondary text-white text-[9px] font-black uppercase tracking-widest rounded-lg shadow-md">Variant: {item.variantName}</span>
-                          )}
-                        </div>
-                        <div className="flex items-baseline gap-2 mt-3">
-                          <p className="text-[10px] font-black text-brand-primary/60 uppercase tracking-widest leading-none">
-                            ₹{item.price.toLocaleString()}
-                          </p>
-                          {item.originalPrice && item.originalPrice > item.price && (
-                            <p className="text-[10px] text-brand-primary/20 line-through font-bold">₹{item.originalPrice.toLocaleString()}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row items-center justify-between sm:justify-end gap-10 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-brand-primary/5">
-                      <div className="bg-brand-primary/5 px-6 py-3 rounded-2xl text-center sm:text-right min-w-[100px] border border-brand-primary/5">
-                        <p className="text-[9px] font-black text-brand-primary/30 uppercase tracking-widest mb-0.5">Quantity</p>
-                        <p className="text-xl font-black text-brand-primary leading-none">{item.quantity} <span className="text-[10px] lowercase italic font-normal opacity-40">pcs</span></p>
-                      </div>
-                      <div className="text-right flex flex-col items-end">
-                        <p className="text-[9px] font-black text-brand-primary/20 uppercase tracking-widest mb-1">Subtotal</p>
-                        <div className="flex items-baseline gap-2">
-                          {item.originalPrice && item.originalPrice > item.price && (
-                            <p className="text-sm font-bold text-brand-primary/10 line-through tracking-wider">₹{(item.quantity * item.originalPrice).toLocaleString()}</p>
-                          )}
-                          <p className="text-xl text-brand-secondary font-black tracking-tight leading-none">₹{(item.quantity * item.price).toLocaleString()}</p>
-                        </div>
-                        {item.originalPrice && item.originalPrice > item.price && (
-                          <p className="text-[8px] font-black text-emerald-600/60 uppercase tracking-tighter mt-1 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
-                            Order Savings: ₹{(item.quantity * (item.originalPrice - item.price)).toLocaleString()}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
 
-            <div className="mt-12 pt-8 border-t border-brand-primary/5 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
-              <div>
-                <div className="flex items-center gap-3">
-                  <div className="px-3 py-1 bg-brand-primary/5 rounded-lg border border-brand-primary/5 text-[9px] font-black text-brand-primary/50 uppercase tracking-widest">
-                    Total Units: {viewOrder.items.reduce((acc, it) => acc + it.quantity, 0)}
-                  </div>
-                </div>
-              </div>
-              <div className="text-right w-full sm:w-auto">
-                <div className="flex flex-col items-end">
-                  <p className="text-[10px] text-brand-primary/40 font-bold uppercase tracking-widest mb-1">Total Amount</p>
-                  {viewOrder.originalTotal > viewOrder.totalAmount ? (
-                    <div className="flex gap-2">
-                      <div className="flex flex-col items-end">
-                        <div className="mt-1 bg-green-50 px-2 py-0.5 rounded-full border border-green-100 italic">
-                          <p className="text-xs font-black text-green-600 uppercase tracking-widest">Saved ₹{(viewOrder.originalTotal - viewOrder.totalAmount).toLocaleString()}</p>
+                      {/* Details Center */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+                          <h4 className="font-serif font-bold text-brand-primary text-base truncate">{item.product?.name}</h4>
+                          <div className="flex items-center gap-2">
+                             <span className="px-3 py-1 bg-brand-primary/5 text-brand-primary text-[9px] font-black uppercase tracking-widest rounded-lg border border-brand-primary/5">SKU: {item.product?.productId || 'N/A'}</span>
+                             {item.variantName && (
+                               <span className="px-3 py-1 bg-brand-secondary text-white text-[9px] font-black uppercase tracking-widest rounded-lg shadow-lg">VARIANT: {item.variantName}</span>
+                             )}
+                          </div>
                         </div>
-                        <p className="text-xl font-bold text-brand-primary/50 line-through tracking-wider leading-none mb-1">₹{viewOrder.originalTotal.toLocaleString()}</p>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                          <div>
+                            <p className="text-[9px] font-black text-brand-primary/20 uppercase tracking-widest mb-1.5">Rate Multiplier</p>
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-base font-bold text-brand-primary tracking-tight">₹{item.price.toLocaleString()}</span>
+                              {item.originalPrice > item.price && (
+                                <span className="text-xs text-brand-primary/20 line-through font-bold">₹{item.originalPrice.toLocaleString()}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-[9px] font-black text-brand-primary/20 uppercase tracking-widest mb-1.5">Allocation</p>
+                            <p className="text-lg font-black text-brand-primary leading-none">{item.quantity} <span className="text-xs lowercase italic font-normal opacity-40">{item.product?.unit?.toLowerCase() || 'pcs'}</span></p>
+                          </div>
+                          <div className="col-span-2 sm:col-span-1 border-t sm:border-t-0 sm:border-l border-brand-primary/5 pt-2 sm:pt-0 sm:pl-6 text-right sm:text-left">
+                            <p className="text-[9px] font-black text-brand-secondary uppercase tracking-widest mb-1">Settlement</p>
+                            <p className="text-lg font-black text-brand-secondary tracking-tighter leading-none">₹{(item.quantity * item.price).toLocaleString()}</p>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-4xl font-black text-brand-primary tracking-tight">₹{viewOrder.totalAmount.toLocaleString()}</p>
+
+                      {/* Verification Checkmark (Optional UX) */}
+                      <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-primary/5 border border-brand-primary/5 text-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <Icon icon="solar:check-circle-bold-duotone" className="w-6 h-6" />
+                      </div>
                     </div>
-                  ) : (
-                    <p className="text-4xl font-black text-brand-primary tracking-tight">₹{viewOrder.totalAmount.toLocaleString()}</p>
-                  )}
+                  ))}
                 </div>
               </div>
-            </div>
-          </div>
+            </section>
+          </main>
         </div>
       )}
     </div>

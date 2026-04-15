@@ -23,13 +23,23 @@ export async function POST(req) {
     // Calculate original total from items
     const originalTotal = roundToTwo(items.reduce((acc, it) => acc + (it.originalPrice || it.price) * it.quantity, 0));
 
-    // Generate unique order number
-    const orderNumber = `SSD-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000).toString().padStart(3, "0")}`;
-
     const newOrder = await prisma.$transaction(async (tx) => {
+      // 1. Get current count to determine next sequence
+      const orderCount = await tx.order.count();
+      const nextSequence = orderCount + 1;
+
+      // 2. Format Date (DDMMYY)
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, "0");
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const yy = String(now.getFullYear()).slice(-2);
+      const dateStr = `${dd}${mm}${yy}`;
+
+      const finalOrderNumber = `SSD-${dateStr}-${nextSequence}`;
+
       const order = await tx.order.create({
         data: {
-          orderNumber,
+          orderNumber: finalOrderNumber,
           wholesalerId: session.userId,
           totalAmount: roundToTwo(totalAmount),
           originalTotal: roundToTwo(originalTotal),

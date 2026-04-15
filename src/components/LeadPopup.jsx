@@ -44,8 +44,20 @@ export default function LeadPopup() {
       // We don't block the second popup here, only if they submit
    };
 
-   const handleSubmit = (e) => {
+   const handleSubmit = async (e) => {
       e.preventDefault();
+
+      try {
+         // SAVE TO DATABASE IN BACKGROUND
+         await fetch("/api/user/inquiry", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...formData, type: "GENERAL" })
+         });
+      } catch (err) {
+         console.error("Lead save error:", err);
+      }
+
       const phone = "917383699199";
       const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Name:* ${formData.name}\n*Mobile:* ${formData.mobile}\n*City:* ${formData.city}\n*State:* ${formData.state}\n*Interested In:* ${formData.product}\n*Quantity:* ${formData.pieces} pcs\n------------------\nPlease help me with the details.`;
 

@@ -79,8 +79,19 @@ export default function CartPage() {
         setSuccessTotals({ total: cartTotal, originalTotal: originalCartTotal });
         setLastOrderDetails(data.order);
         setIsSuccess(true);
+
+        // TRIGGER WHATSAPP MESSAGE
+        const phone = "917383699199";
+        const itemsList = cart.map(item => {
+          const unitLabel = item.unit?.toUpperCase() === "DOZEN" ? "Doz" : "Pcs";
+          return `- *[${item.productId || 'N/A'}]* ${item.name}${item.variantName ? ' (' + item.variantName + ')' : ''}: ${item.quantity} ${unitLabel} x ₹${item.price.toLocaleString()}`;
+        }).join('\n');
+        const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Wholesale Order Placed!\n*Order ID:* #${data.order.orderNumber}\n*Total Value:* ₹${cartTotal.toLocaleString()}\n\n*Product List:*\n${itemsList}\n\n*Wholesaler Details:* ${data.order.wholesaler?.name || 'Authorized Partner'}\n------------------\nPlease authorize and prepare this inventory for dispatch.`;
+        const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+        window.open(whatsappUrl, "_blank");
+
         clearCart();
-        toast.success("Order Placed Successfully!");
+        toast.success("Order Registered Successfully!");
       } else {
         toast.error(data.error || "Failed to place order");
       }

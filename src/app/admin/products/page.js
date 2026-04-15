@@ -86,12 +86,19 @@ export default function ProductsPage() {
     };
 
     const handleToggleVisibility = async (p) => {
+        // Optimistic Update: Change UI instantly
+        const previousData = [...data];
+        setData(prev => prev.map(item =>
+            item.id === p.id ? { ...item, isVisible: !item.isVisible } : item
+        ));
+
         try {
             await updateProduct(p.id, { ...p, isVisible: !p.isVisible });
-            loadData();
             toast.success(`Product ${!p.isVisible ? 'Visible' : 'Hidden'}`);
         } catch (err) {
-            toast.error("Failed to toggle visibility");
+            // Revert state if API fails
+            setData(previousData);
+            toast.error("Failed to sync visibility. Reverted status.");
         }
     };
 
@@ -286,10 +293,12 @@ export default function ProductsPage() {
                                         <div className="flex items-center justify-end gap-2">
                                             <button
                                                 onClick={() => handleToggleVisibility(p)}
-                                                className={`p-2 rounded-lg transition-all ${p.isVisible ? 'text-emerald-500 hover:bg-emerald-50' : 'text-gray-300 hover:bg-gray-100'}`}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none shadow-inner ${p.isVisible ? 'bg-emerald-500' : 'bg-gray-200'}`}
                                                 title={p.isVisible ? "Visible on Website" : "Hidden from Website"}
                                             >
-                                                <Icon icon={p.isVisible ? "solar:eye-bold" : "solar:eye-closed-bold"} className="w-5 h-5" />
+                                                <span
+                                                    className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-sm ${p.isVisible ? 'translate-x-6' : 'translate-x-1'}`}
+                                                />
                                             </button>
                                             <button onClick={() => {
                                                 setEditingId(p.id);
@@ -349,7 +358,7 @@ export default function ProductsPage() {
                                                 <div className="w-10 h-10 bg-brand-primary/10 rounded-2xl flex items-center justify-center text-brand-primary">
                                                     <Icon icon="solar:id-card-bold-duotone" className="w-5 h-5" />
                                                 </div>
-                                                <h4 className="text-[11px] uppercase tracking-[0.2em] font-black text-brand-primary/60">Primary Identifiers</h4>
+                                                <h4 className="text-[11px] uppercase tracking-[0.2em] font-black text-brand-primary/60">Product Identifiers</h4>
                                             </div>
                                             <div className="space-y-6">
                                                 <div className="group">
@@ -372,7 +381,7 @@ export default function ProductsPage() {
                                                 <div className="w-10 h-10 bg-brand-primary/10 rounded-2xl flex items-center justify-center text-brand-primary">
                                                     <Icon icon="solar:layers-bold-duotone" className="w-5 h-5" />
                                                 </div>
-                                                <h4 className="text-[11px] uppercase tracking-[0.2em] font-black text-brand-primary/60">Taxonomy Registry</h4>
+                                                <h4 className="text-[11px] uppercase tracking-[0.2em] font-black text-brand-primary/60">Category Selection</h4>
                                             </div>
                                                 <div className="space-y-4">
                                                     <div>
@@ -534,7 +543,7 @@ export default function ProductsPage() {
                                                     title="LADDU GOPAL"
                                                     onClick={() => {
                                                         const q = ["0", "1", "2", "3", "4", "5", "6"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -547,7 +556,7 @@ export default function ProductsPage() {
                                                     title="GM"
                                                     onClick={() => {
                                                         const q = ["Regular"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -559,7 +568,7 @@ export default function ProductsPage() {
                                                     title="LP"
                                                     onClick={() => {
                                                         const q = ["2", "3", "4", "5", "6", "7", "9", "11"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -571,7 +580,7 @@ export default function ProductsPage() {
                                                     title="DG"
                                                     onClick={() => {
                                                         const q = ["5", "6", "7", "9", "12", "15", "18", "21"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -583,7 +592,7 @@ export default function ProductsPage() {
                                                     title="JAMA"
                                                     onClick={() => {
                                                         const q = ["00", "0", "1", "2", "3", "4", "5", "6", "7", "9"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -595,7 +604,7 @@ export default function ProductsPage() {
                                                     title="Khesh"
                                                     onClick={() => {
                                                         const q = ["5", "8", "10", "13", "18", "24", "30", "38", "48", "78"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -607,7 +616,7 @@ export default function ProductsPage() {
                                                     title="MUKUT"
                                                     onClick={() => {
                                                         const q = ["5", "8", "10", "13", "18", "24", "30", "38", "48", "78"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -619,7 +628,7 @@ export default function ProductsPage() {
                                                     title="RK"
                                                     onClick={() => {
                                                         const q = ["2", "3", "4", "5", "6", "7", "9", "12", "15", "18"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -631,7 +640,7 @@ export default function ProductsPage() {
                                                     title="RD"
                                                     onClick={() => {
                                                         const q = ["2", "3", "4", "5", "6", "7", "9", "12", "15", "18"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -643,7 +652,7 @@ export default function ProductsPage() {
                                                     title="HANJUMANJI"
                                                     onClick={() => {
                                                         const q = ["5", "6", "7", "9", "12", "15", "18", "21", "24", "27", "30"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -655,7 +664,7 @@ export default function ProductsPage() {
                                                     title="SIHASAN"
                                                     onClick={() => {
                                                         const q = ["1", "2", "3", "4", "5"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -667,7 +676,7 @@ export default function ProductsPage() {
                                                     title="ZULA"
                                                     onClick={() => {
                                                         const q = ["4", "6", "8"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -696,7 +705,7 @@ export default function ProductsPage() {
                                                             "18x18",
                                                             "20x20",
                                                         ];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: form.price }))] });
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
                                                         toast.success("Injected common sizes");
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
@@ -894,18 +903,18 @@ export default function ProductsPage() {
                                                     <Icon icon="solar:document-text-bold-duotone" className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-[12px] uppercase tracking-[0.3em] font-black text-brand-primary">Narrative Payload</h4>
+                                                    <h4 className="text-[12px] uppercase tracking-[0.3em] font-black text-brand-primary">Product Description</h4>
                                                     <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest mt-0.5">Linguistic Composition</p>
                                                 </div>
                                             </div>
 
                                             <div className="space-y-8">
                                                 <div className="group">
-                                                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-primary/30 block mb-3 px-1 group-focus-within:text-brand-primary transition-colors">Global Storytelling</label>
+                                                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-primary/30 block mb-3 px-1 group-focus-within:text-brand-primary transition-colors">General Description</label>
                                                     <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full p-6 border border-brand-primary/5 rounded-[32px] bg-white text-[13px] font-bold text-brand-primary h-40 resize-none focus:border-brand-primary/40 outline-none transition-all shadow-inner leading-relaxed" placeholder="Describe the soul of this masterpiece..." />
                                                 </div>
                                                 <div className="group">
-                                                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-secondary/40 block mb-3 px-1 group-focus-within:text-brand-secondary transition-colors">Partner Directives (Wholesale Only)</label>
+                                                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-secondary/40 block mb-3 px-1 group-focus-within:text-brand-secondary transition-colors">Wholesale Only Description</label>
                                                     <textarea value={form.wholesalerDescription} onChange={e => setForm({ ...form, wholesalerDescription: e.target.value })} className="w-full p-6 border border-brand-secondary/10 rounded-[32px] bg-brand-secondary/5 text-[13px] font-bold text-brand-primary h-40 resize-none focus:border-brand-secondary/40 outline-none transition-all shadow-inner leading-relaxed" placeholder="Confidential insights for our valued partners..." />
                                                 </div>
                                             </div>
@@ -923,14 +932,14 @@ export default function ProductsPage() {
                                                     </div>
                                                     <div>
                                                         <h4 className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-primary">Media Payload</h4>
-                                                        <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest mt-0.5">Visual Assets Registry</p>
+                                                        <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest mt-0.5">Visual Assets Management</p>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div className="space-y-8">
                                                 <div>
-                                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-brand-primary/20 mb-4 block underline underline-offset-8">Imagery Stream</span>
+                                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-brand-primary/20 mb-4 block underline underline-offset-8">Imagery Gallary</span>
                                                         <div
                                                             onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
                                                             onDragLeave={() => setIsDraggingImage(false)}
@@ -952,7 +961,7 @@ export default function ProductsPage() {
                                                 </div>
 
                                                 <div>
-                                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-brand-primary/20 mb-4 block underline underline-offset-8">Kinetic Motion (Videos)</span>
+                                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-brand-primary/20 mb-4 block underline underline-offset-8">Videos Gallery</span>
                                                     <div
                                                         onDragOver={(e) => { e.preventDefault(); setIsDraggingVideo(true); }}
                                                         onDragLeave={() => setIsDraggingVideo(false)}
@@ -991,7 +1000,7 @@ export default function ProductsPage() {
                                         </button>
                                     ) : (
                                         <button type="button" onClick={handleSubmit} disabled={uploadingImage || uploadingVideo} className="px-20 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/30 text-[11px] flex items-center gap-3">
-                                            <Icon icon="lucide:save" className="w-5 h-5" /> Commit Masterpiece
+                                            <Icon icon="lucide:save" className="w-5 h-5" /> Save Product
                                         </button>
                                     )}
                                 </div>

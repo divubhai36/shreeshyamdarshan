@@ -240,10 +240,24 @@ export default function WholesalersPage() {
                 <textarea value={form.address || ""} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full p-4 border border-brand-primary/5 rounded-2xl bg-brand-primary/2 focus:ring-4 focus:ring-brand-secondary/10 focus:bg-white outline-none transition-all font-bold text-brand-primary h-24" />
               </div>
 
-              <div className="flex items-center gap-4 py-4">
-                <label className="text-xs font-bold uppercase tracking-widest text-brand-primary/60">Account Access:</label>
-                <button type="button" onClick={() => setForm({ ...form, isActive: !form.isActive })} className={`px-6 py-2 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all ${form.isActive ? 'bg-green-500 text-white shadow-[0_5px_15px_rgba(34,197,94,0.3)]' : 'bg-red-500 text-white shadow-[0_5px_15px_rgba(239,68,68,0.3)]'}`}>
-                  {form.isActive ? 'Active' : 'Deactivated'}
+              <div className="flex items-center justify-between p-6 bg-brand-primary/5 rounded-[32px] border border-brand-primary/5 mb-4 group hover:bg-white hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-500">
+                <div className="flex items-center gap-4 text-left">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 ${form.isActive ? 'bg-green-500/10 text-green-500' : 'bg-brand-primary/10 text-brand-primary/40'}`}>
+                        <Icon icon={form.isActive ? "solar:shield-check-bold-duotone" : "solar:shield-warning-bold-duotone"} className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <label className="text-xs font-black uppercase tracking-[0.1em] text-brand-primary block leading-none">Account Access</label>
+                        <p className="text-[9px] font-black text-brand-primary/40 uppercase tracking-[0.2em] mt-2 italic">{form.isActive ? 'Account Fully Authorized' : 'Authorization Suspended'}</p>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    onClick={() => setForm({ ...form, isActive: !form.isActive })}
+                    className={`relative w-16 h-9 rounded-full transition-all duration-500 p-1.5 focus:outline-none border-2 shadow-inner ${form.isActive ? 'bg-green-500 border-green-500/20' : 'bg-brand-primary/10 border-brand-primary/5'}`}
+                >
+                    <div className={`absolute top-1/2 -translate-y-1/2 w-7 h-7 bg-white rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-500 flex items-center justify-center ${form.isActive ? 'left-7.5' : 'left-1'}`}>
+                        <div className={`w-2 h-2 rounded-full ${form.isActive ? 'bg-green-500' : 'bg-brand-primary/20'}`} />
+                    </div>
                 </button>
               </div>
 

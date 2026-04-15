@@ -45,14 +45,18 @@ export default function CheckoutPage() {
         setOrderInfo(res.order);
         setOrderSuccess(true);
         
-        // Send WhatsApp Message
+        // TRIGGER WHATSAPP MESSAGE
         const phone = "917383699199";
-        const itemsList = cart.map(item => `- ${item.name}${item.variantName ? ' ('+item.variantName+')' : ''}: ${item.quantity} x ₹${item.price}`).join('\n');
-        const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Order Placed!\n*Order ID:* #${res.order.orderNumber}\n*Total:* ₹${cartTotal}\n\n*Items:*\n${itemsList}\n\n*Partner:* ${res.order.wholesaler.name}\n------------------\nPlease process this order.`;
+        const itemsList = cart.map(item => {
+          const unitLabel = item.unit?.toUpperCase() === "DOZEN" ? "Doz" : "Pcs";
+          return `- *[${item.productId || 'N/A'}]* ${item.name}${item.variantName ? ' (' + item.variantName + ')' : ''}: ${item.quantity} ${unitLabel} x ₹${item.price.toLocaleString()}`;
+        }).join('\n');
+        const text = `Hi, *Shree Shyam Darshan Team*\n\nNew SSD Order Registered!\n*Order ID:* #${res.order.orderNumber}\n*Total Valuation:* ₹${cartTotal.toLocaleString()}\n\n*Product List:*\n${itemsList}\n\n*Wholesaler:* ${res.order.wholesaler.name}\n------------------\nPlease authorize this registry for dispatch.`;
         const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
         window.open(whatsappUrl, "_blank");
         
         clearCart();
+        toast.success("Order Registered Successfully!");
       } else {
         toast.error(`Registry failed: ${res.error}`);
       }

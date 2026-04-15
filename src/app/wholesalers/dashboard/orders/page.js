@@ -75,47 +75,71 @@ export default function OrdersPage() {
                   </button>
                </div>
             ) : (
-               <div className="space-y-6">
+               <div className="space-y-4">
                   {orders.map((order) => {
                      const originalTotal = order.items.reduce((acc, it) => acc + (it.originalPrice || it.price) * it.quantity, 0);
                      const savings = originalTotal - order.totalAmount;
+                     const totalUnits = order.items.reduce((acc, it) => acc + it.quantity, 0);
+
+                     const STATUS_DOTS = {
+                        PENDING: "bg-amber-500",
+                        APPROVED: "bg-blue-500",
+                        DISPATCHED: "bg-indigo-500",
+                        COMPLETED: "bg-emerald-500",
+                        CANCELLED: "bg-rose-500",
+                     };
 
                      return (
-                        <div key={order.id} className="bg-white rounded-[40px] border border-brand-primary/5 shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.06)] transition-all overflow-hidden">
+                        <div key={order.id} className="bg-white rounded-[32px] border border-brand-primary/5 shadow-sm active:scale-[0.98] transition-all duration-300 mb-4">
                            <div
-                              className="p-6 sm:p-8 cursor-pointer group"
+                              className="p-5 sm:p-6 cursor-pointer"
                               onClick={() => setActiveOrder(activeOrder === order.id ? null : order.id)}
                            >
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                                 <div className="flex items-center gap-6">
-                                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-brand-primary flex items-center justify-center text-white shrink-0 shadow-xl group-hover:scale-110 transition-transform">
-                                       <Icon icon="solar:bag-heart-bold-duotone" className="w-8 h-8 sm:w-10 sm:h-10" />
+                              <div className="flex flex-col gap-5">
+                                 {/* Top Row: Meta Info */}
+                                 <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                       <div className={`w-2 h-2 rounded-full ${STATUS_DOTS[order.status]}`} />
+                                       <span className="text-[11px] font-black text-brand-primary/30 uppercase tracking-[0.2em]">#{order.orderNumber}</span>
                                     </div>
-                                    <div className="min-w-0">
-                                       <div className="flex items-center gap-3 mb-1.5 flex-wrap">
-                                          <span className={`px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest ${STATUS_COLORS[order.status]}`}>
-                                             {order.status}
-                                          </span>
-                                          <span className="text-[10px] font-bold text-brand-primary/30 uppercase tracking-widest">#{order.orderNumber}</span>
-                                       </div>
+                                    <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg border ${STATUS_COLORS[order.status]}`}>
+                                       {order.status}
+                                    </span>
+                                 </div>
 
-                                       <div className="flex flex-row items-start gap-2">
-                                          <p className="text-xl sm:text-2xl font-black text-brand-primary leading-none">₹{(order.totalAmount || 0).toLocaleString()}</p>
-                                          {savings > 0 && (
-                                             <p className="text-base sm:text-lg font-bold text-brand-primary/20 line-through mb-0.5 tracking-tight">₹{originalTotal.toLocaleString()}</p>
-                                          )}
+                                 {/* Middle Area: Valuation */}
+                                 <div className="flex items-end justify-between">
+                                    <div className="space-y-1">
+                                       <p className="text-2xl font-black text-brand-primary tracking-tighter leading-none">
+                                          ₹{(order.totalAmount || 0).toLocaleString()}
+                                       </p>
+                                       {savings > 0 ? (
+                                          <div className="flex items-center gap-2">
+                                             <span className="text-xs lg:text-lg font-bold text-brand-secondary/70 line-through">₹{originalTotal.toLocaleString()}</span>
+                                             <span className="text-[10px] font-bold text-emerald-600 italic">Saved ₹{savings.toLocaleString()}</span>
+                                          </div>
+                                       ) : (
+                                          <p className="text-[10px] font-bold text-brand-primary/20 uppercase tracking-widest italic font-serif">Procurement Value</p>
+                                       )}
+                                    </div>
+
+                                    <div className="flex flex-col items-end gap-3">
+                                       <div className="text-right">
+                                          <p className="text-[10px] font-black text-brand-primary/30 uppercase tracking-widest leading-none mb-1">{totalUnits} Units</p>
+                                          <p className="text-[8px] font-bold text-brand-primary/20 uppercase tracking-widest leading-none">{order.items.length} Products</p>
                                        </div>
-                                       <p className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest mt-3">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                       <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-500 ${activeOrder === order.id ? 'bg-brand-secondary text-white rotate-180 shadow-lg shadow-brand-secondary/20' : 'bg-brand-primary/5 text-brand-primary'}`}>
+                                          <Icon icon="solar:alt-arrow-down-outline" className="w-4 h-4" />
+                                       </div>
                                     </div>
                                  </div>
-                                 <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto pt-6 sm:pt-0 border-t sm:border-t-0 border-brand-primary/5">
-                                    <div className="text-right flex flex-col items-end">
-                                       <p className="text-[9px] font-black text-brand-primary/30 uppercase tracking-widest mb-1">Total Units</p>
-                                       <p className="text-xl sm:text-2xl font-bold text-brand-primary leading-none">{order.items.reduce((acc, it) => acc + it.quantity, 0)} <span className="text-xs sm:text-sm not-italic opacity-40 lowercase">units</span></p>
-                                    </div>
-                                    <div className={`p-4 rounded-2xl bg-brand-primary/5 text-brand-primary transition-all ${activeOrder === order.id ? 'rotate-180 bg-brand-secondary text-white' : ''}`}>
-                                       <Icon icon="solar:alt-arrow-down-bold" className="w-5 h-5" />
-                                    </div>
+
+                                 {/* Footer: Date Stamp */}
+                                 <div className="pt-4 border-t border-brand-primary/[0.03] flex items-center justify-between">
+                                    <p className="text-[10px] font-bold text-brand-primary/30 uppercase tracking-[0.25em]">
+                                       {new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                    </p>
+                                    <Icon icon="solar:calendar-minimalistic-bold-duotone" className="w-3.5 h-3.5 text-brand-primary/10" />
                                  </div>
                               </div>
                            </div>
@@ -128,37 +152,48 @@ export default function OrdersPage() {
                                     exit={{ height: 0, opacity: 0 }}
                                     className="overflow-hidden bg-[#fcfbf7]/50"
                                  >
-                                    <div className="px-6 sm:px-10 py-10 space-y-4 border-t border-brand-primary/5">
-                                       <p className="text-[10px] font-black text-brand-primary/30 uppercase tracking-[0.3em] mb-6">Products List</p>
+                                    <div className="px-6 sm:px-10 py-8 space-y-2 border-t border-brand-primary/5">
+                                       <p className="text-[9px] font-black text-brand-primary/40 uppercase tracking-[0.3em] mb-4">Order Items</p>
                                        {order.items.map((it, i) => (
-                                          <div key={i} className="flex items-center gap-6 p-4 bg-white rounded-3xl border border-brand-primary/5 shadow-sm group/item">
-                                             <div className="w-16 h-20 bg-brand-accent/30 rounded-2xl overflow-hidden shrink-0">
+                                          <div key={i} className="flex items-center gap-3 py-3 border-b border-brand-primary/[0.03] last:border-0 group/item">
+                                             <div className="w-10 h-10 bg-brand-primary/5 rounded-lg overflow-hidden shrink-0 border border-brand-primary/5">
                                                 {it.product?.images?.[0] ? (
                                                    <img src={it.product.images[0]} alt={it.product.name} className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-700" />
                                                 ) : (
-                                                   <div className="w-full h-full flex items-center justify-center">
-                                                      <Icon icon="solar:box-minimalistic-bold-duotone" className="w-8 h-8 text-brand-primary/20" />
+                                                   <div className="w-full h-full flex items-center justify-center grayscale opacity-10">
+                                                      <Icon icon="solar:box-minimalistic-bold-duotone" className="w-5 h-5 text-brand-primary" />
                                                    </div>
                                                 )}
                                              </div>
+
                                              <div className="flex-grow min-w-0">
-                                                <div className="flex justify-between items-start mb-1">
-                                                   <h5 className="font-bold text-brand-primary text-sm sm:text-base line-clamp-1">{it.product?.name}</h5>
-                                                   <span className="text-[10px] font-black text-brand-primary/40 uppercase ml-4">× {it.quantity}</span>
+                                                <div className="flex justify-between items-start mb-0.5">
+                                                   <h5 className="font-bold text-brand-primary text-[12px] line-clamp-1 leading-tight">{it.product?.name}</h5>
+                                                   <span className="text-[10px] font-black text-brand-secondary whitespace-nowrap ml-2">₹{(it.quantity * it.price).toLocaleString()}</span>
                                                 </div>
-                                                {it.variantName && (
-                                                   <p className="text-[10px] font-bold text-brand-secondary uppercase tracking-widest mb-2 whitespace-nowrap overflow-hidden text-ellipsis">{it.variantName}</p>
-                                                )}
-                                                <div className="flex items-baseline gap-2">
-                                                   <span className="text-lg font-black text-brand-primary tracking-tight">₹{it.price.toLocaleString()}</span>
-                                                   {it.originalPrice && it.originalPrice > it.price && (
-                                                      <span className="text-sm font-bold text-brand-primary/20 line-through tracking-wider">₹{it.originalPrice.toLocaleString()}</span>
-                                                   )}
+
+                                                <div className="flex items-center justify-between">
+                                                   <div className="flex items-center gap-1.5 overflow-hidden">
+                                                      <span className="text-[8px] font-bold text-brand-primary/40 leading-none">ID: {it.product?.productId || 'N/A'}</span>
+                                                      {it.variantName && (
+                                                         <>
+                                                            <span className="w-0.5 h-0.5 rounded-full bg-brand-primary/10" />
+                                                            <span className="text-[8px] font-bold text-brand-secondary/60 leading-none truncate">{it.variantName}</span>
+                                                         </>
+                                                      )}
+                                                   </div>
+                                                   <div className="flex items-center gap-2">
+                                                      <p className="text-[9px] font-bold text-brand-primary/30 uppercase tracking-tighter">
+                                                         {it.quantity} <span className="lowercase">pcs</span>
+                                                      </p>
+                                                      <p className="text-[9px] font-black text-brand-primary/60">
+                                                         @ ₹{it.price.toLocaleString()}
+                                                      </p>
+                                                   </div>
                                                 </div>
                                              </div>
                                           </div>
                                        ))}
-
                                     </div>
                                  </motion.div>
                               )}
@@ -169,7 +204,7 @@ export default function OrdersPage() {
                </div>
             )}
          </main>
-
       </div>
    );
 }
+

@@ -43,58 +43,59 @@ export default function WholesalerCollectionClient({ title, subtitle, products, 
         </div>
 
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 lg:mb-16">
-          <div className="space-y-4">
+        <div className="flex flex-col gap-6 mb-8 lg:mb-16">
+          <div className="space-y-3">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="inline-flex items-center gap-3 bg-brand-secondary/10 px-4 py-1.5 rounded-full border border-brand-secondary/20"
+              className="inline-flex items-center gap-2 bg-brand-secondary/5 px-3 py-1 rounded-full border border-brand-secondary/10"
             >
-              <div className="rotate-45">
-                 <Icon icon={type === 'offers' ? "solar:tag-bold-duotone" : "solar:box-minimalistic-bold-duotone"} className="w-3.5 h-3.5 text-brand-secondary" />
-              </div>
-              <span className="text-brand-secondary text-[8px] font-bold uppercase tracking-widest">{subtitle}</span>
+              <Icon icon={type === 'offers' ? "solar:tag-bold-duotone" : "solar:box-minimalistic-bold-duotone"} className="w-3 h-3 text-brand-secondary" />
+              <span className="text-brand-secondary text-[7px] lg:text-[8px] font-black uppercase tracking-[0.2em]">{subtitle}</span>
             </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-4xl lg:text-7xl font-serif font-black text-brand-primary uppercase tracking-tighter leading-none"
+              className="text-[40px] lg:text-8xl font-serif font-black text-brand-primary uppercase tracking-tighter leading-[0.85] lg:leading-none"
             >
               {title}
             </motion.h1>
           </div>
 
           <motion.div
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             className="flex items-center gap-4 bg-white/50 backdrop-blur-md px-6 py-4 rounded-2xl border border-brand-primary/5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center justify-between bg-white/40 backdrop-blur-xl p-4 lg:p-6 rounded-[24px] border border-brand-primary/[0.03] shadow-sm"
           >
-             <div className="text-right">
-                <p className="text-[9px] font-bold text-brand-primary/30 uppercase tracking-widest">Available Collection</p>
-                <p className="text-xl font-serif font-bold text-brand-primary">{products.length} Products</p>
-             </div>
-             <div className="w-10 h-10 rounded-xl bg-brand-primary/5 flex items-center justify-center text-brand-primary">
-                <Icon icon="solar:shop-bold-duotone" className="w-6 h-6" />
-             </div>
+            <div>
+              <p className="text-[8px] lg:text-[10px] font-black text-brand-primary/30 uppercase tracking-[0.2em] mb-1">Vault Inventory</p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl lg:text-4xl font-serif font-black text-brand-primary leading-none">{products.length}</span>
+                <span className="text-[10px] lg:text-sm font-bold text-brand-primary/40 uppercase tracking-widest">Products</span>
+              </div>
+            </div>
+            <div className="w-10 h-10 lg:w-14 lg:h-14 rounded-2xl bg-brand-primary/5 flex items-center justify-center text-brand-primary/30">
+              <Icon icon="solar:shop-bold-duotone" className="w-6 h-6 lg:w-8 lg:h-8" />
+            </div>
           </motion.div>
         </div>
 
         {/* Product Grid */}
         {/* Liked Products Section */}
         {likedProducts.length > 0 && (
-          <div className="mb-4 lg:mb-6">
+          <div className="mb-10 lg:mb-16">
             <motion.div
-               initial={{ opacity: 0, x: -20 }}
-               animate={{ opacity: 1, x: 0 }}
-               className="flex items-center gap-4 mb-4 lg:mb-6"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-3 mb-6 lg:mb-10"
             >
-              <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl lg:rounded-[24px] bg-rose-500/10 flex items-center justify-center text-rose-500 border border-rose-500/20 shadow-[0_0_30px_rgba(244,63,94,0.1)]">
-                <Icon icon="solar:heart-bold" className="w-6 h-10 lg:w-8 lg:h-8" />
+              <div className="w-10 h-10 lg:w-16 lg:h-16 rounded-[18px] lg:rounded-[24px] bg-rose-500/5 flex items-center justify-center text-rose-500/40 border border-rose-500/10">
+                <Icon icon="solar:heart-bold" className="w-5 h-5 lg:w-8 lg:h-8" />
               </div>
-              <div className="space-y-1">
-                <h2 className="text-2xl lg:text-4xl font-serif font-black text-brand-primary uppercase tracking-tighter">Your Choice</h2>
-                <p className="text-[9px] lg:text-[11px] font-bold text-brand-primary/30 uppercase tracking-[0.2em]">Ready for your selection</p>
+              <div className="space-y-0.5">
+                <h2 className="text-xl lg:text-4xl font-serif font-black text-brand-primary uppercase tracking-tighter leading-none">Your Selection</h2>
+                <p className="text-[8px] lg:text-[10px] font-bold text-brand-primary/20 uppercase tracking-[0.3em]">Personalized Registry Items</p>
               </div>
             </motion.div>
 
@@ -114,20 +115,20 @@ export default function WholesalerCollectionClient({ title, subtitle, products, 
             <motion.div
               initial={{ opacity: 0, scaleX: 0 }}
               animate={{ opacity: 1, scaleX: 1 }}
-              className="mt-4 lg:mt-8 h-px bg-gradient-to-r from-transparent via-brand-primary/10 to-transparent"
+              className="mt-8 lg:mt-16 h-px bg-gradient-to-r from-transparent via-brand-primary/5 to-transparent"
             />
           </div>
         )}
 
         {/* Main Product Grid */}
         {otherProducts.length > 0 && likedProducts.length > 0 && (
-           <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-4 lg:mb-6"
-           >
-              <h2 className="text-xl lg:text-2xl font-serif font-bold text-brand-primary uppercase tracking-widest">More from {title}</h2>
-           </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 lg:mb-10"
+          >
+            <h2 className="text-[10px] lg:text-sm font-black text-brand-primary/30 uppercase tracking-[0.4em]">Extended Collection</h2>
+          </motion.div>
         )}
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-10">
@@ -143,14 +144,15 @@ export default function WholesalerCollectionClient({ title, subtitle, products, 
               </motion.div>
             ))
           ) : (
-            <div className="col-span-full py-32 lg:py-48 bg-white/40 rounded-[40px] border border-dashed border-brand-primary/10 flex flex-col items-center justify-center text-center space-y-6 text-left">
-               <div className="w-20 h-20 rounded-full bg-brand-primary/5 flex items-center justify-center text-brand-primary/20">
-                  <Icon icon="solar:ghost-bold-duotone" className="w-10 h-10" />
-               </div>
-               <div className="space-y-2">
-                  <h3 className="text-xl font-serif font-bold text-brand-primary/40 uppercase tracking-widest">The Vault is Empty</h3>
-                  <p className="text-[10px] lg:text-xs text-brand-primary/20 font-bold uppercase tracking-[0.3em]">Check back soon for new treasures</p>
-               </div>
+            <div className="col-span-full py-24 lg:py-48 bg-white/40 backdrop-blur-sm rounded-[48px] border border-dashed border-brand-primary/10 flex flex-col items-center justify-center text-center px-6 relative overflow-hidden group/empty">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-brand-primary/5 rounded-full blur-3xl opacity-50 transition-all duration-700 group-hover/empty:scale-150" />
+              <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-[32px] bg-brand-primary/[0.03] flex items-center justify-center text-brand-primary/20 mb-8 border border-brand-primary/[0.03] transition-transform duration-700 group-hover/empty:rotate-12">
+                <Icon icon="solar:ghost-bold-duotone" className="w-10 h-10 lg:w-12 lg:h-12 grayscale " />
+              </div>
+              <div className="space-y-3 relative z-10">
+                <h3 className="text-2xl font-serif font-black text-brand-primary/70 uppercase tracking-tighter leading-none">The Vault is Empty</h3>
+                <p className="text-[11px] lg:text-xs text-brand-primary/20 font-bold uppercase tracking-[0.3em] max-w-[200px] lg:max-w-[400px] mx-auto leading-relaxed">Patience is a virtue. We are currently curating new treasures for your registry.</p>
+              </div>
             </div>
           )}
         </div>
