@@ -86,7 +86,7 @@ export default function CartPage() {
           const unitLabel = item.unit?.toUpperCase() === "DOZEN" ? "Doz" : "Pcs";
           return `- *[${item.productId || 'N/A'}]* ${item.name}${item.variantName ? ' (' + item.variantName + ')' : ''}: ${item.quantity} ${unitLabel} x ₹${item.price.toLocaleString()}`;
         }).join('\n');
-        const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Wholesale Order Placed!\n*Order ID:* #${data.order.orderNumber}\n*Total Value:* ₹${cartTotal.toLocaleString()}\n\n*Procurement List:*\n${itemsList}\n\n*Partner Details:* ${data.order.wholesaler?.name || 'Authorized Partner'}\n------------------\nPlease authorize and prepare this inventory for dispatch.`;
+        const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Wholesale Order Placed!\n*Order ID:* #${data.order.orderNumber}\n*Total Value:* ₹${cartTotal.toLocaleString()}\n\n*Product List:*\n${itemsList}\n\n*Wholesaler Details:* ${data.order.wholesaler?.name || 'Authorized Partner'}\n------------------\nPlease authorize and prepare this inventory for dispatch.`;
         const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
         window.open(whatsappUrl, "_blank");
 
