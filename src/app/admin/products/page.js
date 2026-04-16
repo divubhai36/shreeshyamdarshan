@@ -29,6 +29,7 @@ export default function ProductsPage() {
     const [isDraggingImage, setIsDraggingImage] = useState(false);
     const [isDraggingVideo, setIsDraggingVideo] = useState(false);
     const [pendingUploads, setPendingUploads] = useState([]); // [{id, previewUrl, type}]
+    const [isSaving, setIsSaving] = useState(false);
 
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -158,14 +159,15 @@ export default function ProductsPage() {
     const handleSubmit = async () => {
         if (!validateStep(step)) return;
 
-        if (step < 4) {
+        // Multi-step logic only for ADDing product
+        if (!editingId && step < 4) {
             setStep(s => s + 1);
             return;
         }
 
-        // FINAL SUBMISSION VALIDATION (Step 4)
-        if (form.images.length === 0) {
-            toast.error("Assets: Please upload at least one visual masterpiece (image)");
+        // Wait for uploads if on Step 4
+        if (step === 4 && (uploadingImage || uploadingVideo)) {
+            toast.error("Assets: Media is still uploading...");
             return;
         }
 
@@ -185,17 +187,22 @@ export default function ProductsPage() {
         if (!payload.innerSubId) payload.innerSubId = null;
 
         try {
+            setIsSaving(true);
             if (editingId) {
                 await updateProduct(editingId, payload);
                 toast.success("Masterpiece Refined");
+                setIsOpen(false);
+                loadData();
             } else {
                 await createProduct(payload);
                 toast.success("New Masterpiece Injected");
+                setIsOpen(false);
+                loadData();
             }
-            setIsOpen(false);
-            loadData();
         } catch (err) {
             toast.error(err.message || "Failed to save masterpiece. Check connection.");
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -330,45 +337,53 @@ export default function ProductsPage() {
             )}
 
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm overflow-y-auto pt-24 pb-10">
-                    <div className="bg-white max-w-5xl w-full rounded-[48px] p-6 lg:p-12 shadow-2xl relative my-auto">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm overflow-y-auto py-8">
+                    <div className="bg-white max-w-5xl w-full rounded-[40px] p-6 lg:p-10 shadow-2xl relative my-auto">
                         <button onClick={() => setIsOpen(false)} className="absolute top-8 right-8 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all z-10"><Icon icon="lucide:x" className="w-5 h-5" /></button>
 
-                        <div className="mb-10 block">
-                            <h2 className="text-4xl font-serif font-bold text-brand-primary">{editingId ? 'Modify' : 'Inject'} Masterpiece</h2>
-                            <div className="flex gap-2 mt-6">
-                                {[1, 2, 3, 4].map(s => (
-                                    <div key={s} className={`h-1.5 grow rounded-full transition-all duration-700 ${step >= s ? 'bg-brand-secondary shadow-[0_0_10px_rgba(var(--brand-secondary-rgb),0.3)]' : 'bg-gray-100'}`} />
-                                ))}
-                            </div>
-                            <div className="flex justify-between mt-3 text-[9px] uppercase tracking-[0.3em] font-black text-brand-primary/30">
-                                <span>Identity</span>
-                                <span>Economics</span>
-                                <span>Registry</span>
-                                <span>Assets</span>
+                        <div className="mb-6 block">
+                            <h2 className="text-3xl font-serif font-bold text-brand-primary">{editingId ? 'Update' : 'Add'} Product</h2>
+                            <div className="flex gap-4 mt-6">
+                                {['Identity', 'Economics', 'Registry', 'Assets'].map((label, i) => {
+                                    const s = i + 1;
+                                    return (
+                                        <button
+                                            key={label}
+                                            type="button"
+                                            disabled={!editingId}
+                                            onClick={() => setStep(s)}
+                                            className={`flex-1 group flex flex-col gap-4 text-left transition-all py-4 -my-4 outline-none ${editingId ? 'cursor-pointer' : 'cursor-default'}`}
+                                        >
+                                            <div className={`h-1.5 w-full rounded-full transition-all duration-700 ${step >= s ? 'bg-brand-secondary shadow-[0_0_10px_rgba(var(--brand-secondary-rgb),0.3)]' : 'bg-gray-100'} ${editingId ? 'group-hover:bg-brand-secondary/50 group-hover:scale-y-125' : ''}`} />
+                                            <span className={`text-[9px] uppercase tracking-[0.3em] font-black transition-all duration-300 ${step === s ? 'text-brand-primary' : 'text-brand-primary/30'} ${editingId ? 'group-hover:text-brand-primary' : ''}`}>
+                                                {label}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
 
-                        <div className="space-y-8">
+                        <div className="space-y-4">
                             {step === 1 && (
-                                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                                <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                     <div className="space-y-6">
-                                        <div className="p-10 bg-brand-accent/30 rounded-[40px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                        <div className="p-7 bg-brand-accent/30 rounded-[32px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
                                             <div className="flex items-center gap-3 mb-8">
                                                 <div className="w-10 h-10 bg-brand-primary/10 rounded-2xl flex items-center justify-center text-brand-primary">
-                                                    <Icon icon="solar:id-card-bold-duotone" className="w-5 h-5" />
+                                                    <Icon icon="fluent-mdl2:product" className="w-5 h-5" />
                                                 </div>
                                                 <h4 className="text-[11px] uppercase tracking-[0.2em] font-black text-brand-primary/60">Product Identifiers</h4>
                                             </div>
                                             <div className="space-y-6">
                                                 <div className="group">
                                                     <label className={`text-[10px] uppercase tracking-[0.2em] font-black block mb-2 ml-1 transition-colors ${errors.productId ? 'text-red-500' : 'text-brand-primary/40 group-focus-within:text-brand-primary'}`}>Product ID / SKU</label>
-                                                    <input type="text" value={form.productId} onChange={e => { setForm({ ...form, productId: e.target.value.toUpperCase() }); if(errors.productId) setErrors(prev => ({...prev, productId: null})); }} className={`w-full p-5 border rounded-[24px] bg-white font-serif font-bold text-lg transition-all outline-none shadow-inner ${errors.productId ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-primary/5 focus:border-brand-secondary/40 text-brand-primary'}`} placeholder="E.G. VG A-517" required />
+                                                    <input type="text" value={form.productId} onChange={e => { setForm({ ...form, productId: e.target.value.toUpperCase() }); if (errors.productId) setErrors(prev => ({ ...prev, productId: null })); }} className={`w-full p-5 border rounded-[24px] bg-white font-serif font-bold text-lg transition-all outline-none shadow-inner ${errors.productId ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-primary/5 focus:border-brand-secondary/40 text-brand-primary'}`} placeholder="E.G. VG A-517" required />
                                                     {errors.productId && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-2 ml-1">{errors.productId}</p>}
                                                 </div>
                                                 <div className="group">
                                                     <label className={`text-[10px] uppercase tracking-[0.2em] font-black block mb-2 ml-1 transition-colors ${errors.name ? 'text-red-500' : 'text-brand-primary/40 group-focus-within:text-brand-primary'}`}>Product Display Name</label>
-                                                    <input type="text" value={form.name} onChange={e => { setForm({ ...form, name: e.target.value, slug: slugify(e.target.value) }); if(errors.name) setErrors(prev => ({...prev, name: null})); }} className={`w-full p-5 border rounded-[24px] bg-white font-serif font-bold text-lg transition-all outline-none shadow-inner ${errors.name ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-primary/5 focus:border-brand-secondary/40 text-brand-primary'}`} placeholder="Enter Product Name" required />
+                                                    <input type="text" value={form.name} onChange={e => { setForm({ ...form, name: e.target.value, slug: slugify(e.target.value) }); if (errors.name) setErrors(prev => ({ ...prev, name: null })); }} className={`w-full p-5 border rounded-[24px] bg-white font-serif font-bold text-lg transition-all outline-none shadow-inner ${errors.name ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-primary/5 focus:border-brand-secondary/40 text-brand-primary'}`} placeholder="Enter Product Name" required />
                                                     {errors.name && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-2 ml-1">{errors.name}</p>}
                                                 </div>
                                             </div>
@@ -376,56 +391,56 @@ export default function ProductsPage() {
                                     </div>
 
                                     <div className="space-y-6">
-                                        <div className="p-10 bg-brand-accent/30 rounded-[40px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
-                                            <div className="flex items-center gap-3 mb-8">
+                                        <div className="p-7 bg-brand-accent/30 rounded-[32px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                            <div className="flex items-center gap-3 mb-6">
                                                 <div className="w-10 h-10 bg-brand-primary/10 rounded-2xl flex items-center justify-center text-brand-primary">
                                                     <Icon icon="solar:layers-bold-duotone" className="w-5 h-5" />
                                                 </div>
                                                 <h4 className="text-[11px] uppercase tracking-[0.2em] font-black text-brand-primary/60">Category Selection</h4>
                                             </div>
-                                                <div className="space-y-4">
-                                                    <div>
-                                                        <CustomSelect
-                                                            placeholder="1. Select Primary Category"
-                                                            options={cats.map(c => ({ value: c.id, label: c.name }))}
-                                                            value={form.categoryId}
-                                                            onChange={val => { setForm({ ...form, categoryId: val, subCategoryId: '', innerSubId: null }); if(errors.categoryId) setErrors(prev => ({...prev, categoryId: null})); }}
-                                                            isSearchable={true}
-                                                            className={`mb-2 ${errors.categoryId ? 'ring-2 ring-red-500 rounded-xl' : ''}`}
-                                                        />
-                                                        {errors.categoryId && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1 ml-1">{errors.categoryId}</p>}
-                                                    </div>
-                                                    <div>
-                                                        <CustomSelect
-                                                            placeholder="2. Select Luxury Sub-category"
-                                                            options={availableSubs.map(c => ({ value: c.id, label: c.name }))}
-                                                            value={form.subCategoryId}
-                                                            onChange={val => { setForm({ ...form, subCategoryId: val, innerSubId: null }); if(errors.subCategoryId) setErrors(prev => ({...prev, subCategoryId: null})); }}
-                                                            isSearchable={true}
-                                                            disabled={!form.categoryId}
-                                                            className={`mb-2 ${errors.subCategoryId ? 'ring-2 ring-red-500 rounded-xl' : ''}`}
-                                                        />
-                                                        {errors.subCategoryId && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1 ml-1">{errors.subCategoryId}</p>}
-                                                    </div>
+                                            <div className="space-y-4">
+                                                <div>
                                                     <CustomSelect
-                                                        placeholder="3. Select Divine Variant (Optional)"
-                                                        options={availableInners.map(c => ({ value: c.id, label: c.name }))}
-                                                        value={form.innerSubId || ""}
-                                                        onChange={val => setForm({ ...form, innerSubId: val })}
+                                                        placeholder="1. Select Primary Category"
+                                                        options={cats.map(c => ({ value: c.id, label: c.name }))}
+                                                        value={form.categoryId}
+                                                        onChange={val => { setForm({ ...form, categoryId: val, subCategoryId: '', innerSubId: null }); if (errors.categoryId) setErrors(prev => ({ ...prev, categoryId: null })); }}
                                                         isSearchable={true}
-                                                        disabled={!form.subCategoryId || availableInners.length === 0}
+                                                        className={`mb-2 ${errors.categoryId ? 'ring-2 ring-red-500 rounded-xl' : ''}`}
                                                     />
+                                                    {errors.categoryId && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1 ml-1">{errors.categoryId}</p>}
                                                 </div>
+                                                <div>
+                                                    <CustomSelect
+                                                        placeholder="2. Select Luxury Sub-category"
+                                                        options={availableSubs.map(c => ({ value: c.id, label: c.name }))}
+                                                        value={form.subCategoryId}
+                                                        onChange={val => { setForm({ ...form, subCategoryId: val, innerSubId: null }); if (errors.subCategoryId) setErrors(prev => ({ ...prev, subCategoryId: null })); }}
+                                                        isSearchable={true}
+                                                        disabled={!form.categoryId}
+                                                        className={`mb-2 ${errors.subCategoryId ? 'ring-2 ring-red-500 rounded-xl' : ''}`}
+                                                    />
+                                                    {errors.subCategoryId && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1 ml-1">{errors.subCategoryId}</p>}
+                                                </div>
+                                                <CustomSelect
+                                                    placeholder="3. Select Divine Variant (Optional)"
+                                                    options={availableInners.map(c => ({ value: c.id, label: c.name }))}
+                                                    value={form.innerSubId || ""}
+                                                    onChange={val => setForm({ ...form, innerSubId: val })}
+                                                    isSearchable={true}
+                                                    disabled={!form.subCategoryId || availableInners.length === 0}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </motion.div>
                             )}
 
                             {step === 2 && (
-                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                                <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                                     <div className="space-y-6">
-                                        <div className="bg-brand-accent/30 rounded-[40px] p-10 border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
-                                            <div className="flex items-center gap-4 mb-10">
+                                        <div className="bg-brand-accent/30 rounded-[32px] p-7 border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                            <div className="flex items-center gap-4 mb-8">
                                                 <div className="w-12 h-12 bg-brand-secondary/10 rounded-[20px] flex items-center justify-center shadow-inner">
                                                     <Icon icon="solar:wallet-money-bold-duotone" className="w-6 h-6 text-brand-secondary" />
                                                 </div>
@@ -435,13 +450,13 @@ export default function ProductsPage() {
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-8">
-                                                <div className="grid grid-cols-2 gap-6">
+                                            <div className="space-y-6">
+                                                <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-3">
                                                         <label className={`text-[10px] uppercase tracking-widest font-black ml-2 transition-colors ${errors.mrp ? 'text-red-500' : 'text-brand-primary/30'}`}>MRP</label>
                                                         <div className="relative group">
                                                             <span className={`absolute left-5 top-1/2 -translate-y-1/2 font-serif text-xl transition-colors ${errors.mrp ? 'text-red-400' : 'text-brand-primary/20'}`}>₹</span>
-                                                            <input type="number" min="0" onWheel={(e) => e.target.blur()} value={form.mrp} onChange={e => { setForm({ ...form, mrp: e.target.value }); if(errors.mrp) setErrors(prev => ({...prev, mrp: null})); }} className={`w-full p-5 pl-12 border rounded-[24px] bg-white font-serif font-black text-2xl transition-all outline-none shadow-inner ${errors.mrp ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-primary/5 focus:border-brand-secondary/40 text-brand-primary'}`} placeholder="0" required />
+                                                            <input type="number" min="0" onWheel={(e) => e.target.blur()} value={form.mrp} onChange={e => { setForm({ ...form, mrp: e.target.value }); if (errors.mrp) setErrors(prev => ({ ...prev, mrp: null })); }} className={`w-full p-5 pl-12 border rounded-[24px] bg-white font-serif font-black text-2xl transition-all outline-none shadow-inner ${errors.mrp ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-primary/5 focus:border-brand-secondary/40 text-brand-primary'}`} placeholder="0" required />
                                                         </div>
                                                         {errors.mrp && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1 ml-2">{errors.mrp}</p>}
                                                     </div>
@@ -449,13 +464,12 @@ export default function ProductsPage() {
                                                         <label className={`text-[10px] uppercase tracking-widest font-black ml-2 transition-colors ${errors.price ? 'text-red-500' : 'text-brand-secondary/60'}`}>Sale Price</label>
                                                         <div className="relative group">
                                                             <span className={`absolute left-5 top-1/2 -translate-y-1/2 font-serif text-xl transition-colors ${errors.price ? 'text-red-400' : 'text-brand-secondary/40'}`}>₹</span>
-                                                            <input type="number" min="0" onWheel={(e) => e.target.blur()} value={form.price} onChange={e => { setForm({ ...form, price: e.target.value }); if(errors.price) setErrors(prev => ({...prev, price: null})); }} className={`w-full p-5 pl-12 border rounded-[24px] font-serif font-black text-2xl transition-all outline-none shadow-inner ${errors.price ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-secondary/10 bg-brand-secondary/5 text-brand-secondary focus:border-brand-secondary/40'}`} placeholder="0" required />
+                                                            <input type="number" min="0" onWheel={(e) => e.target.blur()} value={form.price} onChange={e => { setForm({ ...form, price: e.target.value }); if (errors.price) setErrors(prev => ({ ...prev, price: null })); }} className={`w-full p-5 pl-12 border rounded-[24px] font-serif font-black text-2xl transition-all outline-none shadow-inner ${errors.price ? 'border-red-500 focus:border-red-600 bg-red-50/10' : 'border-brand-secondary/10 bg-brand-secondary/5 text-brand-secondary focus:border-brand-secondary/40'}`} placeholder="0" required />
                                                         </div>
                                                         {errors.price && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1 ml-2">{errors.price}</p>}
                                                     </div>
                                                 </div>
-
-                                                <div className={`p-8 rounded-[32px] border transition-all duration-700 ${form.isOfferProduct ? 'bg-white border-brand-primary/20 shadow-xl' : 'bg-brand-primary/5 border-transparent'}`}>
+                                                <div className={`p-6 rounded-[28px] border transition-all duration-700 ${form.isOfferProduct ? 'bg-white border-brand-primary/20 shadow-xl' : 'bg-brand-primary/5 border-transparent'}`}>
                                                     <label className="flex items-center justify-between cursor-pointer">
                                                         <div className="flex items-center gap-4">
                                                             <div className={`w-12 h-12 rounded-[18px] flex items-center justify-center transition-all ${form.isOfferProduct ? 'bg-brand-primary text-white shadow-lg' : 'bg-brand-primary/10 text-brand-primary'}`}>
@@ -467,8 +481,8 @@ export default function ProductsPage() {
                                                         <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-[28px] after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-primary relative"></div>
                                                     </label>
                                                     {form.isOfferProduct && (
-                                                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-8 pt-8 border-t border-brand-primary/5">
-                                                            <div className="flex items-center  gap-4">
+                                                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-6 pt-6 border-t border-brand-primary/5">
+                                                            <div className="flex items-center gap-4">
                                                                 <div className="flex-1">
                                                                     <label className={`text-[10px] uppercase tracking-widest font-black block mb-2 px-1 transition-colors ${errors.discountPercent ? 'text-red-500' : 'text-brand-primary/40'}`}>Discount (%)</label>
                                                                     <div className="relative">
@@ -483,7 +497,7 @@ export default function ProductsPage() {
                                                                                 if (val > 100) val = 100;
                                                                                 if (val < 0) val = 0;
                                                                                 setForm({ ...form, discountPercent: val });
-                                                                                if(errors.discountPercent) setErrors(prev => ({...prev, discountPercent: null}));
+                                                                                if (errors.discountPercent) setErrors(prev => ({ ...prev, discountPercent: null }));
                                                                             }}
                                                                             className={`w-full p-5 border rounded-[24px] bg-brand-primary/5 font-serif font-black text-2xl transition-all outline-none ${errors.discountPercent ? 'border-red-500 focus:border-red-600 bg-red-50/10 text-red-500' : 'border-brand-primary/10 text-brand-primary focus:border-brand-primary/40'}`}
                                                                             placeholder="0"
@@ -492,7 +506,7 @@ export default function ProductsPage() {
                                                                     </div>
                                                                     {errors.discountPercent && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-2 px-1">{errors.discountPercent}</p>}
                                                                 </div>
-                                                                <div className="  flex flex-col items-center justify-center mt-5">
+                                                                <div className="flex flex-col items-center justify-center mt-5">
                                                                     <span className="text-[8px] font-black uppercase text-brand-primary/30 mb-1">Price</span>
                                                                     <span className="font-serif font-black text-xl text-brand-primary">₹{roundToTwo(form.price * (1 - form.discountPercent / 100)).toFixed(2)}</span>
                                                                 </div>
@@ -501,8 +515,8 @@ export default function ProductsPage() {
                                                     )}
                                                 </div>
 
-                                                <div className={`p-8 rounded-[32px] border transition-all duration-700 bg-brand-primary/5 border-transparent`}>
-                                                    <label className="text-[10px] uppercase tracking-widest font-black text-brand-primary/40 block mb-4 ml-1">Accept Order In</label>
+                                                <div className={`p-6 rounded-[28px] border transition-all duration-700 bg-brand-primary/5 border-transparent`}>
+                                                    <label className="text-[10px] uppercase tracking-widest font-black text-brand-primary/40 block mb-3 ml-1">Accept Order In</label>
                                                     <div className="flex gap-4">
                                                         {["PIECE", "DOZEN"].map((u) => (
                                                             <button
@@ -520,9 +534,9 @@ export default function ProductsPage() {
                                         </div>
                                     </div>
 
-                                    {/* Column 2: Variants */}
+                                    {/* Column 2 */}
                                     <div className="space-y-6 h-full flex flex-col">
-                                        <div className="bg-white rounded-[32px] p-8 border border-brand-primary/10 shadow-[0_20px_50_rgba(0,0,0,0.03)] h-full flex flex-col gap-5">
+                                        <div className="bg-white rounded-[32px] p-7 border border-brand-primary/10 shadow-[0_20px_50_rgba(0,0,0,0.03)] h-full flex flex-col gap-4">
                                             <div className="flex items-center justify-between gap-4">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 bg-brand-primary/5 rounded-2xl flex items-center justify-center text-brand-primary shadow-sm">
@@ -537,7 +551,7 @@ export default function ProductsPage() {
                                                     <button type="button" onClick={() => setForm({ ...form, variants: [...form.variants, { id: Math.random().toString(36).substr(2, 9), name: "", price: "" }] })} className="w-10 h-10 bg-brand-primary text-white rounded-[12px] flex items-center justify-center transition-all active:scale-90 shadow-lg shadow-brand-primary/20"><Icon icon="lucide:plus" className="w-5 h-5" /></button>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-wrap gap-2">
+                                            <div className="flex flex-wrap gap-1.5 ml-2">
                                                 <button
                                                     type="button"
                                                     title="LADDU GOPAL"
@@ -548,7 +562,7 @@ export default function ProductsPage() {
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
                                                 >
-                                                    LG
+                                                    VG
                                                 </button>
 
                                                 <button
@@ -609,7 +623,7 @@ export default function ProductsPage() {
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
                                                 >
-                                                    Khesh
+                                                    FT
                                                 </button>
                                                 <button
                                                     type="button"
@@ -657,7 +671,7 @@ export default function ProductsPage() {
                                                     }}
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
                                                 >
-                                                    HANJUMANJI
+                                                    HM
                                                 </button>
                                                 <button
                                                     type="button"
@@ -790,9 +804,9 @@ export default function ProductsPage() {
                             )}
 
                             {step === 3 && (
-                                <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-                                    <div className="p-10 bg-brand-accent/30 rounded-[40px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)] h-full">
-                                        <div className="flex items-center gap-4 mb-10">
+                                <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                                    <div className="p-7 bg-brand-accent/30 rounded-[32px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)] h-full">
+                                        <div className="flex items-center gap-4 mb-8">
                                             <div className="w-12 h-12 bg-white rounded-[20px] shadow-sm flex items-center justify-center text-brand-primary">
                                                 <Icon icon="solar:eye-bold-duotone" className="w-6 h-6" />
                                             </div>
@@ -801,56 +815,54 @@ export default function ProductsPage() {
                                                 <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest mt-0.5">Visibility Logic</p>
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4 mb-8">
+                                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
                                             {[
                                                 { id: 'isBestSeller', label: 'Best Seller', icon: 'solar:star-bold', color: 'text-yellow-500' },
                                                 { id: 'isReadyStock', label: 'Ready Stock', icon: 'solar:box-bold', color: 'text-brand-secondary' },
                                                 { id: 'showWashCare', label: 'Wash Care', icon: 'ic:twotone-wash', color: 'text-emerald-500' }
                                             ].map((item) => (
-                                                <label key={item.id} className={`flex flex-col gap-4 p-6 rounded-[32px] cursor-pointer border transition-all duration-500 ${form[item.id] ? 'bg-brand-primary/90 border-transparent hover:bg-brand-primary' : 'bg-white border-brand-primary/20'}`}>
+                                                <label key={item.id} className={`flex flex-col gap-3 p-4 rounded-[24px] cursor-pointer border transition-all duration-500 ${form[item.id] ? 'bg-brand-primary/90 border-transparent hover:bg-brand-primary' : 'bg-white border-brand-primary/20'}`}>
                                                     <div className="flex justify-between items-start">
-                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${form[item.id] ? 'bg-white' : 'bg-white/50'}`}>
-                                                            <Icon icon={item.icon} className={`w-5 h-5 ${form[item.id] ? item.color : 'text-brand-primary'}`} />
+                                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${form[item.id] ? 'bg-white' : 'bg-white/50'}`}>
+                                                            <Icon icon={item.icon} className={`w-4 h-4 ${form[item.id] ? item.color : 'text-brand-primary'}`} />
                                                         </div>
                                                         <input type="checkbox" checked={form[item.id]} onChange={e => setForm({ ...form, [item.id]: e.target.checked })} className="sr-only" />
-                                                        <div className={`w-4 h-4 rounded-full border-2 transition-all ${form[item.id] ? 'bg-white border-brand-primary' : 'border-brand-primary/10'}`} />
+                                                        <div className={`w-3.5 h-3.5 rounded-full border-2 transition-all ${form[item.id] ? 'bg-white border-brand-primary' : 'border-brand-primary/10'}`} />
                                                     </div>
-                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${form[item.id] ? 'text-white' : 'text-brand-primary/70'}`}>{item.label}</span>
+                                                    <span className={`text-[9px] font-black uppercase tracking-widest ${form[item.id] ? 'text-white' : 'text-brand-primary/70'}`}>{item.label}</span>
                                                 </label>
                                             ))}
-                                        </div>
 
-                                        <div className="space-y-4">
-                                            <div className={`p-8 rounded-[32px] border transition-all duration-700 ${form.isVisible ? 'bg-blue-500/5 border-blue-500/20 shadow-xl shadow-blue-500/5' : 'bg-brand-primary/5 border-transparent'}`}>
+                                            <div className="col-span-2 lg:col-span-3 p-5 rounded-[24px] border transition-all duration-700 mt-2 bg-brand-primary/5 border-transparent">
                                                 <label className="flex items-center justify-between cursor-pointer">
                                                     <div className="flex items-center gap-4">
-                                                        <div className={`w-12 h-12 rounded-[18px] flex items-center justify-center transition-all ${form.isVisible ? 'bg-blue-500 text-white shadow-lg' : 'bg-brand-primary/10 text-brand-primary'}`}>
-                                                            <Icon icon="solar:eye-bold" className="w-6 h-6" />
+                                                        <div className={`w-10 h-10 rounded-[15px] flex items-center justify-center transition-all ${form.isVisible ? 'bg-blue-500 text-white shadow-lg' : 'bg-brand-primary/10 text-brand-primary'}`}>
+                                                            <Icon icon="solar:eye-bold" className="w-5 h-5" />
                                                         </div>
-                                                        <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${form.isVisible ? 'text-blue-700' : 'text-brand-primary/30'}`}>Show on Website</span>
+                                                        <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${form.isVisible ? 'text-blue-700' : 'text-brand-primary/30'}`}>Show on Website</span>
                                                     </div>
                                                     <input type="checkbox" checked={form.isVisible} onChange={e => setForm({ ...form, isVisible: e.target.checked })} className="sr-only peer" />
-                                                    <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-[28px] after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500 relative"></div>
+                                                    <div className="w-12 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-[24px] after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500 relative"></div>
                                                 </label>
                                             </div>
 
-                                            <div className={`p-8 rounded-[32px] border transition-all duration-700 ${form.allowToBuy ? 'bg-emerald-500/5 border-emerald-500/20 shadow-xl shadow-emerald-500/5' : 'bg-brand-primary/5 border-transparent'}`}>
+                                            <div className="col-span-2 lg:col-span-3 p-5 rounded-[24px] border transition-all duration-700 bg-brand-primary/5 border-transparent">
                                                 <label className="flex items-center justify-between cursor-pointer">
                                                     <div className="flex items-center gap-4">
-                                                        <div className={`w-12 h-12 rounded-[18px] flex items-center justify-center transition-all ${form.allowToBuy ? 'bg-emerald-500 text-white shadow-lg' : 'bg-brand-primary/10 text-brand-primary'}`}>
-                                                            <Icon icon="solar:cart-large-bold" className="w-6 h-6" />
+                                                        <div className={`w-10 h-10 rounded-[15px] flex items-center justify-center transition-all ${form.allowToBuy ? 'bg-emerald-500 text-white shadow-lg' : 'bg-brand-primary/10 text-brand-primary'}`}>
+                                                            <Icon icon="solar:cart-large-bold" className="w-5 h-5" />
                                                         </div>
-                                                        <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${form.allowToBuy ? 'text-emerald-700' : 'text-brand-primary/30'}`}>Allow to Buy</span>
+                                                        <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${form.allowToBuy ? 'text-emerald-700' : 'text-brand-primary/30'}`}>Allow to Buy</span>
                                                     </div>
                                                     <input type="checkbox" checked={form.allowToBuy} onChange={e => setForm({ ...form, allowToBuy: e.target.checked })} className="sr-only peer" />
-                                                    <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-[28px] after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 relative"></div>
+                                                    <div className="w-12 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-[24px] after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 relative"></div>
                                                 </label>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="p-10 bg-brand-accent/30 rounded-[40px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
-                                        <div className="flex items-center gap-4 mb-10">
+                                    <div className="p-7 bg-brand-accent/30 rounded-[32px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                        <div className="flex items-center gap-4 mb-8">
                                             <div className="w-12 h-12 bg-white rounded-[20px] shadow-sm flex items-center justify-center text-brand-primary">
                                                 <Icon icon="solar:medal-star-bold-duotone" className="w-6 h-6" />
                                             </div>
@@ -859,14 +871,14 @@ export default function ProductsPage() {
                                                 <p className="text-[8px] text-brand-primary/40 uppercase font-black tracking-widest mt-0.5">Specifications Registry</p>
                                             </div>
                                         </div>
-                                        <div className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-3">
                                             {["Fabric", "Embroidery", "Work", "Included"].map((label) => {
                                                 const detail = form.details.find(d => d.label === label);
                                                 return (
-                                                    <div key={label} className="group bg-white p-5 rounded-[24px] border border-brand-primary/5 transition-all focus-within:border-brand-secondary/40">
-                                                        <div className="flex items-center gap-2 mb-2">
-                                                            <div className="w-1.5 h-1.5 rounded-full bg-brand-secondary/40" />
-                                                            <span className="text-[9px] font-black uppercase tracking-widest text-brand-primary/30 group-focus-within:text-brand-secondary transition-colors">{label} Composition</span>
+                                                    <div key={label} className="group bg-white p-4 rounded-[20px] border border-brand-primary/5 transition-all focus-within:border-brand-secondary/40">
+                                                        <div className="flex items-center gap-2 mb-1.5">
+                                                            <div className="w-1 h-1 rounded-full bg-brand-secondary/40" />
+                                                            <span className="text-[8px] font-black uppercase tracking-widest text-brand-primary/30 group-focus-within:text-brand-secondary transition-colors">{label}</span>
                                                         </div>
                                                         <input
                                                             type="text"
@@ -883,8 +895,8 @@ export default function ProductsPage() {
                                                                 }
                                                                 setForm({ ...form, details: newDetails });
                                                             }}
-                                                            placeholder={`Define the ${label} quality...`}
-                                                            className="w-full bg-transparent border-none text-[13px] font-bold text-brand-primary outline-none placeholder:text-brand-primary/10"
+                                                            placeholder={`Define ${label}...`}
+                                                            className="w-full bg-transparent border-none outline-none p-0 font-serif font-bold text-sm text-brand-primary placeholder:text-brand-primary/10"
                                                         />
                                                     </div>
                                                 );
@@ -895,10 +907,10 @@ export default function ProductsPage() {
                             )}
 
                             {step === 4 && (
-                                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                                <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                                     <div className="lg:col-span-5 space-y-6">
-                                        <div className="p-10 bg-brand-accent/30 rounded-[40px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
-                                            <div className="flex items-center gap-4 mb-10">
+                                        <div className="p-7 bg-brand-accent/30 rounded-[32px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)]">
+                                            <div className="flex items-center gap-4 mb-8">
                                                 <div className="w-12 h-12 bg-white rounded-[20px] shadow-sm flex items-center justify-center text-brand-primary">
                                                     <Icon icon="solar:document-text-bold-duotone" className="w-6 h-6" />
                                                 </div>
@@ -922,9 +934,7 @@ export default function ProductsPage() {
                                     </div>
 
                                     <div className="lg:col-span-7 space-y-6">
-                                        <div className="p-8 bg-white rounded-[40px] border border-brand-primary/10 shadow-xl overflow-hidden relative group/payload">
-                                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-primary/20 via-brand-secondary/20 to-brand-primary/20 opacity-50" />
-
+                                        <div className="p-8 bg-white rounded-[40px] border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.07)] overflow-hidden relative group/payload">
                                             <div className="flex items-center justify-between mb-8">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 bg-brand-primary/5 rounded-[20px] flex items-center justify-center text-brand-primary shadow-inner">
@@ -940,24 +950,24 @@ export default function ProductsPage() {
                                             <div className="space-y-8">
                                                 <div>
                                                     <span className="text-[8px] font-black uppercase tracking-[0.3em] text-brand-primary/20 mb-4 block underline underline-offset-8">Imagery Gallary</span>
-                                                        <div
-                                                            onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
-                                                            onDragLeave={() => setIsDraggingImage(false)}
-                                                            onDrop={(e) => { e.preventDefault(); setIsDraggingImage(false); handleUpload(null, 'image', Array.from(e.dataTransfer.files)); }}
-                                                            className={`grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 p-4 rounded-3xl border-2 border-dashed transition-all ${isDraggingImage ? 'border-brand-secondary bg-brand-secondary/5 scale-[1.02]' : errors.images ? 'border-red-500 bg-red-50/10' : 'border-gray-100 hover:border-brand-primary/20'}`}
-                                                        >
-                                                            {form.images.map((img, i) => (
-                                                                <div key={i} className="aspect-[3/4] rounded-2xl overflow-hidden border border-black/5 relative group shadow-sm transition-transform hover:scale-105">
-                                                                    <img src={img} className="w-full h-full object-cover" />
-                                                                    <button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="solar:trash-bin-trash-bold" className="text-white w-6 h-6" /></button>
-                                                                </div>
-                                                            ))}
-                                                            <div className={`aspect-[3/4] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingImage ? 'border-brand-secondary' : errors.images ? 'border-red-400 bg-red-50/20' : 'border-gray-200'}`}>
-                                                                {uploadingImage ? <Icon icon="line-md:loading-loop" className="text-brand-secondary w-8 h-8" /> : <><Icon icon="solar:camera-add-bold-duotone" className={`w-8 h-8 ${isDraggingImage ? 'text-brand-secondary' : errors.images ? 'text-red-400' : 'text-gray-300'}`} /><span className={`text-[7px] font-black uppercase mt-2 ${errors.images ? 'text-red-400' : 'text-gray-400'}`}>Capture Image</span></>}
-                                                                <input type="file" multiple disabled={uploadingImage} onChange={(e) => { handleUpload(e, 'image'); if(errors.images) setErrors(prev => ({...prev, images: null})); }} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                                                    <div
+                                                        onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
+                                                        onDragLeave={() => setIsDraggingImage(false)}
+                                                        onDrop={(e) => { e.preventDefault(); setIsDraggingImage(false); handleUpload(null, 'image', Array.from(e.dataTransfer.files)); }}
+                                                        className={`grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 p-4 rounded-3xl border-2 border-dashed transition-all ${isDraggingImage ? 'border-brand-secondary bg-brand-secondary/5 scale-[1.02]' : errors.images ? 'border-red-500 bg-red-50/10' : 'border-gray-100 hover:border-brand-primary/20'}`}
+                                                    >
+                                                        {form.images.map((img, i) => (
+                                                            <div key={i} className="aspect-[3/4] rounded-2xl overflow-hidden border border-black/5 relative group shadow-sm transition-transform hover:scale-105">
+                                                                <img src={img} className="w-full h-full object-cover" />
+                                                                <button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="solar:trash-bin-trash-bold" className="text-white w-6 h-6" /></button>
                                                             </div>
+                                                        ))}
+                                                        <div className={`aspect-[3/4] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingImage ? 'border-brand-secondary' : errors.images ? 'border-red-400 bg-red-50/20' : 'border-gray-200'}`}>
+                                                            {uploadingImage ? <Icon icon="line-md:loading-loop" className="text-brand-secondary w-8 h-8" /> : <><Icon icon="solar:camera-add-bold-duotone" className={`w-8 h-8 ${isDraggingImage ? 'text-brand-secondary' : errors.images ? 'text-red-400' : 'text-gray-300'}`} /><span className={`text-[7px] font-black uppercase mt-2 ${errors.images ? 'text-red-400' : 'text-gray-400'}`}>Capture Image</span></>}
+                                                            <input type="file" multiple disabled={uploadingImage} onChange={(e) => { handleUpload(e, 'image'); if (errors.images) setErrors(prev => ({ ...prev, images: null })); }} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
                                                         </div>
-                                                        {errors.images && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-2 ml-1">{errors.images}</p>}
+                                                    </div>
+                                                    {errors.images && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-2 ml-1">{errors.images}</p>}
                                                 </div>
 
                                                 <div>
@@ -987,22 +997,32 @@ export default function ProductsPage() {
                             )}
 
                             <div className="pt-10 border-t border-brand-primary/5 flex justify-between items-center mt-auto">
-                                <button type="button" onClick={() => setIsOpen(false)} className="px-8 py-5 rounded-[24px] text-[11px] font-black uppercase tracking-[0.2em] text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100">Terminate Protocol</button>
+                                <button type="button" onClick={() => setIsOpen(false)} className="px-8 py-5 rounded-[24px] text-[11px] font-black uppercase tracking-[0.2em] text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100">Cancel</button>
 
                                 <div className="flex gap-4">
                                     {step > 1 && (
-                                        <button type="button" onClick={() => { setStep(s => s - 1); setErrors({}); }} className="px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-gray-100 hover:bg-gray-200 transition-all text-[11px] flex items-center gap-3 text-brand-primary/60"> <Icon icon="lucide:arrow-left" className="w-5 h-5" /> Previous Stage</button>
+                                        <button type="button" onClick={() => { setStep(s => s - 1); setErrors({}); }} className="px-8 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-gray-100 hover:bg-gray-200 transition-all text-[11px] flex items-center gap-3 text-brand-primary/60"> <Icon icon="lucide:arrow-left" className="w-5 h-5" /> {editingId ? 'Previous' : 'Previous Stage'}</button>
                                     )}
 
                                     {step < 4 ? (
-                                        <button type="button" onClick={handleSubmit} className="px-14 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/20 text-[11px] flex items-center gap-3">
-                                            Proceed <Icon icon="lucide:arrow-right" className="w-5 h-5" />
+                                        <button type="button" onClick={editingId ? (() => setStep(s => s + 1)) : handleSubmit} className={`py-5 rounded-[24px] font-black uppercase tracking-[0.2em] transition-all text-[11px] flex items-center gap-3 ${editingId ? 'px-8 bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/20' : 'px-14 bg-brand-primary text-white hover:bg-brand-secondary shadow-lg shadow-brand-primary/20'}`}>
+                                            {editingId ? 'Next Section' : 'Proceed'} <Icon icon="lucide:arrow-right" className="w-5 h-5" />
                                         </button>
                                     ) : (
-                                        <button type="button" onClick={handleSubmit} disabled={uploadingImage || uploadingVideo} className="px-20 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/30 text-[11px] flex items-center gap-3">
-                                            <Icon icon="lucide:save" className="w-5 h-5" /> Save Product
+                                        !editingId && (
+                                            <button type="button" onClick={handleSubmit} disabled={uploadingImage || uploadingVideo || isSaving} className="px-20 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/30 text-[11px] flex items-center gap-3">
+                                                {isSaving ? <Icon icon="line-md:loading-loop" className="w-5 h-5" /> : <Icon icon="lucide:save" className="w-5 h-5" />}
+                                                {isSaving ? 'Saving...' : 'Save Product'}
+                                            </button>
+                                        )
+                                    )}
+                                    {editingId && (
+                                        <button type="button" onClick={handleSubmit} disabled={uploadingImage || uploadingVideo || isSaving} className="px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl shadow-brand-primary/10 text-[11px] flex items-center gap-3">
+                                            {isSaving ? <Icon icon="line-md:loading-loop" className="w-5 h-5" /> : <Icon icon="lucide:save" className="w-5 h-5" />}
+                                            {isSaving ? 'Saving...' : 'Save'}
                                         </button>
                                     )}
+
                                 </div>
                             </div>
                         </div>
