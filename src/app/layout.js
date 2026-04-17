@@ -4,6 +4,7 @@ import Providers from "@/components/Providers";
 import siteConfig from "@/config/site";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import GlobalCartSummary from "@/components/GlobalCartSummary";
 import { Toaster } from "react-hot-toast";
 
 
@@ -129,6 +130,7 @@ export default function RootLayout({ children }) {
         />
         <Providers>
           <Header />
+          <GlobalCartSummary />
           {children}
           <Footer />
           <Toaster 

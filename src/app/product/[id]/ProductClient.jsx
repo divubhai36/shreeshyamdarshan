@@ -12,7 +12,7 @@ import { toast } from "react-hot-toast";
 import { roundToTwo } from "@/lib/utils";
 
 export default function ProductClient({ product, navCategory, subCategory, innerSubCategory, relatedProducts }) {
-  const { addToCart, addMultipleToCart, toggleSave, isProductSaved, isAuthenticated } = useCart();
+  const { cart, addToCart, addMultipleToCart, removeFromCart, toggleSave, isProductSaved, isAuthenticated } = useCart();
   const saved = isProductSaved(product.id);
 
   // State Management
@@ -22,60 +22,75 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [variantQuantities, setVariantQuantities] = useState({}); // { variantName: quantity }
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [product.id]);
 
-  // Handle single product quantity (if no variants)
+  // Handle initial variant quantities from cart
   useEffect(() => {
+    const unitMultiplier = product.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
+
     if (!product.variants || product.variants.length === 0) {
-      setVariantQuantities({ [product.name]: 0 });
+      const vNameInCart = null;
+      const existing = cart.find(item => item.id === product.id && item.variantName === vNameInCart);
+      setVariantQuantities({ [product.name]: existing ? (existing.quantity / unitMultiplier) : 0 });
     } else {
       const initial = {};
-      product.variants.forEach(v => initial[v.name] = 0);
+      product.variants.forEach(v => {
+        const existing = cart.find(item => item.id === product.id && item.variantName === v.name);
+        initial[v.name] = existing ? (existing.quantity / unitMultiplier) : 0;
+      });
       setVariantQuantities(initial);
     }
-  }, [product]);
+  }, [product, cart]);
 
   const handleAddToCartConfirm = () => {
     const unitMultiplier = product.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
-    const itemsToAdd = [];
+    let changeDetected = false;
 
     Object.entries(variantQuantities).forEach(([vName, qty]) => {
       const numQty = parseInt(qty) || 0;
-      if (numQty > 0) {
-        const actualQty = numQty * unitMultiplier;
-        const basePrice = product.isOfferProduct ? product.offerPrice : product.price;
+      const actualNewQty = numQty * unitMultiplier;
 
-        // Find variant price if it exists
+      const vNameInCart = vName === product.name ? null : vName;
+      const existingInCart = cart.find(item => item.id === product.id && item.variantName === vNameInCart);
+      const existingQty = existingInCart ? existingInCart.quantity : 0;
+
+      const diff = actualNewQty - existingQty;
+
+      if (diff !== 0) {
+        changeDetected = true;
+        // Find prices
+        const basePrice = product.isOfferProduct ? product.offerPrice : product.price;
         const variantObj = product.variants?.find(v => v.name === vName);
         const rawItemPrice = variantObj ? variantObj.price : basePrice;
 
-        // Apply discount to variant price if offer product
         const finalItemPrice = product.isOfferProduct
           ? roundToTwo(rawItemPrice * (1 - (product.discountPercent || 0) / 100))
           : roundToTwo(rawItemPrice);
 
-        itemsToAdd.push({
-          product,
-          quantity: actualQty,
-          variantName: vName === product.name ? null : vName,
-          variantPrice: finalItemPrice,
-          originalPrice: variantObj?.price || product.price
-        });
+        const originalPrice = variantObj?.price || product.price;
+
+        if (actualNewQty <= 0) {
+          if (existingInCart) removeFromCart(product.id, vNameInCart);
+        } else {
+          // addToCart in CartContext handles existing items by addition
+          // So we pass the DIFF to adjust to the new total.
+          addToCart(product, diff, vNameInCart, finalItemPrice, originalPrice);
+        }
       }
     });
 
-    if (itemsToAdd.length > 0) {
-      addMultipleToCart(itemsToAdd);
-      toast.success(`${itemsToAdd.length} items added to cart successfully`);
-      setIsCartModalOpen(false);
-      // Reset quantities
-      const reset = {};
-      Object.keys(variantQuantities).forEach(k => reset[k] = 0);
-      setVariantQuantities(reset);
+    if (changeDetected) {
+      toast.success(`Cart updated successfully`);
     }
+    setIsCartModalOpen(false);
   };
 
 
@@ -96,17 +111,16 @@ export default function ProductClient({ product, navCategory, subCategory, inner
     dots: false,
     infinite: true,
     speed: 1000,
-    slidesToShow: 4,
+    mobileFirst: true,
+    slidesToShow: 2,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
     arrows: false,
     pauseOnHover: true,
     responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: 3.5 } },
-      { breakpoint: 1024, settings: { slidesToShow: 3 } },
-      { breakpoint: 768, settings: { slidesToShow: 2 } },
-      { breakpoint: 480, settings: { slidesToShow: 2 } },
+      { breakpoint: 768, settings: { slidesToShow: 3 } },
+      { breakpoint: 1024, settings: { slidesToShow: 4 } },
     ],
   };
 
@@ -629,59 +643,45 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                 </div>
 
                 <div className="story-slider-wrapper relative -mx-4 group">
-                  <Slider
-                    {...{
-                      dots: false,
-                      infinite: true,
-                      speed: 800,
-                      slidesToScroll: 1,
-                      autoplay: true,
-                      autoplaySpeed: 3000,
-                      arrows: false,
-
-                      // Desktop first
-                      slidesToShow: 5,
-
-                      responsive: [
+                  {isMounted && (
+                    <Slider
+                      dots={false}
+                      infinite={true}
+                      speed={800}
+                      slidesToScroll={1}
+                      autoplay={true}
+                      autoplaySpeed={3000}
+                      arrows={false}
+                      mobileFirst={true}
+                      slidesToShow={3}
+                      responsive={[
                         {
-                          breakpoint: 1280, // below 1280px
+                          breakpoint: 1024,
                           settings: {
                             slidesToShow: 4,
                           },
                         },
                         {
-                          breakpoint: 1024, // below 1024px
+                          breakpoint: 1280,
                           settings: {
-                            slidesToShow: 3,
+                            slidesToShow: 5,
                           },
                         },
-                        {
-                          breakpoint: 768, // below 768px
-                          settings: {
-                            slidesToShow: 2.5,
-                          },
-                        },
-                        {
-                          breakpoint: 480, // small mobile
-                          settings: {
-                            slidesToShow: 2.2,
-                          },
-                        },
-                      ],
-                    }}
-                    className="story-slider"
-                  >
-                    {[{ url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244607/lv_0_20250325174749_cdcicc.mp4", title: "Handwork" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244604/lv_0_20250426151713_exrd5i.mp4", title: "Fabric Shine" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244599/lv_0_20250411143949_iwsj9d.mp4" },].map((video, idx) => (
-                      <div key={idx} className="px-2 md:px-4 py-8 pb-10">
-                        <motion.div whileHover={{ y: -10 }} onClick={() => setActiveVideo(video.url)} className="group relative aspect-9/16 overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5">
-                          <video src={video.url} autoPlay muted loop playsInline className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                          <div className="absolute inset-0 bg-linear-to-t from-brand-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
-                            <h3 className="text-xl lg:text-xl font-serif text-white">Watch Story</h3>
-                          </div>
-                        </motion.div>
-                      </div>
-                    ))}
-                  </Slider>
+                      ]}
+                      className="story-slider"
+                    >
+                      {[{ url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244607/lv_0_20250325174749_cdcicc.mp4", title: "Handwork" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244604/lv_0_20250426151713_exrd5i.mp4", title: "Fabric Shine" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244599/lv_0_20250411143949_iwsj9d.mp4" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244607/lv_0_20250325174749_cdcicc.mp4", title: "Handwork" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244604/lv_0_20250426151713_exrd5i.mp4", title: "Fabric Shine" },].map((video, idx) => (
+                        <div key={idx} className="px-2 md:px-4 py-8 pb-10">
+                          <motion.div whileHover={{ y: -10 }} onClick={() => setActiveVideo(video.url)} className="group relative aspect-9/16 overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5">
+                            <video src={video.url} autoPlay muted loop playsInline className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                            <div className="absolute inset-0 bg-linear-to-t from-brand-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
+                              <h3 className="text-xl lg:text-xl font-serif text-white">Watch Story</h3>
+                            </div>
+                          </motion.div>
+                        </div>
+                      ))}
+                    </Slider>
+                  )}
                 </div>
               </div>
             </section>
@@ -693,23 +693,25 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   <h2 className="text-2xl lg:text-4xl font-serif font-bold text-brand-primary uppercase">Elite <span className="italic font-normal">Masterpieces</span></h2>
                 </div>
                 <div className="related-products-slider -mx-4">
-                  <Slider {...relatedSliderSettings}>
-                    {relatedProducts.map((p) => (
-                      <div key={p.id} className="px-2 md:px-4 pb-8 lg:pb-16 pt-6">
-                        <Link href={`/product/${p.id}`} className="block group">
-                          <div className="relative aspect-square rounded-[24px] lg:rounded-[32px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 bg-white border border-brand-primary/5">
-                            <Image src={p.image} alt={p.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover transition-transform duration-1000 group-hover:scale-110" />
-                            <div className="absolute bottom-4 left-4 right-4 z-10 transition-all duration-1000">
-                              <div className="bg-white/95 backdrop-blur-md p-4 lg:p-5 rounded-3xl border border-white/20 shadow-xl group-hover:bg-white/10 group-hover:text-white">
-                                <p className="text-[11px] lg:text-xs font-serif font-bold truncate">{p.name}</p>
-                                <p className="text-[10px] lg:text-[11px] font-bold text-brand-secondary mt-1 group-hover:text-white">₹{p.price}</p>
+                  {isMounted && (
+                    <Slider {...relatedSliderSettings}>
+                      {relatedProducts.map((p) => (
+                        <div key={p.id} className="px-2 md:px-4 pb-8 lg:pb-16 pt-6">
+                          <Link href={`/product/${p.id}`} className="block group">
+                            <div className="relative aspect-square rounded-[24px] lg:rounded-[32px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 bg-white border border-brand-primary/5">
+                              <Image src={p.image} alt={p.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover transition-transform duration-1000 group-hover:scale-110" />
+                              <div className="absolute bottom-4 left-4 right-4 z-10 transition-all duration-1000">
+                                <div className="bg-white/95 backdrop-blur-md p-4 lg:p-5 rounded-3xl border border-white/20 shadow-xl group-hover:bg-white/10 group-hover:text-white">
+                                  <p className="text-[11px] lg:text-xs font-serif font-bold truncate">{p.name}</p>
+                                  <p className="text-[10px] lg:text-[11px] font-bold text-brand-secondary mt-1 group-hover:text-white">₹{p.price}</p>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </Link>
-                      </div>
-                    ))}
-                  </Slider>
+                          </Link>
+                        </div>
+                      ))}
+                    </Slider>
+                  )}
                 </div>
               </div>
             )}
@@ -741,27 +743,27 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                className="bg-white w-full max-w-2xl rounded-[40px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+                className="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
               >
                 {/* Modal Header */}
-                <div className="p-8 pb-4 border-b border-brand-primary/5 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-serif font-bold text-brand-primary">Select Quantities</h3>
-                    <p className="text-[10px] font-bold text-brand-secondary uppercase tracking-[0.2em] mt-1">
+                <div className="p-4 sm:p-8 pb-3 border-b border-brand-primary/5 flex items-center justify-between">
+                  <div className="text-left">
+                    <h3 className="text-lg sm:text-2xl font-serif font-bold text-brand-primary">Select Quantities</h3>
+                    <p className="text-[8px] sm:text-[10px] font-bold text-brand-secondary uppercase tracking-[0.2em] mt-0.5">
                       Order in {product.unit?.toUpperCase() === "DOZEN" ? "Dozen" : "Piece"}
                     </p>
                   </div>
                   <button
                     onClick={() => setIsCartModalOpen(false)}
-                    className="w-10 h-10 rounded-full bg-brand-primary/5 flex items-center justify-center text-brand-primary hover:bg-brand-primary/10 transition-all"
+                    className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-brand-primary/5 flex items-center justify-center text-brand-primary hover:bg-brand-primary/10 transition-all"
                   >
-                    <Icon icon="lucide:x" className="w-5 h-5" />
+                    <Icon icon="lucide:x" className="w-4 h-4 sm:w-6 sm:h-6" />
                   </button>
                 </div>
 
                 {/* Modal Content */}
-                <div className="p-4 sm:p-8 pt-6 overflow-y-auto no-scrollbar grow">
-                  <div className="space-y-4">
+                <div className="p-3 sm:p-8 pt-4 overflow-y-auto no-scrollbar grow">
+                  <div className="space-y-2 sm:space-y-4">
                     {(product.variants && product.variants.length > 0 ? product.variants : [{ name: product.name, price: product.price }]).map((v, i) => {
                       const qty = variantQuantities[v.name] || 0;
                       const unitMultiplier = product.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
@@ -774,47 +776,66 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                       const hasDiscount = product.isOfferProduct && originalP > basePrice;
 
                       return (
-                        <div key={i} className="flex flex-col sm:grid sm:grid-cols-3 items-center gap-4 p-4 rounded-2xl bg-brand-primary/[0.02] border border-brand-primary/5 hover:bg-brand-primary/[0.04] transition-all">
-                          {/* Left: Info */}
-                          <div className="w-full text-left">
-                            <p className="font-bold text-brand-primary text-lg">{v.name}</p>
-                            <div className="flex items-center gap-2 mt-0.5">
+                        <div key={i} className="flex items-center justify-between gap-3 p-3 sm:p-5 rounded-[24px] bg-brand-primary/[0.02] border border-brand-primary/5 hover:border-brand-secondary/20 transition-all group">
+                          {/* Info: Name & Unit Price */}
+                          <div className="flex-grow min-w-0">
+                            <p className="font-bold text-brand-primary text-xs sm:text-lg uppercase tracking-wider truncate">{v.name}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
                               {hasDiscount && (
-                                <span className="text-sm text-brand-primary/60 line-through">₹{originalP.toLocaleString()}</span>
+                                <span className="text-[8px] sm:text-xs font-bold text-brand-primary/20 line-through">₹{originalP.toLocaleString()}</span>
                               )}
-                              <p className="text-sm text-brand-primary font-bold">₹{basePrice.toLocaleString()} / pc</p>
+                              <p className="text-[9px] sm:text-sm text-brand-secondary font-black tracking-widest uppercase">₹{basePrice.toLocaleString()}<span className="text-[8px] opacity-20 ml-0.5">/pc</span></p>
                             </div>
                           </div>
 
-                          {/* Center: Quantity */}
-                          <div className="flex flex-col items-center w-full">
-                            <span className="text-[10px] sm:text-xs font-bold text-brand-primary/30 uppercase tracking-widest mb-1.5">Qty ({product.unit?.toUpperCase() === "DOZEN" ? "Dozen" : "Piece"})</span>
-                            <input
-                              type="number"
-                              min="0"
-                              value={qty === 0 ? "" : qty}
-                              onChange={(e) => setVariantQuantities({
-                                ...variantQuantities,
-                                [v.name]: e.target.value === "" ? 0 : parseInt(e.target.value)
-                              })}
-                              placeholder="0"
-                              className="w-16 h-12 bg-white rounded-xl border border-brand-primary/10 text-center font-bold text-brand-primary focus:border-brand-secondary outline-none transition-all px-0"
-                            />
+                          {/* Stepper: Compact Center */}
+                          <div className="flex flex-col items-center shrink-0">
+                            <div className="flex items-center gap-1.5 sm:gap-3 bg-white p-1 sm:p-1.5 rounded-xl sm:rounded-2xl border border-brand-primary/5 shadow-inner">
+                              <button
+                                onClick={() => {
+                                  const newVal = Math.max(0, qty - 1);
+                                  setVariantQuantities({ ...variantQuantities, [v.name]: newVal });
+                                }}
+                                className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white border border-brand-primary/5 shadow-sm flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                              >
+                                <Icon icon="lucide:minus" className="w-3 h-3 sm:w-4 sm:h-4" />
+                              </button>
+
+                              <input
+                                type="number"
+                                min="0"
+                                value={qty === 0 ? "" : qty}
+                                onChange={(e) => {
+                                  const val = e.target.value === "" ? 0 : parseInt(e.target.value);
+                                  setVariantQuantities({ ...variantQuantities, [v.name]: isNaN(val) ? 0 : val });
+                                }}
+                                className="w-7 sm:w-12 text-center font-bold text-xs sm:text-xl text-brand-primary bg-transparent border-none outline-none p-0 appearance-none"
+                                placeholder="0"
+                              />
+
+                              <button
+                                onClick={() => {
+                                  const newVal = qty + 1;
+                                  setVariantQuantities({ ...variantQuantities, [v.name]: newVal });
+                                }}
+                                className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white border border-brand-primary/5 shadow-sm flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                              >
+                                <Icon icon="lucide:plus" className="w-3 h-3 sm:w-4 sm:h-4" />
+                              </button>
+                            </div>
+                            {product.unit?.toUpperCase() === "DOZEN" && qty > 0 && (
+                              <p className="text-[7px] text-brand-secondary font-black uppercase mt-1">({qty * 12} Pcs)</p>
+                            )}
                           </div>
 
-                          {/* Right: Total */}
-                          <div className="w-full flex flex-col items-end">
-                            <p className="text-[10px] sm:text-xs font-bold text-brand-primary/30 uppercase tracking-widest mb-1.5">Total Value</p>
+                          {/* Valuation: Right Side */}
+                          <div className="text-right min-w-[70px] sm:min-w-[120px] border-l border-brand-primary/5 pl-3 sm:pl-6">
+                            <p className="text-[7px] sm:text-[9px] font-black text-brand-primary/20 uppercase tracking-[0.2em] mb-0.5 italic">Total</p>
                             <div className="flex flex-col items-end">
-                              <div className="flex items-center justify-end gap-2">
-                                {product.isOfferProduct && qty > 0 && (
-                                  <span className="text-sm font-bold text-brand-primary/20 line-through">₹{(qty * unitMultiplier * v.price).toLocaleString()}</span>
-                                )}
-                                <p className="font-bold text-brand-primary text-xl tracking-tight">₹{(qty * unitMultiplier * basePrice).toLocaleString()}</p>
-                              </div>
-                              {product.unit?.toUpperCase() === "DOZEN" && qty > 0 && (
-                                <p className="text-[10px] text-brand-secondary font-bold">({qty * 12} pcs)</p>
+                              {product.isOfferProduct && qty > 0 && (
+                                <span className="text-[8px] sm:text-base font-bold text-brand-primary/10 line-through leading-none mb-0.5">₹{(qty * unitMultiplier * v.price).toLocaleString()}</span>
                               )}
+                              <p className="font-bold text-brand-primary text-sm sm:text-2xl tracking-tighter leading-none">₹{(qty * unitMultiplier * basePrice).toLocaleString()}</p>
                             </div>
                           </div>
                         </div>
@@ -824,12 +845,12 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                 </div>
 
                 {/* Modal Footer */}
-                <div className="p-6 sm:p-8 pt-4 border-t border-brand-primary/5 bg-brand-primary/[0.02]">
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-4 text-center sm:text-left">
+                <div className="p-4 sm:p-8 pt-3 border-t border-brand-primary/5 bg-brand-primary/[0.02]">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-4 text-center sm:text-left">
                     <div className="w-full sm:w-auto">
-                      <p className="text-[10px] font-bold text-brand-primary/30 uppercase tracking-widest">Total Order Amount</p>
+                      <p className="text-[8px] sm:text-[10px] font-black text-brand-primary/30 uppercase tracking-[0.3em] mb-0.5">Total Order Amount</p>
                       <div className="flex flex-col">
-                        <p className="text-2xl sm:text-3xl font-bold text-brand-primary">
+                        <p className="text-xl sm:text-4xl font-bold text-brand-primary tracking-tighter">
                           ₹{Object.entries(variantQuantities).reduce((acc, [vName, qty]) => {
                             const v = (product.variants || []).find(v => v.name === vName) || { price: product.price };
                             const basePrice = product.isOfferProduct
@@ -839,7 +860,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                             return acc + (qty * multiplier * basePrice);
                           }, 0).toLocaleString()}
                           {product.isOfferProduct && Object.values(variantQuantities).some(q => q > 0) && (
-                            <span className="text-base sm:text-lg font-bold text-brand-primary/50 line-through mb-1 ml-2">
+                            <span className="text-xs sm:text-xl font-bold text-brand-primary/20 line-through ml-3">
                               ₹{Object.entries(variantQuantities).reduce((acc, [vName, qty]) => {
                                 const v = (product.variants || []).find(v => v.name === vName) || { price: product.price };
                                 const multiplier = product.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
@@ -853,7 +874,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     <button
                       onClick={handleAddToCartConfirm}
                       disabled={Object.values(variantQuantities).every(q => !q || q <= 0)}
-                      className="w-full sm:w-auto bg-brand-primary text-white py-4 sm:py-5 px-10 rounded-2xl font-bold uppercase tracking-[0.2em] text-[10px] sm:text-xs shadow-xl hover:bg-brand-secondary transition-all disabled:opacity-50 disabled:grayscale"
+                      className="w-full sm:w-auto bg-brand-primary text-white py-4 sm:py-5 px-12 rounded-2xl font-bold uppercase tracking-[0.2em] text-[10px] sm:text-xs shadow-xl hover:bg-brand-secondary transition-all disabled:opacity-50 disabled:grayscale"
                     >
                       Add To Cart
                     </button>

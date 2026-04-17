@@ -43,7 +43,7 @@ export default function WholesalerCollectionClient({ title, subtitle, products, 
         </div>
 
         {/* Header Section */}
-        <div className="flex flex-col gap-6 mb-8 lg:mb-16">
+        <div className="flex flex-col gap-6 mb-4 lg:mb-8">
           <div className="space-y-3">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -57,28 +57,11 @@ export default function WholesalerCollectionClient({ title, subtitle, products, 
             <motion.h1
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-[40px] lg:text-8xl font-serif font-black text-brand-primary uppercase tracking-tighter leading-[0.85] lg:leading-none"
+              className="text-lg lg:text-5xl font-serif font-black text-brand-primary uppercase tracking-tighter leading-[0.85] lg:leading-none"
             >
               {title}
             </motion.h1>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center justify-between bg-white/40 backdrop-blur-xl p-4 lg:p-6 rounded-[24px] border border-brand-primary/[0.03] shadow-sm"
-          >
-            <div>
-              <p className="text-[8px] lg:text-[10px] font-black text-brand-primary/30 uppercase tracking-[0.2em] mb-1">Vault Inventory</p>
-              <div className="flex items-baseline gap-1">
-                <span className="text-2xl lg:text-4xl font-serif font-black text-brand-primary leading-none">{products.length}</span>
-                <span className="text-[10px] lg:text-sm font-bold text-brand-primary/40 uppercase tracking-widest">Products</span>
-              </div>
-            </div>
-            <div className="w-10 h-10 lg:w-14 lg:h-14 rounded-2xl bg-brand-primary/5 flex items-center justify-center text-brand-primary/30">
-              <Icon icon="solar:shop-bold-duotone" className="w-6 h-6 lg:w-8 lg:h-8" />
-            </div>
-          </motion.div>
         </div>
 
         {/* Product Grid */}

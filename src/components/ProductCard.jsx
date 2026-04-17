@@ -18,8 +18,8 @@ export default function ProductCard({ product }) {
     >
       {/* Classic Diagonal Best Seller Sash - Now Card Relative for Premium Look */}
       {product.isBestSeller && (
-        <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden z-30 pointer-events-none rounded-tr-2xl lg:rounded-tr-3xl">
-          <div className="bg-red-600 text-white text-[7px] font-black uppercase tracking-[0.2em] py-1 w-[140%] text-center absolute top-6 -right-8 rotate-45 shadow-[0_5px_15px_rgba(220,38,38,0.4)] border-y border-white/10">
+        <div className="absolute top-[-8px] right-[-12px] sm:top-0 sm:right-0 w-24 h-20 sm:w-24 sm:h-24 overflow-hidden z-30 pointer-events-none rounded-tr-2xl lg:rounded-tr-3xl">
+          <div className="bg-red-600 text-white text-[6px] sm:text-[7px] font-black uppercase tracking-[0.2em] py-[2px] sm:py-1 w-[140%] text-center absolute top-6 -right-8 rotate-45 shadow-[0_5px_15px_rgba(220,38,38,0.4)] border-y border-white/10">
             Best Seller
           </div>
         </div>
@@ -52,7 +52,7 @@ export default function ProductCard({ product }) {
         </div>
 
         {/* Price Tag - Added rounded-bl to fix sharp corners on desktop */}
-        <div className="absolute bottom-1 left-1 lg:bottom-0 lg:left-0 px-2 py-1 lg:px-4 lg:py-2 bg-brand-primary/90 text-white font-bold rounded-tr-2xl rounded-bl-xl lg:rounded-bl-2xl text-[10px] lg:text-sm backdrop-blur-sm shadow-xl z-20 transition-all">
+        <div className="absolute bottom-0 left-0 px-2 py-1 lg:px-4 lg:py-2 bg-brand-primary/90 text-white font-bold rounded-tr-2xl rounded-bl-xl lg:rounded-bl-2xl text-[10px] lg:text-sm backdrop-blur-sm shadow-xl z-20 transition-all">
           {product.isOfferProduct && product.offerPrice ? `₹${product.offerPrice}` : `₹${product.price}`}
         </div>
       </Link>

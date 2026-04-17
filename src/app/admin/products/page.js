@@ -554,7 +554,7 @@ export default function ProductsPage() {
                                             <div className="flex flex-wrap gap-1.5 ml-2">
                                                 <button
                                                     type="button"
-                                                    title="LADDU GOPAL"
+                                                    title="VG"
                                                     onClick={() => {
                                                         const q = ["0", "1", "2", "3", "4", "5", "6"];
                                                         setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
@@ -615,7 +615,7 @@ export default function ProductsPage() {
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    title="Khesh"
+                                                    title="FT"
                                                     onClick={() => {
                                                         const q = ["5", "8", "10", "13", "18", "24", "30", "38", "48", "78"];
                                                         setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
