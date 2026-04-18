@@ -8,7 +8,7 @@ import { roundToTwo } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function CartPage() {
-  const { cart = [], removeFromCart, updateQuantity, clearCart, cartTotal, originalCartTotal, cartCount } = useCart();
+  const { cart = [], addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, originalCartTotal, cartCount } = useCart();
   const router = useRouter();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -24,7 +24,6 @@ export default function CartPage() {
     }
   }, []);
 
-  // Group cart items by product ID
   const groupedCart = cart.reduce((acc, item) => {
     if (!acc[item.id]) {
       acc[item.id] = {
@@ -33,14 +32,18 @@ export default function CartPage() {
         category: item.category,
         image: item.image || (item.images && item.images[0]),
         unit: item.unit || "PIECE",
-        variants: [],
-        totalQty: 0,
+        variantsInCart: [], // Tracking only what's currently in cart
+        allAvailableVariants: (item.variants || []), // All variants from product definition
+        totalQtyInCart: 0,
         totalPrice: 0,
-        originalTotalPrice: 0
+        originalTotalPrice: 0,
+        // Also keep product prices in case a variant doesn't have its own
+        basePrice: item.price,
+        baseMrp: item.originalPrice || item.price
       };
     }
-    acc[item.id].variants.push(item);
-    acc[item.id].totalQty += item.quantity;
+    acc[item.id].variantsInCart.push(item);
+    acc[item.id].totalQtyInCart += item.quantity;
     acc[item.id].totalPrice = roundToTwo(acc[item.id].totalPrice + (item.price * item.quantity));
     acc[item.id].originalTotalPrice = roundToTwo(acc[item.id].originalTotalPrice + ((item.originalPrice || item.price) * item.quantity));
     return acc;
@@ -223,10 +226,10 @@ export default function CartPage() {
 
                       <div className="mt-1.5 sm:mt-2 flex flex-wrap gap-1.5 sm:gap-2">
                         <span className="text-[7px] sm:text-[9px] font-bold text-brand-primary/60 bg-brand-primary/5 px-2 py-0.5 sm:py-1 rounded-lg uppercase tracking-widest">
-                          {product.variants.length} Variants
+                          {product.variantsInCart.length} Active Designs
                         </span>
                         <span className="text-[7px] sm:text-[9px] font-bold text-brand-secondary bg-brand-secondary/10 px-2 py-0.5 sm:py-1 rounded-lg uppercase tracking-widest italic">
-                          Total: {formatQty(product.totalQty, product.unit)}
+                          {formatQty(product.totalQtyInCart, product.unit)}
                         </span>
                       </div>
                     </div>
@@ -259,14 +262,14 @@ export default function CartPage() {
                   </div>
                   <div className="min-w-0 flex-grow">
                     <p className="text-[8px] sm:text-[10px] font-bold text-brand-primary/80 uppercase tracking-widest mb-1 sm:mb-1.5 opacity-60">Total Amount</p>
-                    <div className="flex items-center sm:gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-xl sm:text-3xl font-bold text-brand-primary tracking-tight">₹{(cartTotal || 0).toLocaleString()}</p>
                       {originalCartTotal > cartTotal && (
-                        <div className="flex flex-col">
+                        <div className="flex flex-row gap-1 items-center">
+                          <span className="text-xs sm:text-lg font-bold text-brand-primary/20 line-through decoration-brand-primary/30 leading-none">₹{originalCartTotal.toLocaleString()}</span>
                           <p className="text-[7px] sm:text-[9px] font-black text-green-600 uppercase tracking-[0.15em] mt-0.5 whitespace-nowrap bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
                             Saved ₹{(originalCartTotal - cartTotal).toLocaleString()}
                           </p>
-                          <span className="text-xs sm:text-lg font-bold text-brand-primary/20 line-through decoration-brand-primary/30 leading-none">₹{originalCartTotal.toLocaleString()}</span>
                         </div>
                       )}
                     </div>
@@ -292,155 +295,215 @@ export default function CartPage() {
 
         {/* Variant Management Popup */}
         <AnimatePresence>
-          {selectedProduct && (
-            <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedProduct(null)}
-                className="absolute inset-0 bg-brand-primary/80 backdrop-blur-md"
-              />
+          {selectedProduct && (() => {
+            // Find the "live" version of the selected product from our grouped items 
+            // This ensures the UI updates instantly when context changes
+            const liveProduct = groupedItems.find(p => p.id === selectedProduct.id) || {
+              ...selectedProduct,
+              variantsInCart: [],
+              totalPrice: 0,
+              originalTotalPrice: 0,
+              totalQtyInCart: 0
+            };
 
-              <motion.div
-                initial={{ y: '100%', sm: { y: 20, scale: 0.9, opacity: 0 } }}
-                animate={{ y: 0, sm: { y: 0, scale: 1, opacity: 1 } }}
-                exit={{ y: '100%', sm: { y: 20, scale: 0.9, opacity: 0 } }}
-                className="bg-white w-full max-w-2xl rounded-t-[32px] sm:rounded-[48px] overflow-hidden shadow-2xl relative z-10 border border-brand-primary/5"
-              >
-                {/* Popup Header */}
-                <div className="p-6 sm:p-10 bg-brand-primary relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-brand-secondary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl opacity-50" />
+            return (
+              <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setSelectedProduct(null)}
+                  className="absolute inset-0 bg-brand-primary/80 backdrop-blur-md"
+                />
 
-                  <div className="relative z-10 flex justify-between items-start">
-                    <div className="flex gap-4 sm:gap-6 items-center">
-                      <div className="w-14 h-18 sm:w-20 sm:h-24 rounded-xl sm:rounded-2xl overflow-hidden border border-white/20 shadow-2xl shrink-0">
-                        <img src={selectedProduct.image} className="w-full h-full object-cover" />
+                <motion.div
+                  initial={{ y: '100%', sm: { y: 20, scale: 0.9, opacity: 0 } }}
+                  animate={{ y: 0, sm: { y: 0, scale: 1, opacity: 1 } }}
+                  exit={{ y: '100%', sm: { y: 20, scale: 0.9, opacity: 0 } }}
+                  className="bg-white w-full max-w-2xl rounded-t-[32px] sm:rounded-3xl overflow-hidden shadow-2xl relative z-10 border border-brand-primary/5"
+                >
+                  {/* Popup Header */}
+                  <div className="p-6 sm:p-10 bg-brand-primary relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-brand-secondary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl opacity-50" />
+
+                    <div className="relative z-10 flex justify-between items-start">
+                      <div className="flex gap-4 sm:gap-6 items-center">
+                        <div className="w-14 h-18 sm:w-20 sm:h-24 rounded-xl sm:rounded-2xl overflow-hidden border border-white/20 shadow-2xl shrink-0">
+                          <img src={liveProduct.image} className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                          <p className="text-[8px] sm:text-[10px] font-bold text-brand-secondary uppercase tracking-[0.3em] mb-1.5 italic">Inventory</p>
+                          <h2 className="text-lg sm:text-3xl font-serif font-bold text-white leading-tight truncate max-w-[180px] sm:max-w-none">{liveProduct.name}</h2>
+                          <p className="text-[9px] sm:text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1 sm:mt-2">Ordering in {liveProduct.unit?.toUpperCase() === "DOZEN" ? "Dozens (12 Pcs)" : "Pieces"}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[8px] sm:text-[10px] font-bold text-brand-secondary uppercase tracking-[0.3em] mb-1.5 italic">Inventory</p>
-                        <h2 className="text-lg sm:text-3xl font-serif font-bold text-white leading-tight truncate max-w-[180px] sm:max-w-none">{selectedProduct.name}</h2>
-                        <p className="text-[9px] sm:text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1 sm:mt-2">Ordering in {selectedProduct.unit?.toUpperCase() === "DOZEN" ? "Dozens (12 Pcs)" : "Pieces"}</p>
+                      <button
+                        onClick={() => setSelectedProduct(null)}
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all border border-white/10"
+                      >
+                        <Icon icon="lucide:x" className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Variant List */}
+                  <div className="p-2 sm:p-4 max-h-[60vh] sm:max-h-[50vh] overflow-y-auto no-scrollbar bg-[#f8f7f3]">
+                    <div className="space-y-2">
+                      {/* Map over ALL available variants using LIVE data */}
+                      {(liveProduct.allAvailableVariants.length > 0 ? liveProduct.allAvailableVariants : [{ name: 'Base' }]).map((availableV, idx) => {
+                        const vName = availableV.name || null;
+                        
+                        // Find if this variant is already in the live cart
+                        const inCart = liveProduct.variantsInCart.find(item => 
+                          vName === 'Base' ? !item.variantName : item.variantName === vName
+                        );
+
+                        const currentQty = inCart ? inCart.quantity : 0;
+                        const vPrice = inCart ? inCart.price : (availableV.price || liveProduct.basePrice);
+                        const vMrp = inCart ? (inCart.originalPrice || inCart.price) : (availableV.price || liveProduct.baseMrp);
+
+                        return (
+                          <div key={idx} className={`bg-white p-3 sm:p-5 rounded-2xl sm:rounded-3xl border ${currentQty > 0 ? 'border-brand-secondary/20 shadow-sm' : 'border-brand-primary/5 opacity-60'} flex items-center justify-between gap-3 sm:gap-6 group hover:border-brand-secondary/30 transition-all`}>
+                            {/* Info Section */}
+                            <div className="flex-grow min-w-0">
+                                <p className="font-bold text-brand-primary text-xs sm:text-lg uppercase tracking-wider truncate">{vName === 'Base' ? 'Base Design' : vName}</p>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  {vMrp > vPrice && (
+                                    <span className="text-[8px] sm:text-xs font-bold text-brand-primary/20 line-through">₹{(vMrp || 0).toLocaleString()}</span>
+                                  )}
+                                  <p className="text-[9px] sm:text-sm text-brand-secondary font-black tracking-widest uppercase">₹{(vPrice || 0).toLocaleString()}<span className="text-[8px] opacity-20 ml-0.5">/pc</span></p>
+                                </div>
+                            </div>
+
+                            {/* Stepper Center Section */}
+                            <div className="flex flex-col items-center shrink-0">
+                              <div className="flex items-center gap-1.5 sm:gap-3 bg-white p-1 sm:p-1.5 rounded-xl sm:rounded-2xl border border-brand-primary/5 shadow-inner">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const step = liveProduct.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
+                                    const newQty = Math.max(0, currentQty - step);
+                                    
+                                    if (newQty === 0 && currentQty > 0) {
+                                      removeFromCart(liveProduct.id, vName === 'Base' ? null : vName);
+                                    } else if (newQty > 0) {
+                                      updateQuantity(liveProduct.id, vName === 'Base' ? null : vName, newQty);
+                                    }
+                                  }}
+                                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white border border-brand-primary/5 shadow-sm flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                >
+                                  <Icon icon="lucide:minus" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                </button>
+                                
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={liveProduct.unit?.toUpperCase() === "DOZEN" ? (currentQty / 12 || "") : (currentQty || "")}
+                                  onChange={(e) => {
+                                    const val = e.target.value === "" ? 0 : parseInt(e.target.value);
+                                    const multiplier = liveProduct.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
+                                    const newQty = isNaN(val) ? 0 : val * multiplier;
+                                    
+                                    if (newQty === 0 && currentQty > 0) {
+                                      removeFromCart(liveProduct.id, vName === 'Base' ? null : vName);
+                                    } else if (newQty > 0) {
+                                      if (currentQty === 0) {
+                                        const prodToAdd = {
+                                          id: liveProduct.id,
+                                          name: liveProduct.name,
+                                          category: liveProduct.category,
+                                          image: liveProduct.image,
+                                          unit: liveProduct.unit,
+                                        };
+                                        addToCart(prodToAdd, newQty, vName === 'Base' ? null : vName, vPrice, vMrp);
+                                      } else {
+                                        updateQuantity(liveProduct.id, vName === 'Base' ? null : vName, newQty);
+                                      }
+                                    }
+                                  }}
+                                  className="w-8 sm:w-12 text-center font-bold font-serif text-sm sm:text-lg text-brand-primary bg-transparent border-none outline-none p-0 appearance-none"
+                                  placeholder="0"
+                                />
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const step = liveProduct.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
+                                    const newQty = currentQty + step;
+                                    
+                                    if (currentQty === 0) {
+                                      const prodToAdd = {
+                                        id: liveProduct.id,
+                                        name: liveProduct.name,
+                                        category: liveProduct.category,
+                                        image: liveProduct.image,
+                                        unit: liveProduct.unit,
+                                      };
+                                      addToCart(prodToAdd, step, vName === 'Base' ? null : vName, vPrice, vMrp);
+                                    } else {
+                                      updateQuantity(liveProduct.id, vName === 'Base' ? null : vName, newQty);
+                                    }
+                                  }}
+                                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white border border-brand-primary/5 shadow-sm flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                >
+                                  <Icon icon="lucide:plus" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                </button>
+                              </div>
+                              {liveProduct.unit?.toUpperCase() === "DOZEN" && currentQty > 0 && (
+                                <p className="text-[7px] text-brand-secondary font-black uppercase mt-1">({currentQty} Pcs)</p>
+                              )}
+                            </div>
+
+                            {/* Valuation Section */}
+                            <div className="text-right min-w-[70px] sm:min-w-[120px] border-l border-brand-primary/5 pl-3 sm:pl-6">
+                              <p className="text-[7px] sm:text-[9px] font-black text-brand-primary/20 uppercase tracking-[0.15em] mb-0.5 italic">Value</p>
+                              <div className="flex flex-col items-end">
+                                {(vMrp * currentQty > vPrice * currentQty) && (
+                                  <span className="text-[8px] sm:text-base font-bold text-brand-primary/10 line-through leading-none mb-0.5">₹{(vMrp * currentQty).toLocaleString()}</span>
+                                )}
+                                <p className={`font-bold text-sm sm:text-2xl tracking-tighter leading-none ${currentQty > 0 ? 'text-brand-primary' : 'text-brand-primary/10'}`}>₹{(vPrice * currentQty).toLocaleString()}</p>
+                              </div>
+                            </div>
+
+                            {currentQty > 0 && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeFromCart(liveProduct.id, vName === 'Base' ? null : vName);
+                                }}
+                                className="p-2 sm:p-2 text-brand-primary/10 hover:text-red-500 transition-colors shrink-0"
+                              >
+                                <Icon icon="solar:trash-bin-trash-bold" className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Popup Footer */}
+                  <div className="p-6 sm:p-10 border-t border-brand-primary/5 flex flex-col xs:flex-row items-center justify-between bg-white gap-4 relative z-10">
+                    <div className="text-center xs:text-left w-full xs:w-auto">
+                      <p className="text-xs font-bold text-brand-primary/30 uppercase tracking-[0.2em] mb-1">Subtotal Valuation</p>
+                      <div className="flex items-end justify-center xs:justify-start gap-2">
+                         <p className="text-2xl sm:text-4xl font-bold text-brand-primary tracking-tight">₹{(liveProduct.totalPrice || 0).toLocaleString()}</p>
+                        {liveProduct.originalTotalPrice > liveProduct.totalPrice && (
+                          <span className="text-sm sm:text-xl font-bold text-brand-primary/20 line-through decoration-brand-primary/30 mb-1">₹{(liveProduct.originalTotalPrice || 0).toLocaleString()}</span>
+                        )}
                       </div>
                     </div>
                     <button
                       onClick={() => setSelectedProduct(null)}
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all border border-white/10"
+                      className="w-full xs:w-auto px-10 py-4 sm:py-5 bg-brand-primary text-white font-bold rounded-2xl sm:rounded-[20px] uppercase tracking-[0.2em] text-[10px] shadow-xl hover:bg-brand-secondary transition-all"
                     >
-                      <Icon icon="lucide:x" className="w-5 h-5 sm:w-6 sm:h-6" />
+                      Save
                     </button>
                   </div>
-                </div>
-
-                {/* Variant List */}
-                <div className="p-2 sm:p-4 max-h-[60vh] sm:max-h-[50vh] overflow-y-auto no-scrollbar bg-[#f8f7f3]">
-                  <div className="space-y-2">
-                    {selectedProduct.variants.map((variant, idx) => (
-                      <div key={idx} className="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-brand-primary/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 group hover:border-brand-secondary/30 transition-all">
-                        <div className="flex items-center gap-4 w-full sm:w-auto">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-brand-accent/50 flex items-center justify-center text-brand-primary group-hover:bg-brand-secondary group-hover:text-white transition-all font-bold text-sm uppercase italic font-serif shrink-0">
-                            {idx + 1}
-                          </div>
-                          <div className="min-w-0 flex-grow">
-                            <h4 className="text-sm sm:text-xl font-bold text-brand-primary uppercase tracking-wider truncate">{variant.variantName || 'Base'}</h4>
-                            <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                              {(variant.originalPrice > variant.price) && (
-                                <span className="text-[10px] font-bold text-brand-primary/20 line-through">₹{(variant.originalPrice || 0).toLocaleString()}</span>
-                              )}
-                              <p className="text-[10px] sm:text-xs font-bold text-brand-secondary tracking-widest uppercase">₹{(variant.price || 0).toLocaleString()} <span className="text-[8px] opacity-40">/ PC</span></p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-brand-primary/5">
-                          <div className="flex items-center gap-2 sm:gap-3 bg-[#fcfbf7] p-1 sm:p-1.5 rounded-xl sm:rounded-2xl border border-brand-primary/5 shadow-inner">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const step = selectedProduct.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
-                                updateQuantity(variant.id, variant.variantName, variant.quantity - step);
-                                if (variant.quantity <= step) {
-                                  const newVariants = selectedProduct.variants.filter((_, i) => i !== idx);
-                                  if (newVariants.length === 0) setSelectedProduct(null);
-                                  else setSelectedProduct({ ...selectedProduct, variants: newVariants });
-                                } else {
-                                  const newVariants = [...selectedProduct.variants];
-                                  newVariants[idx].quantity -= step;
-                                  setSelectedProduct({ ...selectedProduct, variants: newVariants });
-                                }
-                              }}
-                              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white border border-brand-primary/5 shadow-sm flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                            >
-                              <Icon icon="lucide:minus" className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                            </button>
-                            <span className="w-8 text-center font-bold font-serif text-sm sm:text-base text-brand-primary">
-                              {selectedProduct.unit?.toUpperCase() === "DOZEN" ? variant.quantity / 12 : variant.quantity}
-                            </span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const step = selectedProduct.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
-                                updateQuantity(variant.id, variant.variantName, variant.quantity + step);
-                                const newVariants = [...selectedProduct.variants];
-                                newVariants[idx].quantity += step;
-                                setSelectedProduct({ ...selectedProduct, variants: newVariants });
-                              }}
-                              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white border border-brand-primary/5 shadow-sm flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                            >
-                              <Icon icon="lucide:plus" className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                            </button>
-                          </div>
-
-                          <div className="text-right sm:min-w-[100px] border-l border-brand-primary/5 pl-4 sm:pl-6 flex-grow sm:flex-grow-0">
-                            <p className="text-[7px] sm:text-[8px] font-bold text-brand-primary/30 uppercase tracking-widest mb-0.5 italic">Total Value</p>
-                            <div className="flex flex-col items-end">
-                              {((variant.originalPrice || variant.price) * variant.quantity) > (variant.price * variant.quantity) && (
-                                <span className="text-xs font-bold text-brand-primary/20 line-through decoration-brand-primary/30">₹{((variant.originalPrice || variant.price) * variant.quantity).toLocaleString()}</span>
-                              )}
-                              <p className="text-base sm:text-xl font-bold text-brand-primary tracking-tight">₹{(variant.price * variant.quantity).toLocaleString()}</p>
-                            </div>
-                            {selectedProduct.unit?.toUpperCase() === "DOZEN" && <p className="text-[8px] text-brand-secondary font-bold">({variant.quantity} Pcs)</p>}
-                          </div>
-
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeFromCart(variant.id, variant.variantName);
-                              const newVariants = selectedProduct.variants.filter((_, i) => i !== idx);
-                              if (newVariants.length === 0) setSelectedProduct(null);
-                              else setSelectedProduct({ ...selectedProduct, variants: newVariants });
-                            }}
-                            className="p-2 sm:p-3 text-brand-primary/10 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all shrink-0"
-                          >
-                            <Icon icon="solar:trash-bin-trash-bold" className="w-4 h-4 sm:w-5 sm:h-5" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Popup Footer */}
-                <div className="p-6 sm:p-10 border-t border-brand-primary/5 flex flex-col xs:flex-row items-center justify-between bg-white gap-4 relative z-10">
-                  <div className="text-center xs:text-left w-full xs:w-auto">
-                    <p className="text-xs font-bold text-brand-primary/30 uppercase tracking-[0.2em] mb-1">Subtotal Valuation</p>
-                    <div className="flex items-end justify-center xs:justify-start gap-2">
-                      <p className="text-2xl sm:text-4xl font-bold text-brand-primary tracking-tight">₹{(selectedProduct.totalPrice || 0).toLocaleString()}</p>
-                      {selectedProduct.originalTotalPrice > selectedProduct.totalPrice && (
-                        <span className="text-sm sm:text-xl font-bold text-brand-primary/20 line-through decoration-brand-primary/30 mb-1">₹{(selectedProduct.originalTotalPrice || 0).toLocaleString()}</span>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setSelectedProduct(null)}
-                    className="w-full xs:w-auto px-10 py-4 sm:py-5 bg-brand-primary text-white font-bold rounded-2xl sm:rounded-[20px] uppercase tracking-[0.2em] text-[10px] shadow-xl hover:bg-brand-secondary transition-all"
-                  >
-                    Save
-                  </button>
-                </div>
-              </motion.div>
-            </div>
-          )}
+                </motion.div>
+              </div>
+            );
+          })()}
         </AnimatePresence>
       </main>
 

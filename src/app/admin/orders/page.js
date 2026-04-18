@@ -97,7 +97,7 @@ export default function OrdersPage() {
           content: `${item.product?.name || "Product"}\nID: ${item.product?.productId || "N/A"}${item.variantName ? `\nVariant: ${item.variantName}` : ""}`,
           styles: { fontStyle: 'bold' }
         },
-        item.quantity,
+        `${item.product?.unit?.toLowerCase() === "dozen" ? item.quantity / 12 : item.quantity} ${item.product?.unit || 'Pcs'}`,
         {
           content: `Rs. ${rate.toLocaleString()}${savings > 0 ? `\nMRP Rs. ${mrp.toLocaleString()}` : ""}`,
           styles: { fontSize: 8 }
@@ -134,7 +134,7 @@ export default function OrdersPage() {
         0: { cellWidth: 10 },
         1: { cellWidth: 22 },
         2: { cellWidth: 65 },
-        3: { halign: "center", cellWidth: 16 },
+        3: { halign: "center", cellWidth: 22 },
         4: { halign: "left", cellWidth: 30 },
         5: { halign: "right", cellWidth: 40 }
       },
@@ -596,7 +596,7 @@ export default function OrdersPage() {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
                           <h4 className="font-serif font-bold text-brand-primary text-base truncate">{item.product?.name}</h4>
                           <div className="flex items-center gap-2">
-                             <span className="px-3 py-1 bg-brand-primary/5 text-brand-primary text-[9px] font-black uppercase tracking-widest rounded-lg border border-brand-primary/5">SKU: {item.product?.productId || 'N/A'}</span>
+                             <span className="px-3 py-1 bg-brand-primary/5 text-brand-primary text-[9px] font-black uppercase tracking-widest rounded-lg border border-brand-primary/5">ID: {item.product?.productId || 'N/A'}</span>
                              {item.variantName && (
                                <span className="px-3 py-1 bg-brand-secondary text-white text-[9px] font-black uppercase tracking-widest rounded-lg shadow-lg">VARIANT: {item.variantName}</span>
                              )}
@@ -615,10 +615,13 @@ export default function OrdersPage() {
                           </div>
                           <div>
                             <p className="text-[9px] font-black text-brand-primary/20 uppercase tracking-widest mb-1.5">Allocation</p>
-                            <p className="text-lg font-black text-brand-primary leading-none">{item.quantity} <span className="text-xs lowercase italic font-normal opacity-40">{item.product?.unit?.toLowerCase() || 'pcs'}</span></p>
+                            <p className="text-lg font-black text-brand-primary leading-none">
+                              {item.product?.unit?.toLowerCase() === "dozen" ? item.quantity / 12 : item.quantity}
+                              <span className="text-xs lowercase italic font-normal opacity-40 ml-1">{item.product?.unit?.toLowerCase() || 'pcs'}</span>
+                            </p>
                           </div>
                           <div className="col-span-2 sm:col-span-1 border-t sm:border-t-0 sm:border-l border-brand-primary/5 pt-2 sm:pt-0 sm:pl-6 text-right sm:text-left">
-                            <p className="text-[9px] font-black text-brand-secondary uppercase tracking-widest mb-1">Settlement</p>
+                            <p className="text-[9px] font-black text-brand-secondary uppercase tracking-widest mb-1">Sub Total</p>
                             <p className="text-lg font-black text-brand-secondary tracking-tighter leading-none">₹{(item.quantity * item.price).toLocaleString()}</p>
                           </div>
                         </div>

@@ -57,7 +57,7 @@ export default function HomeClient({ products, categories, reviews }) {
                   transition={{ duration: 0.8 }}
                   className="w-full"
                >
-                  <motion.h2
+                  <motion.h1
                      className="text-3xl sm:text-5xl lg:text-7xl font-serif font-bold text-brand-primary leading-tight uppercase text-center mb-4 overflow-hidden flex flex-wrap justify-center items-center"
                   >
                      {(() => {
@@ -89,7 +89,7 @@ export default function HomeClient({ products, categories, reviews }) {
                            </React.Fragment>
                         ));
                      })()}
-                  </motion.h2>
+                  </motion.h1>
                   <motion.div
                      initial={{ opacity: 0, letterSpacing: "1em", y: 10 }}
                      animate={{ opacity: 1, letterSpacing: "0.4em", y: 0 }}
@@ -478,7 +478,7 @@ export default function HomeClient({ products, categories, reviews }) {
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        className="flex-grow flex flex-col justify-between p-10 lg:p-10 rounded-[50px] lg:rounded-[40px] bg-gradient-to-br from-white via-brand-accent/20 to-white border border-brand-secondary/20 relative overflow-hidden group shadow-[0_60px_120px_-30px_rgba(26,67,50,0.12)] selection:bg-brand-secondary/30"
+                        className="flex-grow flex flex-col justify-between p-7 sm:p-10 rounded-[40px] lg:rounded-[40px] bg-gradient-to-br from-white via-brand-accent/20 to-white border border-brand-secondary/20 relative overflow-hidden group shadow-[0_60px_120px_-30px_rgba(26,67,50,0.12)] selection:bg-brand-secondary/30"
                      >
                         <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none select-none">
                            <Icon icon="solar:crown-minimalistic-bold" className="w-40 h-40 text-brand-secondary rotate-12" />
@@ -488,22 +488,22 @@ export default function HomeClient({ products, categories, reviews }) {
                            <motion.div
                               initial={{ opacity: 0, y: 10 }}
                               whileInView={{ opacity: 1, y: 0 }}
-                              className="flex items-center gap-4 mb-10"
+                              className="flex items-center gap-3 sm:gap-4 mb-6 lg:mb-10"
                            >
                               <div className="relative flex items-center justify-center">
-                                 <div className="w-3.5 h-3.5 bg-brand-secondary rounded-full shadow-[0_0_20px_rgba(197,160,89,0.8)]" />
-                                 <div className="absolute inset-0 w-3.5 h-3.5 bg-brand-secondary rounded-full animate-ping opacity-30" />
+                                 <div className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 bg-brand-secondary rounded-full shadow-[0_0_20px_rgba(197,160,89,0.8)]" />
+                                 <div className="absolute inset-0 w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 bg-brand-secondary rounded-full animate-ping opacity-30" />
                               </div>
-                              <span className="text-[10px] lg:text-[11px] font-bold uppercase tracking-[0.5em] text-brand-primary">SSD • SURAT STUDIO</span>
+                              <span className="text-[9px] lg:text-[11px] font-bold uppercase tracking-[0.3em] lg:tracking-[0.5em] text-brand-primary">SSD • SURAT STUDIO</span>
                            </motion.div>
 
-                           <h3 className="text-5xl lg:text-7xl font-serif font-black text-brand-primary mb-8 leading-[1.1] tracking-tighter">
+                           <h3 className="text-4xl sm:text-5xl lg:text-7xl font-serif font-black text-brand-primary mb-6 lg:mb-8 leading-[1.1] tracking-tighter">
                               Visit Our <span className="relative inline-block">
                                  <span className="bg-gradient-to-r from-brand-secondary via-[#d4af37] to-brand-secondary bg-clip-text text-transparent italic font-normal">Surat</span>
                                  <motion.div
                                     initial={{ scaleX: 0 }}
                                     whileInView={{ scaleX: 1 }}
-                                    className="absolute -bottom-2 left-0 w-full h-1 bg-brand-secondary/30 origin-left"
+                                    className="absolute -bottom-1 lg:-bottom-2 left-0 w-full h-1 bg-brand-secondary/30 origin-left"
                                  />
                               </span>
                            </h3>
@@ -512,48 +512,54 @@ export default function HomeClient({ products, categories, reviews }) {
                               "Step into a sanctuary of devotion where every thread is woven with soul and generations of heritage."
                            </p>
 
-                           <div className="grid grid-cols-1 gap-6 mb-12 lg:mb-20">
-                              <div className="flex items-center gap-6 lg:gap-8 group/item">
-                                 <div className="w-16 h-16 rounded-2xl bg-white/80 backdrop-blur-xl shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] flex items-center justify-center shrink-0 border border-brand-secondary/10 group-hover/item:border-brand-secondary transition-all duration-700">
-                                    <Icon icon="solar:map-point-wave-bold" className="w-8 h-8 text-brand-primary" />
+                           <div className="grid grid-cols-1 gap-5 lg:gap-6 mb-10 lg:mb-20">
+                              <a
+                                 href="https://maps.app.goo.gl/JApzZ9c7UvcsunWB7"
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                              >
+                                 <div className="flex items-center gap-4 sm:gap-6 lg:gap-8 group/item">
+                                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-white/80 backdrop-blur-xl shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] flex items-center justify-center shrink-0 border border-brand-secondary/10 group-hover/item:border-brand-secondary transition-all duration-700">
+                                       <Icon icon="solar:map-point-wave-bold" className="w-6 h-6 sm:w-8 sm:h-8 text-brand-primary" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                       <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] text-brand-secondary mb-1 opacity-60">The Creative Studio</span>
+                                       <span className="text-[13px] sm:text-lg font-serif font-bold text-brand-primary leading-tight">69, Darshan Ind., Laskana, Surat.</span>
+                                    </div>
                                  </div>
-                                 <div className="flex flex-col">
-                                    <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-secondary mb-1.5 opacity-60">The Creative Studio</span>
-                                    <span className="text-sm lg:text-lg font-serif font-bold text-brand-primary leading-tight">69, Darshan Ind., Laskana, Surat.</span>
-                                 </div>
-                              </div>
+                              </a>
 
-                              <div className="flex items-center gap-6 lg:gap-8 group/item">
-                                 <div className="w-16 h-16 rounded-2xl bg-white/80 backdrop-blur-xl shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] flex items-center justify-center shrink-0 border border-brand-secondary/10 group-hover/item:border-brand-secondary transition-all duration-700">
-                                    <Icon icon="solar:history-bold" className="w-8 h-8 text-brand-primary" />
+                              <div className="flex items-center gap-4 sm:gap-6 lg:gap-8 group/item">
+                                 <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-white/80 backdrop-blur-xl shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] flex items-center justify-center shrink-0 border border-brand-secondary/10 group-hover/item:border-brand-secondary transition-all duration-700">
+                                    <Icon icon="solar:history-bold" className="w-6 h-6 sm:w-8 sm:h-8 text-brand-primary" />
                                  </div>
                                  <div className="flex flex-col">
-                                    <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-secondary mb-1.5 opacity-60">Boutique Timings</span>
-                                    <span className="text-sm lg:text-lg font-serif font-bold text-brand-primary">Mon - Sat | 09:00 AM - 06:00 PM</span>
+                                    <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] text-brand-secondary mb-1 opacity-60">Boutique Timings</span>
+                                    <span className="text-[13px] sm:text-lg font-serif font-bold text-brand-primary">Mon - Sat | 09:00 AM - 06:00 PM</span>
                                  </div>
                               </div>
                            </div>
                         </div>
 
-                        <div className="flex items-center gap-5 relative z-10">
+                        <div className="flex items-center gap-3 sm:gap-5 relative z-10 w-full">
                            <a
                               href="https://maps.app.goo.gl/JApzZ9c7UvcsunWB7"
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-grow relative overflow-hidden group/btn rounded-[20px] lg:rounded-full"
+                              className="flex-grow relative overflow-hidden group/btn rounded-[20px] lg:rounded-full h-14 sm:h-16"
                            >
                               <div className="absolute inset-0 bg-gradient-to-r from-brand-primary via-[#2d4f41] to-brand-primary opacity-100 group-hover/btn:opacity-90 transition-opacity" />
                               <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-[1.5s] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-                              <div className="relative py-6 lg:py-4 px-10 lg:px-12 flex items-center justify-center gap-4 text-white text-xs lg:text-sm font-bold uppercase tracking-[0.3em]">
-                                 <Icon icon="logos:google-maps" className="w-6 h-6 lg:w-7 lg:h-7 grayscale brightness-[5] group-hover/btn:grayscale-0 group-hover/btn:brightness-100 transition-all duration-500" />
-                                 Click Here For Map
+                              <div className="relative h-full px-4 sm:px-10 lg:px-12 flex items-center justify-center gap-2 sm:gap-4 text-white text-[10px] sm:text-xs lg:text-sm font-bold uppercase tracking-[0.1em] sm:tracking-[0.3em]">
+                                 <Icon icon="logos:google-maps" className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 grayscale brightness-[5] group-hover/btn:grayscale-0 group-hover/btn:brightness-100 transition-all duration-500" />
+                                 <span className="whitespace-nowrap">Click Here For Map</span>
                               </div>
                            </a>
 
                            <a href="tel:+917383699199" className="shrink-0">
-                              <div className="w-16 h-16 rounded-[20px] lg:rounded-[20px] bg-brand-secondary/10 flex items-center justify-center text-brand-secondary border border-brand-secondary/20 shadow-xl hover:bg-brand-secondary hover:text-white transition-all duration-300 transform hover:-rotate-6 active:scale-95 group/call">
-                                 <Icon icon="solar:phone-calling-bold" className="w-8 h-8 lg:w-8 lg:h-8 transition-transform duration-500" />
+                              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[18px] sm:rounded-[20px] bg-brand-secondary/10 flex items-center justify-center text-brand-secondary border border-brand-secondary/20 shadow-xl hover:bg-brand-secondary hover:text-white transition-all duration-300 transform hover:-rotate-6 active:scale-95 group/call">
+                                 <Icon icon="solar:phone-calling-bold" className="w-7 h-7 sm:w-8 sm:h-8 transition-transform duration-500" />
                               </div>
                            </a>
                         </div>

@@ -1,7 +1,17 @@
 import CollectionsClient from "./CollectionsClient";
-import productData from "../../../data/products.json";
-import navigationData from "../../../data/navigation.json";
 import prisma from "@/lib/prisma";
+
+export const revalidate = 3600; // Revalidate every hour
+
+export async function generateStaticParams() {
+  const categories = await prisma.category.findMany({
+    select: { slug: true }
+  });
+
+  return categories.map((cat) => ({
+    categoryId: cat.slug,
+  }));
+}
 
 export async function generateMetadata({ params }) {
   const { categoryId } = await params;
