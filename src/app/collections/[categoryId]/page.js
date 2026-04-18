@@ -1,5 +1,7 @@
 import CollectionsClient from "./CollectionsClient";
 import prisma from "@/lib/prisma";
+import { Icon } from "@iconify/react";
+import Link from "next/link";
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -15,7 +17,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }) {
   const { categoryId } = await params;
-  
+
   // Try DB first
   const dbCat = await prisma.category.findUnique({ where: { slug: categoryId } });
   if (dbCat) {
@@ -40,19 +42,19 @@ export async function generateMetadata({ params }) {
     alternates: { canonical: `/collections/${categoryId}` }
   };
   */
-  
+
   return { title: "Collection Not Found" };
 }
 
 export default async function CollectionsPage({ params }) {
   const { categoryId } = await params;
-  
+
   // Try DB First
-  const dbCategory = await prisma.category.findUnique({ 
-    where: { slug: categoryId }, 
-    include: { subCategories: true } 
+  const dbCategory = await prisma.category.findUnique({
+    where: { slug: categoryId },
+    include: { subCategories: true }
   });
-  
+
   if (dbCategory) {
      const subCategoriesData = await Promise.all(dbCategory.subCategories.map(async (sub) => {
         const count = await prisma.product.count({ where: { subCategoryId: sub.id, isVisible: true } });
@@ -64,12 +66,12 @@ export default async function CollectionsPage({ params }) {
         };
      }));
 
-     const proxyCategory = { 
-       id: dbCategory.slug, 
-       name: dbCategory.name, 
-       label: dbCategory.name, 
+     const proxyCategory = {
+       id: dbCategory.slug,
+       name: dbCategory.name,
+       label: dbCategory.name,
        image: dbCategory.imageUrl,
-       videos: dbCategory.videos 
+       videos: dbCategory.videos
      };
 
 
@@ -106,12 +108,12 @@ export default async function CollectionsPage({ params }) {
       <p className="text-brand-primary/60 max-w-md mx-auto mb-10 leading-relaxed text-sm">
         We couldn't locate this specific registry entry in our master catalog. Our curators may be updating the collection.
       </p>
-      <a 
+      <Link 
         href="/" 
         className="inline-flex items-center justify-center px-10 py-5 bg-brand-primary text-white rounded-full font-bold text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-brand-primary/30 hover:bg-brand-secondary transition-all active:scale-95"
       >
         Back to Master Catalog
-      </a>
+      </Link>
     </div>
   );
 }

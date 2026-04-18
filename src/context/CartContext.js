@@ -1,6 +1,7 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { roundToTwo } from '@/lib/utils';
 
 const CartContext = createContext({
@@ -14,6 +15,7 @@ const CartContext = createContext({
   toggleSave: () => {},
   isProductSaved: () => false,
   cartTotal: 0,
+  originalCartTotal: 0,
   cartCount: 0,
   isAuthenticated: false,
   isLoading: true
@@ -23,108 +25,98 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
   const [saved, setSaved] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const isInitialLoad = React.useRef(true);
-  const isCartFetched = React.useRef(false);
+  const [isReady, setIsReady] = useState(false);
+  const queryClient = useQueryClient();
   const pathname = usePathname();
 
-  // Re-check authentication and fetch data
+  // Check Auth
   useEffect(() => {
     const hasSession = document.cookie.split(';').some((item) => item.trim().startsWith('ssd_wholesale_logged=true'));
     setIsAuthenticated(hasSession);
-    
-    if (hasSession) {
-      // Re-fetch items on every navigation to ensure multi-device accuracy
-      // We no longer PUSH local storage to DB to avoid data corruption across devices
-      fetchSavedFromBackend();
-      fetchCartFromBackend();
-
-      if (!isCartFetched.current) {
-        isCartFetched.current = true;
-      }
-    }
   }, [pathname]);
 
+  // Initial local storage load
   useEffect(() => {
-    // Initial load from storage
     const savedCart = localStorage.getItem('ssd_cart');
     const savedWishlist = localStorage.getItem('ssd_saved');
-    
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error("Failed to parse cart", e);
-      }
-    }
-    if (savedWishlist) {
-      try {
-        setSaved(JSON.parse(savedWishlist));
-      } catch (e) {
-        console.error("Failed to parse wishlist", e);
-      }
-    }
-    
-    isInitialLoad.current = false;
-    setIsLoading(false);
+    if (savedCart) try { setCart(JSON.parse(savedCart)); } catch (e) {}
+    if (savedWishlist) try { setSaved(JSON.parse(savedWishlist)); } catch (e) {}
+    setIsReady(true);
   }, []);
 
-  const fetchSavedFromBackend = async () => {
-    try {
+  // Server Queries
+  const { data: serverSaved } = useQuery({
+    queryKey: ['user-saved'],
+    queryFn: async () => {
       const res = await fetch('/api/user/saved');
       const data = await res.json();
-      if (data.success) {
-        setSaved(data.saved);
-      }
-    } catch (err) {
-      console.error("Error fetching saved products:", err);
-    }
-  };
+      return data.success ? data.saved : [];
+    },
+    enabled: isAuthenticated,
+  });
 
-
-  const fetchCartFromBackend = async () => {
-    try {
+  const { data: serverCart } = useQuery({
+    queryKey: ['user-cart'],
+    queryFn: async () => {
       const res = await fetch('/api/user/cart');
       const data = await res.json();
-      if (data.success) {
-        setCart(data.cart);
-      }
-    } catch (err) {
-      console.error("Error fetching cart from backend:", err);
-    }
-  };
+      return data.success ? data.cart : [];
+    },
+    enabled: isAuthenticated,
+  });
 
-  const syncCartItem = async (productId, quantity, variantName, price, originalPrice, action) => {
-    if (!isAuthenticated) return;
-    try {
-      await fetch('/api/user/cart', {
+  // Sync server data to local state when it arrives
+  useEffect(() => {
+    if (isAuthenticated && serverSaved) setSaved(serverSaved);
+  }, [serverSaved, isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated && serverCart) setCart(serverCart);
+  }, [serverCart, isAuthenticated]);
+
+  // Handle local storage persistence
+  useEffect(() => {
+    if (isReady) {
+      localStorage.setItem('ssd_cart', JSON.stringify(cart));
+      localStorage.setItem('ssd_saved', JSON.stringify(saved));
+    }
+  }, [cart, saved, isReady]);
+
+  // Mutations
+  const cartMutation = useMutation({
+    mutationFn: async ({ productId, quantity, variantName, price, originalPrice, action }) => {
+      if (!isAuthenticated) return;
+      return fetch('/api/user/cart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productId, quantity, variantName, price, originalPrice, action })
       });
-    } catch (err) {
-      console.error("Error syncing cart item:", err);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-cart'] });
     }
-  };
+  });
 
-  useEffect(() => {
-    if (!isInitialLoad.current) {
-      localStorage.setItem('ssd_cart', JSON.stringify(cart));
-      localStorage.setItem('ssd_saved', JSON.stringify(saved));
+  const savedMutation = useMutation({
+    mutationFn: async ({ productId, variantName }) => {
+      if (!isAuthenticated) return;
+      return fetch('/api/user/saved', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId, variantName })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-saved'] });
     }
-  }, [cart, saved]);
+  });
 
   const addToCart = (product, quantity = 1, variantName = null, variantPrice = null, originalPrice = null) => {
     const existing = cart.find(item => item.id === product.id && item.variantName === variantName);
     const finalQty = existing ? existing.quantity + quantity : quantity;
     
-    const priceToUse = (variantPrice !== null && variantPrice !== undefined) 
-      ? roundToTwo(variantPrice) 
-      : roundToTwo(product.price || 0);
-    
-    const oldPrice = (originalPrice !== null && originalPrice !== undefined)
-      ? roundToTwo(originalPrice)
-      : roundToTwo(product.mrp || product.price || 0);
+    const priceToUse = roundToTwo(variantPrice ?? product.price ?? 0);
+    const oldPrice = roundToTwo(originalPrice ?? product.mrp ?? product.price ?? 0);
 
     setCart(prev => {
       if (existing) {
@@ -133,26 +125,20 @@ export function CartProvider({ children }) {
       return [...prev, { ...product, quantity: finalQty, price: priceToUse, originalPrice: oldPrice, variantName }];
     });
     
-    // Sync with DB
     if (isAuthenticated) {
-      syncCartItem(product.id, finalQty, variantName, priceToUse, oldPrice);
+      cartMutation.mutate({ productId: product.id, quantity: finalQty, variantName, price: priceToUse, originalPrice: oldPrice });
     }
   };
 
   const addMultipleToCart = (items) => {
-    // items: Array of { product, quantity, variantName, variantPrice, originalPrice }
     setCart(prev => {
       let nextCart = [...prev];
       items.forEach(({ product, quantity, variantName, variantPrice, originalPrice }) => {
         const priceToUse = roundToTwo(variantPrice ?? product.price ?? 0);
         const oldPrice = roundToTwo(originalPrice ?? product.mrp ?? product.price ?? 0);
-        
         const existingIdx = nextCart.findIndex(item => item.id === product.id && item.variantName === variantName);
         if (existingIdx > -1) {
-          nextCart[existingIdx] = { 
-            ...nextCart[existingIdx], 
-            quantity: nextCart[existingIdx].quantity + quantity 
-          };
+          nextCart[existingIdx] = { ...nextCart[existingIdx], quantity: nextCart[existingIdx].quantity + quantity };
         } else {
           nextCart.push({ ...product, quantity, price: priceToUse, originalPrice: oldPrice, variantName });
         }
@@ -161,33 +147,21 @@ export function CartProvider({ children }) {
     });
 
     if (isAuthenticated) {
-      // Sync each to DB - For high performance we could add a bulk API endpoint
-      // but individual calls are safer for current architecture. 
-      // Actually, let's just loop them for now as it's a small number of variants.
-      items.forEach(async (item) => {
-        // Need to find the final quantity after increment
-        // It's safer to just sync the whole cart or use a bulk endpoint.
-        // I will implement a bulk sync in the API.
-      });
-      
-      items.forEach((item) => {
-        syncCartItem(
-          item.product.id, 
-          item.quantity, 
-          item.variantName, 
-          item.variantPrice || item.product.price, 
-          item.originalPrice || item.product.mrp || item.product.price
-        );
+      items.forEach(item => {
+        cartMutation.mutate({ 
+          productId: item.product.id, 
+          quantity: item.quantity, 
+          variantName: item.variantName, 
+          price: item.variantPrice || item.product.price, 
+          originalPrice: item.originalPrice || item.product.mrp || item.product.price 
+        });
       });
     }
   };
 
-
   const removeFromCart = (id, variantName = null) => {
     setCart(prev => prev.filter(item => !(item.id === id && item.variantName === variantName)));
-    if (isAuthenticated) {
-      syncCartItem(id, 0, variantName, 0, 0);
-    }
+    if (isAuthenticated) cartMutation.mutate({ productId: id, quantity: 0, variantName, price: 0, originalPrice: 0 });
   };
 
   const updateQuantity = (id, variantName, quantity) => {
@@ -202,20 +176,15 @@ export function CartProvider({ children }) {
       }
       return item;
     }));
-    if (isAuthenticated) {
-      syncCartItem(id, quantity, variantName, itemPrice, itemOriginalPrice);
-    }
+    if (isAuthenticated) cartMutation.mutate({ productId: id, quantity, variantName, price: itemPrice, originalPrice: itemOriginalPrice });
   };
 
   const clearCart = () => {
     setCart([]);
-    if (isAuthenticated) {
-      syncCartItem(null, 0, null, 0, 0, "CLEAR_CART");
-    }
+    if (isAuthenticated) cartMutation.mutate({ productId: null, quantity: 0, variantName: null, price: 0, originalPrice: 0, action: "CLEAR_CART" });
   };
 
-  const toggleSave = async (product, variantName = null) => {
-    // Optimistic update
+  const toggleSave = (product, variantName = null) => {
     const vName = variantName || product.variantName || null;
     const isSaved = saved.some(item => item.id === product.id && item.variantName === vName);
     if (isSaved) {
@@ -224,17 +193,8 @@ export function CartProvider({ children }) {
       setSaved(prev => [{ ...product, variantName: vName }, ...prev]);
     }
 
-    // Sync with backend if authenticated
     if (isAuthenticated) {
-      try {
-        await fetch('/api/user/saved', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productId: product.id, variantName: vName })
-        });
-      } catch (err) {
-        console.error("Error syncing saved product:", err);
-      }
+      savedMutation.mutate({ productId: product.id, variantName: vName });
     }
   };
 
@@ -247,7 +207,7 @@ export function CartProvider({ children }) {
   return (
     <CartContext.Provider value={{ 
       cart, addToCart, addMultipleToCart, removeFromCart, updateQuantity, clearCart, cartTotal, originalCartTotal, cartCount,
-      saved, toggleSave, isProductSaved, isAuthenticated, isLoading
+      saved, toggleSave, isProductSaved, isAuthenticated, isLoading: !isReady 
     }}>
       {children}
     </CartContext.Provider>

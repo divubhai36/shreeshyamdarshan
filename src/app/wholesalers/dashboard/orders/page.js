@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const STATUS_COLORS = {
@@ -13,10 +14,19 @@ const STATUS_COLORS = {
 };
 
 export default function OrdersPage() {
-   const [orders, setOrders] = useState([]);
-   const [loading, setLoading] = useState(true);
    const [activeOrder, setActiveOrder] = useState(null);
    const router = useRouter();
+
+   const { data: orders = [], isLoading: loading } = useQuery({
+      queryKey: ['user-orders'],
+      queryFn: async () => {
+         const res = await fetch("/api/user/orders");
+         const dt = await res.json();
+         if (!dt.success) throw new Error("Load failed");
+         return dt.orders;
+      },
+      staleTime: 5 * 60 * 1000, // 5 minutes cache
+   });
 
    useEffect(() => {
       const isLogged = document.cookie.split(';').some(c => c.trim().startsWith('ssd_wholesale_logged=true'));
@@ -24,17 +34,7 @@ export default function OrdersPage() {
          router.push('/login?callbackUrl=/wholesalers/dashboard/orders');
          return;
       }
-      loadOrders();
    }, []);
-
-   const loadOrders = async () => {
-      try {
-         const res = await fetch("/api/user/orders");
-         const dt = await res.json();
-         if (dt.success) setOrders(dt.orders);
-      } catch (e) { console.error("Failed to load orders"); }
-      setLoading(false);
-   };
 
    return (
       <div className="min-h-screen bg-[#fcfbf7]">

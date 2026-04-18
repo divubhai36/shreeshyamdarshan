@@ -1,13 +1,24 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import { usePathname } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LeadPopup() {
    const [show, setShow] = useState(false);
    const [formData, setFormData] = useState({ name: '', mobile: '', product: '', pieces: '1', state: '', city: '' });
    const pathname = usePathname();
+
+   const inquiryMutation = useMutation({
+      mutationFn: async (payload) => {
+         return fetch("/api/user/inquiry", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...payload, type: "GENERAL" })
+         });
+      }
+   });
 
    useEffect(() => {
       // Disable popups on admin and professional B2B routes
@@ -37,26 +48,16 @@ export default function LeadPopup() {
          clearTimeout(timer1);
          clearTimeout(timer2);
       };
-   }, []);
+   }, [pathname]);
 
    const handleClose = () => {
       setShow(false);
-      // We don't block the second popup here, only if they submit
    };
 
    const handleSubmit = async (e) => {
       e.preventDefault();
-
-      try {
-         // SAVE TO DATABASE IN BACKGROUND
-         await fetch("/api/user/inquiry", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...formData, type: "GENERAL" })
-         });
-      } catch (err) {
-         console.error("Lead save error:", err);
-      }
+      
+      inquiryMutation.mutate(formData);
 
       const phone = "917383699199";
       const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Name:* ${formData.name}\n*Mobile:* ${formData.mobile}\n*City:* ${formData.city}\n*State:* ${formData.state}\n*Interested In:* ${formData.product}\n*Quantity:* ${formData.pieces} pcs\n------------------\nPlease help me with the details.`;
@@ -64,7 +65,6 @@ export default function LeadPopup() {
       const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
       window.open(whatsappUrl, '_blank');
 
-      // Mark as submitted to never show the popup again in this session
       if (typeof window !== 'undefined') {
          sessionStorage.setItem('lead_popup_submitted', 'true');
       }
