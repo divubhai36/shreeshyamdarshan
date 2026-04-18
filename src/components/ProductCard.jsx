@@ -80,7 +80,7 @@ export default function ProductCard({ product }) {
                   toggleSave(product);
                 }}
                 className={`transition-all duration-300 shrink-0 ${
-                  saved ? "text-rose-500" : "text-brand-primary/10 hover:text-brand-primary"
+                  saved ? "text-rose-500" : "text-brand-secondary/60 hover:text-brand-primary"
                 }`}
               >
                 <Icon

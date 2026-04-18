@@ -1,10 +1,9 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { Icon } from '@iconify/react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 const STATUS_COLORS = {
   PENDING: "bg-amber-50 text-amber-600 border-amber-200",
@@ -236,8 +235,6 @@ export default function MyAccount() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

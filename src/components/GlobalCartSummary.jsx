@@ -22,7 +22,7 @@ export default function GlobalCartSummary() {
 
   return (
     <AnimatePresence>
-      <div className="fixed bottom-4 sm:bottom-8 left-0 right-0 z-40 px-4 sm:px-6 pointer-events-none">
+      <div className="fixed bottom-4 sm:bottom-8 left-0 right-0 z-[100] px-4 sm:px-6 pointer-events-none">
         <motion.div
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

@@ -1,8 +1,6 @@
 "use client";
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -116,7 +114,6 @@ export default function AboutUsClient() {
          </motion.div>
       </section>
 
-      <Footer />
     </div>
   );
 }

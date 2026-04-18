@@ -1,9 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import Header from "../../components/Header";
 import { Icon } from "@iconify/react";
-import Footer from "../../components/Footer";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -136,7 +134,6 @@ export default function ContactUsClient() {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 }

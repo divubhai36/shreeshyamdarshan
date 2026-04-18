@@ -1,5 +1,6 @@
 import ProductClient from "./ProductClient";
 import prisma from "@/lib/prisma";
+import Link from "next/link";
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -143,12 +144,12 @@ export default async function ProductPage({ params }) {
       <p className="text-brand-primary/60 max-w-md mx-auto mb-10 leading-relaxed text-sm">
         This Product is currently unavailable. Please check back later or explore our other divine collections.
       </p>
-      <a
+      <Link
         href="/"
         className="inline-flex items-center justify-center px-10 py-5 bg-brand-primary text-white rounded-full font-bold text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-brand-primary/30 hover:bg-brand-secondary transition-all active:scale-95"
       >
         Continue Exploration
-      </a>
+      </Link>
     </div>
   );
 }
