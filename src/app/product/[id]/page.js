@@ -1,7 +1,19 @@
 import ProductClient from "./ProductClient";
-import productData from "../../../data/products.json";
-import navigationData from "../../../data/navigation.json";
 import prisma from "@/lib/prisma";
+
+export const revalidate = 3600; // Revalidate every hour
+
+export async function generateStaticParams() {
+  const products = await prisma.product.findMany({
+    where: { isVisible: true },
+    select: { id: true },
+    take: 100 // Pre-render top 100 products for instant loading
+  });
+
+  return products.map((product) => ({
+    id: product.id,
+  }));
+}
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
@@ -10,24 +22,24 @@ export async function generateMetadata({ params }) {
       const dbProduct = await prisma.product.findUnique({ where: { id, isVisible: true } });
       if (dbProduct) {
           return {
-            title: dbProduct.name,
-            description: `${dbProduct.name}. Buy premium divine poshaks direct from factory.`,
-            openGraph: { title: dbProduct.name, description: dbProduct.description, images: [dbProduct.images[0]] },
+            title: `${dbProduct.name} | Shree Shyam Darshan`,
+            description: dbProduct.description || `${dbProduct.name}. Buy premium divine poshaks direct from factory.`,
+            openGraph: {
+              title: dbProduct.name,
+              description: dbProduct.description,
+              images: [{ url: dbProduct.images[0], width: 800, height: 600, alt: dbProduct.name }],
+              type: 'website',
+            },
+            twitter: {
+              card: 'summary_large_image',
+              title: dbProduct.name,
+              description: dbProduct.description,
+              images: [dbProduct.images[0]],
+            },
             alternates: { canonical: `/product/${id}` }
           };
       }
-  // eslint-disable-next-line no-empty
   } catch (err) {}
-
-  // --- FALLBACK SUSPENDED BY USER ---
-  /*
-  const product = productData.products.find((p) => String(p.id) === id);
-  if (!product) return { title: "ProducCinematic Qualityt Not Found" };
-  return {
-    title: product.name,
-    alternates: { canonical: `/product/${id}` },
-  };
-  */
 
   return { title: "Product Not Found" };
 }
@@ -42,7 +54,6 @@ export default async function ProductPage({ params }) {
       });
 
       if (dbProduct) {
-         // Gather up to 10 random related products from the same subcategory
          const relatedDbPool = await prisma.product.findMany({
              where: { subCategoryId: dbProduct.subCategoryId, id: { not: dbProduct.id }, isVisible: true },
              take: 20
@@ -58,9 +69,9 @@ export default async function ProductPage({ params }) {
              innerCategory: dbProduct.innerSubCategory?.name || null,
              price: dbProduct.price,
              description: dbProduct.description,
-             image: dbProduct.images[0] || "/hero.png", // Hero image map
-             images: dbProduct.images, // Full array map
-             videos: dbProduct.videos, // Full array map
+             image: dbProduct.images[0] || "/hero.png",
+             images: dbProduct.images,
+             videos: dbProduct.videos,
              isBestSeller: dbProduct.isBestSeller,
              isOfferProduct: dbProduct.isOfferProduct,
              offerPrice: dbProduct.offerPrice,
@@ -91,22 +102,35 @@ export default async function ProductPage({ params }) {
          const subCat = { id: dbProduct.subCategory.slug, name: dbProduct.subCategory.name };
          const innerSubCat = dbProduct.innerSubCategory ? { id: dbProduct.innerSubCategory.slug, name: dbProduct.innerSubCategory.name } : null;
 
-         return <ProductClient product={mappedProduct} navCategory={navCat} subCategory={subCat} innerSubCategory={innerSubCat} relatedProducts={mappedRelated} />;
+         // Product JSON-LD
+         const jsonLd = {
+           "@context": "https://schema.org",
+           "@type": "Product",
+           "name": dbProduct.name,
+           "image": dbProduct.images,
+           "description": dbProduct.description,
+           "sku": dbProduct.productId,
+           "brand": { "@type": "Brand", "name": "Shree Shyam Darshan" },
+           "offers": {
+             "@type": "Offer",
+             "url": `https://shreeshyamdarshan.com/product/${dbProduct.id}`,
+             "priceCurrency": "INR",
+             "price": dbProduct.offerPrice || dbProduct.price,
+             "availability": "https://schema.org/InStock"
+           }
+         };
+
+         return (
+           <>
+             <script
+               type="application/ld+json"
+               dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+             />
+             <ProductClient product={mappedProduct} navCategory={navCat} subCategory={subCat} innerSubCategory={innerSubCat} relatedProducts={mappedRelated} />
+           </>
+         );
       }
-  // eslint-disable-next-line no-empty
   } catch(err) {}
-
-  // --- FALLBACK SUSPENDED BY USER ---
-  /*
-  const product = productData.products.find((p) => String(p.id) === id);
-  if (!product) return <div>Product Not Found</div>;
-
-  const navCategory = navigationData.find((c) => c.subCategories.some((sub) => sub.name.toLowerCase() === product.category.toLowerCase() || sub.id.toLowerCase() === product.category.toLowerCase()));
-  const subCategory = navCategory?.subCategories.find((sub) => sub.name.toLowerCase() === product.category.toLowerCase() || sub.id.toLowerCase() === product.category.toLowerCase());
-  const relatedProducts = productData.products.filter((p) => p.id !== product.id && (p.category === product.category || (navCategory && p.category === navCategory.id))).slice(0, 10);
-
-  return <ProductClient product={product} navCategory={navCategory} subCategory={subCategory} relatedProducts={relatedProducts} />;
-  */
 
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">

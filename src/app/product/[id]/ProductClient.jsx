@@ -160,6 +160,25 @@ export default function ProductClient({ product, navCategory, subCategory, inner
     window.open(whatsappUrl, "_blank");
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: product.name,
+      text: `Divine collection from Shree Shyam Darshan: ${product.name}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copied to clipboard!");
+      }
+    } catch (err) {
+      console.error("Share error:", err);
+    }
+  };
+
   const AccordionItem = ({ id, title, icon, children }) => {
     const isOpen = activeAccordion === id;
     return (
@@ -380,39 +399,51 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     <h1 className="text-2xl sm:text-3xl lg:text-5xl font-serif font-bold text-brand-primary leading-tight tracking-tight text-left capitalize grow">
                       {product.name}
                     </h1>
-                    {isAuthenticated && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="shrink-0"
+                    <div className="flex items-center gap-2 lg:gap-4 shrink-0">
+                      <motion.button
+                        whileHover={{ scale: 1.1, y: -2 }}
+                        whileTap={{ scale: 0.85 }}
+                        onClick={handleShare}
+                        className="text-brand-primary/40 hover:text-brand-primary transition-colors p-2"
+                        title="Share Product"
                       >
-                        <motion.button
-                          whileHover={{ scale: 1.1, y: -2 }}
-                          whileTap={{ scale: 0.85 }}
-                          onClick={() => toggleSave(product)}
-                          className={`transition-all duration-300 relative ${saved ? "text-rose-500" : "text-brand-primary hover:scale-95"
-                            }`}
+                        <Icon icon="solar:share-linear" className="w-6 h-6 lg:w-8 lg:h-8" />
+                      </motion.button>
+                      
+                      {isAuthenticated && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="shrink-0"
                         >
-                          <motion.div
-                            animate={{
-                              scale: saved ? [1, 1.25, 1] : 1,
-                            }}
-                            transition={{
-                              duration: 0.25,
-                              ease: "easeOut",
-                            }}
+                          <motion.button
+                            whileHover={{ scale: 1.1, y: -2 }}
+                            whileTap={{ scale: 0.85 }}
+                            onClick={() => toggleSave(product)}
+                            className={`transition-all duration-300 relative ${saved ? "text-rose-500" : "text-brand-primary hover:scale-95"
+                              }`}
                           >
-                            <Icon
-                              icon={saved ? "solar:heart-bold" : "solar:heart-linear"}
-                              className={`w-8 h-8 lg:w-10 lg:h-10 ${saved
-                                ? "drop-shadow-[0_0_15px_rgba(244,63,94,0.3)]"
-                                : ""
-                                }`}
-                            />
-                          </motion.div>
-                        </motion.button>
-                      </motion.div>
-                    )}
+                            <motion.div
+                              animate={{
+                                scale: saved ? [1, 1.25, 1] : 1,
+                              }}
+                              transition={{
+                                duration: 0.25,
+                                ease: "easeOut",
+                              }}
+                            >
+                              <Icon
+                                icon={saved ? "solar:heart-bold" : "solar:heart-linear"}
+                                className={`w-8 h-8 lg:w-10 lg:h-10 ${saved
+                                  ? "drop-shadow-[0_0_15px_rgba(244,63,94,0.3)]"
+                                  : ""
+                                  }`}
+                              />
+                            </motion.div>
+                          </motion.button>
+                        </motion.div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-6 mb-2 lg:mb-10 text-left">
@@ -593,13 +624,22 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     </div>
                   )}
 
-                  <button
-                    onClick={handleWhatsApp}
-                    className="w-full bg-white text-brand-primary border border-brand-primary/10 py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-sm hover:shadow-lg hover:border-brand-primary/20 transition-all active:scale-[0.98] group"
-                  >
-                    <Icon icon="logos:whatsapp-icon" className="w-6 h-6" />
-                    <span>Inquiry On Whatsapp</span>
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button
+                      onClick={handleWhatsApp}
+                      className="grow bg-white text-brand-primary border border-brand-primary/10 py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-sm hover:shadow-lg hover:border-brand-primary/20 transition-all active:scale-[0.98] group"
+                    >
+                      <Icon icon="logos:whatsapp-icon" className="w-6 h-6" />
+                      <span>Inquiry On Whatsapp</span>
+                    </button>
+                    <button
+                      onClick={handleShare}
+                      className="shrink-0 bg-brand-primary/5 text-brand-primary p-5 rounded-2xl hover:bg-brand-primary/10 transition-all flex items-center justify-center"
+                      title="Share Product"
+                    >
+                      <Icon icon="solar:share-bold" className="w-6 h-6" />
+                    </button>
+                  </div>
 
                   <div className="mt-8 space-y-0 text-left">
 

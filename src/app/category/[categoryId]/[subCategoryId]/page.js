@@ -1,7 +1,18 @@
 import SubCategoryClient from "./SubCategoryClient";
-import productData from "../../../../data/products.json";
-import navigationData from "../../../../data/navigation.json";
 import prisma from "@/lib/prisma";
+
+export const revalidate = 3600; // Revalidate every hour
+
+export async function generateStaticParams() {
+  const subCategories = await prisma.subCategory.findMany({
+    include: { category: true }
+  });
+
+  return subCategories.map((sub) => ({
+    categoryId: sub.category.slug,
+    subCategoryId: sub.slug,
+  }));
+}
 
 export async function generateMetadata({ params }) {
   const { categoryId, subCategoryId } = await params;

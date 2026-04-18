@@ -567,18 +567,6 @@ export default function ProductsPage() {
 
                                                 <button
                                                     type="button"
-                                                    title="GM"
-                                                    onClick={() => {
-                                                        const q = ["Regular"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
-                                                        toast.success("Injected common sizes");
-                                                    }}
-                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                                                >
-                                                    GM
-                                                </button>
-                                                <button
-                                                    type="button"
                                                     title="LP"
                                                     onClick={() => {
                                                         const q = ["2", "3", "4", "5", "6", "7", "9", "11"];
@@ -588,114 +576,6 @@ export default function ProductsPage() {
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
                                                 >
                                                     LP
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="DG"
-                                                    onClick={() => {
-                                                        const q = ["5", "6", "7", "9", "12", "15", "18", "21"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
-                                                        toast.success("Injected common sizes");
-                                                    }}
-                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                                                >
-                                                    DG
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="JAMA"
-                                                    onClick={() => {
-                                                        const q = ["00", "0", "1", "2", "3", "4", "5", "6", "7", "9"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
-                                                        toast.success("Injected common sizes");
-                                                    }}
-                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                                                >
-                                                    JAMA
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="FT"
-                                                    onClick={() => {
-                                                        const q = ["5", "8", "10", "13", "18", "24", "30", "38", "48", "78"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
-                                                        toast.success("Injected common sizes");
-                                                    }}
-                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                                                >
-                                                    FT
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="MUKUT"
-                                                    onClick={() => {
-                                                        const q = ["5", "8", "10", "13", "18", "24", "30", "38", "48", "78"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
-                                                        toast.success("Injected common sizes");
-                                                    }}
-                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                                                >
-                                                    MUKUT
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="RK"
-                                                    onClick={() => {
-                                                        const q = ["2", "3", "4", "5", "6", "7", "9", "12", "15", "18"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
-                                                        toast.success("Injected common sizes");
-                                                    }}
-                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                                                >
-                                                    RK
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="RD"
-                                                    onClick={() => {
-                                                        const q = ["2", "3", "4", "5", "6", "7", "9", "12", "15", "18"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
-                                                        toast.success("Injected common sizes");
-                                                    }}
-                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                                                >
-                                                    RD
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="HANJUMANJI"
-                                                    onClick={() => {
-                                                        const q = ["5", "6", "7", "9", "12", "15", "18", "21", "24", "27", "30"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
-                                                        toast.success("Injected common sizes");
-                                                    }}
-                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                                                >
-                                                    HM
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="SIHASAN"
-                                                    onClick={() => {
-                                                        const q = ["1", "2", "3", "4", "5"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
-                                                        toast.success("Injected common sizes");
-                                                    }}
-                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                                                >
-                                                    SIHASAN
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="ZULA"
-                                                    onClick={() => {
-                                                        const q = ["4", "6", "8"];
-                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
-                                                        toast.success("Injected common sizes");
-                                                    }}
-                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
-                                                >
-                                                    ZULA
                                                 </button>
                                                 <button
                                                     type="button"
@@ -725,6 +605,126 @@ export default function ProductsPage() {
                                                     className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
                                                 >
                                                     AASAN
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="JAMA"
+                                                    onClick={() => {
+                                                        const q = ["00", "0", "1", "2", "3", "4", "5", "6", "7", "9"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    JAMA
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="DG"
+                                                    onClick={() => {
+                                                        const q = ["5", "6", "7", "9", "12", "15", "18", "21"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    DG
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="FT"
+                                                    onClick={() => {
+                                                        const q = ["5", "8", "10", "13", "18", "24", "30", "38", "48", "78"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    FT
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="MUKUT"
+                                                    onClick={() => {
+                                                        const q = ["5", "8", "10", "13", "18", "24", "30", "38", "48", "78"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    MUKUT
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="HANJUMANJI"
+                                                    onClick={() => {
+                                                        const q = ["5", "6", "7", "9", "12", "15", "18", "21", "24", "27", "30"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    HM
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="RK"
+                                                    onClick={() => {
+                                                        const q = ["2", "3", "4", "5", "6", "7", "9", "12", "15", "18"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    RK
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="GM"
+                                                    onClick={() => {
+                                                        const q = ["Regular"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    GM
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="RD"
+                                                    onClick={() => {
+                                                        const q = ["2", "3", "4", "5", "6", "7", "9", "12", "15", "18"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    RD
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="SIHASAN"
+                                                    onClick={() => {
+                                                        const q = ["1", "2", "3", "4", "5"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    SIHASAN
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="ZULA"
+                                                    onClick={() => {
+                                                        const q = ["4", "6", "8"];
+                                                        setForm({ ...form, variants: [...form.variants, ...q.map(s => ({ id: Math.random().toString(36).substr(2, 9) + Math.random(), name: s, price: "" }))] });
+                                                        toast.success("Injected common sizes");
+                                                    }}
+                                                    className="min-w-10 h-10 px-2 text-[10px] bg-brand-primary/10 text-brand-primary rounded-[12px] flex items-center justify-center border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                                >
+                                                    ZULA
                                                 </button>
                                             </div>
                                             <div className="flex-grow overflow-y-auto no-scrollbar max-h-[400px]">

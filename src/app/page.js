@@ -7,6 +7,8 @@ export const metadata = {
    description: "Shree Shyam Darshan is the leading manufacturer of Laddu Gopal Poshaks, Shringar sets, and Divine Accessories in Surat, India. Worldwide delivery available.",
 };
 
+export const revalidate = 3600; // Revalidate every hour
+
 export default async function Home() {
    // 1. Fetch Dynamic Database Content
    const dbProducts = await prisma.product.findMany({ 
@@ -57,5 +59,29 @@ export default async function Home() {
       }));
     }
     
-    return <HomeClient products={products} categories={categories} reviews={reviews} />;
+    // SEO Structured Data
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Shree Shyam Darshan",
+      "url": "https://shreeshyamdarshan.com",
+      "logo": "https://shreeshyamdarshan.com/logo.png",
+      "description": "India's Biggest Manufacturer of Divine Poshaks and Accessories.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Surat",
+        "addressRegion": "Gujarat",
+        "addressCountry": "India"
+      }
+    };
+
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <HomeClient products={products} categories={categories} reviews={reviews} />
+      </>
+    );
 }
