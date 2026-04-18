@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
-import CategoryCard from "../../../components/CategoryCard";
+import CategoryCard from "@/components/CategoryCard";
 import Image from "next/image";
 
 export default function CollectionsClient({ category, categoryId, subCategories }) {

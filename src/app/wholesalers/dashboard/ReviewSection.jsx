@@ -1,56 +1,55 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Icon } from '@iconify/react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ReviewSection() {
-  const [review, setReview] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
 
-  useEffect(() => {
-    fetchReview();
-  }, []);
-
-  const fetchReview = async () => {
-    try {
+  const { data: review, isLoading: loading } = useQuery({
+    queryKey: ['user-review'],
+    queryFn: async () => {
       const res = await fetch("/api/user/reviews");
       const data = await res.json();
-      if (data.success) setReview(data.review);
-    } catch (err) {
-      console.error("Failed to fetch review");
-    } finally {
-      setLoading(false);
+      return data.success ? data.review : null;
     }
-  };
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
+  const submitMutation = useMutation({
+    mutationFn: async (payload) => {
       const res = await fetch("/api/user/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating, comment }),
+        body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      return res.json();
+    },
+    onSuccess: (data) => {
       if (data.success) {
-        setReview(data.review);
+        queryClient.invalidateQueries({ queryKey: ['user-review'] });
         setIsModalOpen(false);
+        setComment("");
         setMessage({ type: "success", text: "Feedback submitted for moderation!" });
       } else {
         setMessage({ type: "error", text: data.error || "Submission failed" });
       }
-    } catch (err) {
+    },
+    onError: () => {
       setMessage({ type: "error", text: "Connection error" });
-    } finally {
-      setSubmitting(false);
     }
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    submitMutation.mutate({ rating, comment });
   };
+
+  const submitting = submitMutation.isPending;
 
   if (loading) return null;
 
@@ -108,7 +107,7 @@ export default function ReviewSection() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-white w-full max-w-md rounded-[40px] p-8 lg:p-10 shadow-2xl relative z-10"
+              className="bg-white w-full max-md rounded-[40px] p-8 lg:p-10 shadow-2xl relative z-10"
             >
               <button 
                 onClick={() => setIsModalOpen(false)}
@@ -149,7 +148,7 @@ export default function ReviewSection() {
                 </div>
 
                 <div className="pt-4">
-                  <button 
+                   <button 
                     disabled={submitting}
                     className="w-full bg-brand-primary text-white py-5 rounded-3xl font-bold uppercase tracking-[0.2em] text-xs shadow-xl hover:bg-brand-secondary transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
                   >

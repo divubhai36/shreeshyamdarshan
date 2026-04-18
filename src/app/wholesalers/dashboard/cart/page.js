@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { useRouter } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import { roundToTwo } from '@/lib/utils';
@@ -11,18 +12,9 @@ export default function CartPage() {
   const { cart = [], addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, originalCartTotal, cartCount } = useCart();
   const router = useRouter();
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [lastOrderDetails, setLastOrderDetails] = useState(null);
   const [successTotals, setSuccessTotals] = useState({ total: 0, originalTotal: 0 });
-
-  useEffect(() => {
-    const isLogged = document.cookie.split(';').some(c => c.trim().startsWith('ssd_wholesale_logged=true'));
-    if (!isLogged && !localStorage.getItem('ssd_user')) {
-      router.push('/login?callbackUrl=/wholesalers/dashboard/cart');
-      return;
-    }
-  }, []);
 
   const groupedCart = cart.reduce((acc, item) => {
     if (!acc[item.id]) {
@@ -62,22 +54,16 @@ export default function CartPage() {
     return `${qty} Piece`;
   };
 
-  const handleCheckout = async () => {
-    if (cart.length === 0) return;
-
-    setIsProcessing(true);
-    try {
+  const checkoutMutation = useMutation({
+    mutationFn: async (payload) => {
       const res = await fetch("/api/user/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: cart,
-          totalAmount: cartTotal
-        })
+        body: JSON.stringify(payload)
       });
-
-      const data = await res.json();
-
+      return res.json();
+    },
+    onSuccess: (data) => {
       if (data.success) {
         setSuccessTotals({ total: cartTotal, originalTotal: originalCartTotal });
         setLastOrderDetails(data.order);
@@ -98,12 +84,29 @@ export default function CartPage() {
       } else {
         toast.error(data.error || "Failed to place order");
       }
-    } catch (err) {
+    },
+    onError: () => {
       toast.error("Connection failed. Please try again.");
-    } finally {
-      setIsProcessing(false);
     }
+  });
+
+  useEffect(() => {
+    const isLogged = document.cookie.split(';').some(c => c.trim().startsWith('ssd_wholesale_logged=true'));
+    if (!isLogged && !localStorage.getItem('ssd_user')) {
+      router.push('/login?callbackUrl=/wholesalers/dashboard/cart');
+      return;
+    }
+  }, []);
+
+  const handleCheckout = () => {
+    if (cart.length === 0) return;
+    checkoutMutation.mutate({
+      items: cart,
+      totalAmount: cartTotal
+    });
   };
+
+  const isProcessing = checkoutMutation.isPending;
 
   if (isSuccess) {
     return (

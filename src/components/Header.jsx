@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
@@ -57,9 +58,29 @@ export default function Header() {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const searchResults = searchQuery.length > 0
-    ? productData.products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    : [];
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+
+  // Handle debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const { data: searchResults = { products: [], collections: [] }, isFetching: isSearching } = useQuery({
+    queryKey: ['products-search', debouncedSearchQuery],
+    queryFn: async () => {
+      if (debouncedSearchQuery.length < 2) return { products: [], collections: [] };
+      const res = await fetch(`/api/products/search?q=${encodeURIComponent(debouncedSearchQuery)}`);
+      if (!res.ok) throw new Error("Search failed");
+      return res.json();
+    },
+    enabled: debouncedSearchQuery.length >= 2,
+    placeholderData: (prev) => prev || { products: [], collections: [] },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
 
   if (isExcluded) return null;
 
@@ -519,44 +540,107 @@ export default function Header() {
                     animate={{ opacity: 1 }}
                     className="space-y-12"
                   >
-                    <div className="flex flex-col items-center gap-4 border-b border-brand-primary/5 pb-6">
-                      <p className="text-[10px] font-bold text-brand-primary/20 uppercase tracking-[0.4em]">
-                        {searchResults.length} Selected results
-                      </p>
-                    </div>
+                    {isSearching ? (
+                      <div className="space-y-16 animate-pulse">
+                        {/* Skeleton for Collections */}
+                        <div className="space-y-6">
+                          <div className="flex items-center gap-4">
+                            <div className="h-3 w-24 bg-brand-primary/5 rounded-full"></div>
+                            <div className="h-px w-full bg-brand-primary/5"></div>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {[1, 2, 3, 4].map((i) => (
+                              <div key={i} className="h-32 bg-brand-primary/5 rounded-2xl"></div>
+                            ))}
+                          </div>
+                        </div>
 
-                    {searchResults.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8">
-                        {searchResults.map((p, idx) => (
-                          <motion.div
-                            key={p.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.03 }}
-                          >
-                            <Link
-                              href={`/product/${p.id}`}
-                              onClick={() => setIsSearchOpen(false)}
-                              className="group flex items-center gap-6 p-4 rounded-2xl hover:bg-brand-accent/30 transition-all duration-500"
-                            >
-                              <div className="relative w-20 h-20 lg:w-24 lg:h-24 rounded-xl overflow-hidden shrink-0 bg-brand-accent/50 p-2">
-                                <Image
-                                  src={p.image}
-                                  alt={p.name}
-                                  fill
-                                  sizes="96px"
-                                  className="object-cover rounded-lg group-hover:scale-110 transition-transform duration-1000"
-                                />
-                              </div>
-                              <div className="flex flex-col justify-center flex-grow">
-                                <div className="text-brand-secondary text-[8px] font-black uppercase tracking-[0.3em] mb-1">{p.category}</div>
-                                <h4 className="text-brand-primary text-sm lg:text-base font-bold group-hover:text-brand-secondary transition-colors line-clamp-1">{p.name}</h4>
-                                <p className="text-brand-primary/40 text-[10px] font-bold mt-1 tracking-widest uppercase">₹{p.price}</p>
-                              </div>
-                              <Icon icon="lucide:arrow-right" className="w-4 h-4 text-brand-primary/10 group-hover:text-brand-secondary group-hover:translate-x-1 transition-all" />
-                            </Link>
-                          </motion.div>
-                        ))}
+                        {/* Skeleton for Products */}
+                        <div className="space-y-6">
+                          <div className="flex items-center gap-4">
+                            <div className="h-3 w-32 bg-brand-primary/5 rounded-full"></div>
+                            <div className="h-px w-full bg-brand-primary/5"></div>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8">
+                            {[1, 2].map((i) => (
+                              <div key={i} className="h-28 bg-brand-primary/5 rounded-2xl"></div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (searchResults.collections.length > 0 || searchResults.products.length > 0) ? (
+                      <div className="space-y-16">
+                        {/* Suggested Collections Section */}
+                        {searchResults.collections.length > 0 && (
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <span className="text-xs font-black text-brand-secondary/40 uppercase tracking-[0.5em] shrink-0">Collections</span>
+                              <div className="h-px w-full bg-brand-primary/5"></div>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                              {searchResults.collections.map((coll) => (
+                                <Link
+                                  key={coll.id}
+                                  href={coll.path}
+                                  onClick={() => {
+                                    setIsSearchOpen(false);
+                                    setSearchQuery('');
+                                  }}
+                                  className="group flex flex-col items-center justify-center p-6 rounded-2xl border border-brand-primary/5 hover:border-brand-secondary/30 transition-all duration-500 bg-brand-accent/5"
+                                >
+                                  <span className="text-[10px] font-serif italic text-brand-primary/30 mb-2 group-hover:text-brand-secondary transition-colors uppercase tracking-[0.1em]">{coll.type}</span>
+                                  <span className="text-sm lg:text-base font-serif italic font-bold text-brand-primary uppercase tracking-[0.1em] text-center">{coll.name}</span>
+                                  <div className="w-0 group-hover:w-6 h-[1px] bg-brand-secondary mt-3 transition-all duration-500"></div>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Product Results Section */}
+                        {searchResults.products.length > 0 && (
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <span className="text-xs font-black text-brand-secondary/40 uppercase tracking-[0.5em] shrink-0">Masterpieces</span>
+                              <div className="h-px w-full bg-brand-primary/5"></div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8">
+                              {searchResults.products.map((p, idx) => (
+                                <motion.div
+                                  key={p.id}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: idx * 0.03 }}
+                                >
+                                  <Link
+                                    href={`/product/${p.id}`}
+                                    onClick={() => {
+                                      setIsSearchOpen(false);
+                                      setSearchQuery('');
+                                    }}
+                                    className="group flex items-center gap-6 p-4 rounded-2xl hover:bg-brand-accent/30 transition-all duration-500"
+                                  >
+                                    <div className="relative w-20 h-20 lg:w-24 lg:h-24 rounded-xl overflow-hidden shrink-0 bg-brand-accent/50 p-2">
+                                      <Image
+                                        src={p.image}
+                                        alt={p.name}
+                                        fill
+                                        sizes="96px"
+                                        className="object-cover rounded-lg group-hover:scale-110 transition-transform duration-1000"
+                                      />
+                                    </div>
+                                    <div className="flex flex-col justify-center flex-grow">
+                                      <div className="text-brand-secondary text-[8px] font-black uppercase tracking-[0.3em] mb-1">{p.category} {p.section ? `• ${p.section}` : ''}</div>
+                                      <h4 className="text-brand-primary text-sm lg:text-base font-bold group-hover:text-brand-secondary transition-colors line-clamp-1">{p.name}</h4>
+                                      <p className="text-brand-primary/40 text-[10px] font-bold mt-1 tracking-widest uppercase">₹{p.price}</p>
+                                    </div>
+                                    <Icon icon="lucide:arrow-right" className="w-4 h-4 text-brand-primary/10 group-hover:text-brand-secondary group-hover:translate-x-1 transition-all" />
+                                  </Link>
+                                </motion.div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <motion.div
@@ -564,6 +648,9 @@ export default function Header() {
                         animate={{ opacity: 1 }}
                         className="py-32 flex flex-col items-center text-center"
                       >
+                        <div className="w-16 h-16 bg-brand-primary/5 rounded-full flex items-center justify-center mb-6 text-brand-primary/20">
+                          <Icon icon="solar:magnifer-zoom-out-broken" className="w-8 h-8" />
+                        </div>
                         <h3 className="text-2xl font-serif italic text-brand-primary mb-3">No Masterpieces Found</h3>
                         <p className="text-[9px] font-bold text-brand-primary/20 uppercase tracking-[0.3em] max-w-[200px] leading-relaxed">Try alternative terms or browse our core essence</p>
                       </motion.div>

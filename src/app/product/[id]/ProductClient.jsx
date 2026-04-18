@@ -11,6 +11,22 @@ import "slick-carousel/slick/slick-theme.css";
 import { toast } from "react-hot-toast";
 import { roundToTwo } from "@/lib/utils";
 
+const ImageWithFallback = ({ src, alt, ...props }) => {
+  const [imgSrc, setImgSrc] = useState(src);
+  useEffect(() => {
+    setImgSrc(src);
+  }, [src]);
+
+  return (
+    <Image
+      {...props}
+      src={imgSrc || '/hero.png'}
+      alt={alt}
+      onError={() => setImgSrc('/hero.png')}
+    />
+  );
+};
+
 export default function ProductClient({ product, navCategory, subCategory, innerSubCategory, relatedProducts }) {
   const { cart, addToCart, addMultipleToCart, removeFromCart, toggleSave, isProductSaved, isAuthenticated } = useCart();
   const saved = isProductSaved(product.id);
@@ -342,7 +358,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   className="relative aspect-square overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5"
                 >
                   <div className="relative w-full h-full">
-                    <Image
+                    <ImageWithFallback
                       src={productImages[activeImageIdx]}
                       alt={product.name}
                       fill
@@ -373,7 +389,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                           : "border-transparent opacity-60 hover:opacity-100"
                           }`}
                       >
-                        <Image
+                        <ImageWithFallback
                           src={img}
                           alt={`${product.name} thumbnail ${idx + 1}`}
                           fill
@@ -739,7 +755,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                         <div key={p.id} className="px-2 md:px-4 pb-8 lg:pb-16 pt-6">
                           <Link href={`/product/${p.id}`} className="block group">
                             <div className="relative aspect-square rounded-[24px] lg:rounded-[32px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 bg-white border border-brand-primary/5">
-                              <Image src={p.image} alt={p.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover transition-transform duration-1000 group-hover:scale-110" />
+                              <ImageWithFallback src={p.image} alt={p.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover transition-transform duration-1000 group-hover:scale-110" />
                               <div className="absolute bottom-4 left-4 right-4 z-10 transition-all duration-1000">
                                 <div className="bg-white/95 backdrop-blur-md p-4 lg:p-5 rounded-3xl border border-white/20 shadow-xl group-hover:bg-white/10 group-hover:text-white">
                                   <p className="text-[11px] lg:text-xs font-serif font-bold truncate">{p.name}</p>
