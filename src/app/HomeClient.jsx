@@ -488,6 +488,7 @@ export default function HomeClient({ products, categories, reviews }) {
                            <motion.div
                               initial={{ opacity: 0, y: 10 }}
                               whileInView={{ opacity: 1, y: 0 }}
+                              viewport={{ once: true }}
                               className="flex items-center gap-3 sm:gap-4 mb-6 lg:mb-10"
                            >
                               <div className="relative flex items-center justify-center">
@@ -503,6 +504,7 @@ export default function HomeClient({ products, categories, reviews }) {
                                  <motion.div
                                     initial={{ scaleX: 0 }}
                                     whileInView={{ scaleX: 1 }}
+                                    viewport={{ once: true }}
                                     className="absolute -bottom-1 lg:-bottom-2 left-0 w-full h-1 bg-brand-secondary/30 origin-left"
                                  />
                               </span>

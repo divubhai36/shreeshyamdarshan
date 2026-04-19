@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import { roundToTwo } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import CartSummaryPill from '@/components/CartSummaryPill';
 
 export default function CartPage() {
   const { cart = [], addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, originalCartTotal, cartCount } = useCart();
@@ -203,9 +204,9 @@ export default function CartPage() {
             </button>
           </div>
         ) : (
-          <div className="space-y-4 sm:space-y-6">
-            {/* Grouped Cart Items List */}
-            <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 lg:gap-12 items-start">
+            {/* Left: Product List */}
+            <div className="space-y-4">
               <AnimatePresence mode="popLayout">
                 {groupedItems.map((product) => (
                   <motion.div
@@ -251,55 +252,69 @@ export default function CartPage() {
               </AnimatePresence>
             </div>
 
-            {/* Premium Summary Bar */}
-            <div className="fixed bottom-4 sm:bottom-8 left-0 right-0 z-40 px-4 sm:px-6 pointer-events-none">
-              <motion.div
-                initial={{ y: 100 }}
-                animate={{ y: 0 }}
-                className="container mx-auto max-w-lg bg-white p-4 sm:p-4 rounded-[28px] sm:rounded-4xl border border-brand-primary/10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)] flex items-center justify-between gap-4 pointer-events-auto backdrop-blur-md"
-              >
-                <div className="flex items-center gap-3 sm:gap-6 border-r border-brand-primary/5 pr-4 sm:pr-8 min-w-0">
-                  <div className="hidden sm:block">
-                    <p className="text-[7px] sm:text-[8px] font-bold text-brand-primary/30 uppercase tracking-widest mb-1 sm:mb-1.5">Units</p>
-                    <p className="text-lg sm:text-xl font-bold text-brand-primary">{cartCount}</p>
+            {/* Right: Dedicated Summary Sidebar */}
+            <div className="lg:sticky lg:top-36 space-y-6">
+              <div className="bg-white rounded-[40px] p-8 border border-brand-primary/10 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.08)]">
+                <h3 className="text-xl font-serif font-bold text-brand-primary mb-6">Order Summary</h3>
+
+                <div className="space-y-4 mb-8">
+                  <div className="flex justify-between items-center text-xs font-bold text-brand-primary/40 uppercase tracking-widest">
+                    <span>Items</span>
+                    <span className="text-brand-primary">{groupedItems.length} Products</span>
                   </div>
-                  <div className="min-w-0 flex-grow">
-                    <p className="text-[8px] sm:text-[10px] font-bold text-brand-primary/80 uppercase tracking-widest mb-1 sm:mb-1.5 opacity-60">Total Amount</p>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-xl sm:text-3xl font-bold text-brand-primary tracking-tight">₹{(cartTotal || 0).toLocaleString()}</p>
-                      {originalCartTotal > cartTotal && (
-                        <div className="flex flex-row gap-1 items-center">
-                          <span className="text-xs sm:text-lg font-bold text-brand-primary/20 line-through decoration-brand-primary/30 leading-none">₹{originalCartTotal.toLocaleString()}</span>
-                          <p className="text-[7px] sm:text-[9px] font-black text-green-600 uppercase tracking-[0.15em] mt-0.5 whitespace-nowrap bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
-                            Saved ₹{(originalCartTotal - cartTotal).toLocaleString()}
-                          </p>
-                        </div>
-                      )}
+                  <div className="flex justify-between items-center text-xs font-bold text-brand-primary/40 uppercase tracking-widest">
+                    <span>Quantity</span>
+                    <span className="text-brand-primary">{cartCount} Units</span>
+                  </div>
+
+                  {originalCartTotal > cartTotal && (
+                    <div className="pt-4 border-t border-brand-primary/5">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs font-bold text-brand-primary/40 uppercase tracking-widest">Original Total</span>
+                        <span className="text-sm font-bold text-brand-primary/20 line-through decoration-brand-primary/10">₹{originalCartTotal.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-brand-primary/40 uppercase tracking-widest">Discount</span>
+                        <span className="text-xs font-black text-green-600 bg-green-50 px-2 py-1 rounded-lg border border-green-100">
+                          ₹{(originalCartTotal - cartTotal).toLocaleString()} Saved
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  )}
+                </div>
+
+                <div className="flex justify-between items-end mb-8 pt-6 border-t border-brand-primary/5">
+                  <p className="text-[10px] font-bold text-brand-primary/30 uppercase tracking-[0.2em] mb-2">Total Amount</p>
+                  <p className="text-4xl font-bold text-brand-primary tracking-tighter">₹{(cartTotal || 0).toLocaleString()}</p>
                 </div>
 
                 <button
                   onClick={handleCheckout}
                   disabled={isProcessing}
-                  className="shrink-0 sm:px-8 px-5 py-4 sm:py-5 bg-brand-secondary text-white font-bold rounded-2xl sm:rounded-3xl uppercase tracking-[0.2em] text-[10px] sm:text-xs shadow-xl hover:scale-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 sm:gap-3 group disabled:opacity-50 disabled:grayscale cursor-pointer"
+                  className="w-full bg-brand-primary text-white py-5 rounded-[20px] font-bold uppercase tracking-[0.2em] text-xs shadow-2xl hover:bg-brand-secondary transition-all flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:grayscale group"
                 >
                   {isProcessing ? (
-                    <Icon icon="line-md:loading-loop" className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <Icon icon="line-md:loading-loop" className="w-6 h-6" />
                   ) : (
-                    <Icon icon="material-symbols:shopping-cart-checkout-rounded" className="w-5 h-5 sm:w-6 sm:h-6 hidden sm:block" />
+                    <Icon icon="material-symbols:shopping-cart-checkout-rounded" className="w-6 h-6" />
                   )}
-                  <span className="inline">{isProcessing ? "Processing..." : "Checkout"}</span>
+                  <span>{isProcessing ? "Processing..." : "Place Order"}</span>
                 </button>
-              </motion.div>
+
+                <p className="text-[10px] text-center text-brand-primary/30 font-medium mt-6 leading-relaxed italic">
+                  By placing this order, you authorize inventory preparation for your store.
+                </p>
+              </div>
             </div>
           </div>
         )}
 
+
+
         {/* Variant Management Popup */}
         <AnimatePresence>
           {selectedProduct && (() => {
-            // Find the "live" version of the selected product from our grouped items 
+            // Find the "live" version of the selected product from our grouped items
             // This ensures the UI updates instantly when context changes
             const liveProduct = groupedItems.find(p => p.id === selectedProduct.id) || {
               ...selectedProduct,
@@ -355,9 +370,9 @@ export default function CartPage() {
                       {/* Map over ALL available variants using LIVE data */}
                       {(liveProduct.allAvailableVariants.length > 0 ? liveProduct.allAvailableVariants : [{ name: 'Base' }]).map((availableV, idx) => {
                         const vName = availableV.name || null;
-                        
+
                         // Find if this variant is already in the live cart
-                        const inCart = liveProduct.variantsInCart.find(item => 
+                        const inCart = liveProduct.variantsInCart.find(item =>
                           vName === 'Base' ? !item.variantName : item.variantName === vName
                         );
 
@@ -369,13 +384,13 @@ export default function CartPage() {
                           <div key={idx} className={`bg-white p-3 sm:p-5 rounded-2xl sm:rounded-3xl border ${currentQty > 0 ? 'border-brand-secondary/20 shadow-sm' : 'border-brand-primary/5 opacity-60'} flex items-center justify-between gap-3 sm:gap-6 group hover:border-brand-secondary/30 transition-all`}>
                             {/* Info Section */}
                             <div className="flex-grow min-w-0">
-                                <p className="font-bold text-brand-primary text-xs sm:text-lg uppercase tracking-wider truncate">{vName === 'Base' ? 'Base Design' : vName}</p>
-                                <div className="flex items-center gap-1.5 mt-0.5">
-                                  {vMrp > vPrice && (
-                                    <span className="text-[8px] sm:text-xs font-bold text-brand-primary/20 line-through">₹{(vMrp || 0).toLocaleString()}</span>
-                                  )}
-                                  <p className="text-[9px] sm:text-sm text-brand-secondary font-black tracking-widest uppercase">₹{(vPrice || 0).toLocaleString()}<span className="text-[8px] opacity-20 ml-0.5">/pc</span></p>
-                                </div>
+                              <p className="font-bold text-brand-primary text-xs sm:text-lg uppercase tracking-wider truncate">{vName === 'Base' ? 'Base Design' : vName}</p>
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                {vMrp > vPrice && (
+                                  <span className="text-[8px] sm:text-xs font-bold text-brand-primary/20 line-through">₹{(vMrp || 0).toLocaleString()}</span>
+                                )}
+                                <p className="text-[9px] sm:text-sm text-brand-secondary font-black tracking-widest uppercase">₹{(vPrice || 0).toLocaleString()}<span className="text-[8px] opacity-20 ml-0.5">/pc</span></p>
+                              </div>
                             </div>
 
                             {/* Stepper Center Section */}
@@ -386,7 +401,7 @@ export default function CartPage() {
                                     e.stopPropagation();
                                     const step = liveProduct.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
                                     const newQty = Math.max(0, currentQty - step);
-                                    
+
                                     if (newQty === 0 && currentQty > 0) {
                                       removeFromCart(liveProduct.id, vName === 'Base' ? null : vName);
                                     } else if (newQty > 0) {
@@ -397,7 +412,7 @@ export default function CartPage() {
                                 >
                                   <Icon icon="lucide:minus" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 </button>
-                                
+
                                 <input
                                   type="number"
                                   min="0"
@@ -406,7 +421,7 @@ export default function CartPage() {
                                     const val = e.target.value === "" ? 0 : parseInt(e.target.value);
                                     const multiplier = liveProduct.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
                                     const newQty = isNaN(val) ? 0 : val * multiplier;
-                                    
+
                                     if (newQty === 0 && currentQty > 0) {
                                       removeFromCart(liveProduct.id, vName === 'Base' ? null : vName);
                                     } else if (newQty > 0) {
@@ -433,7 +448,7 @@ export default function CartPage() {
                                     e.stopPropagation();
                                     const step = liveProduct.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
                                     const newQty = currentQty + step;
-                                    
+
                                     if (currentQty === 0) {
                                       const prodToAdd = {
                                         id: liveProduct.id,
@@ -490,7 +505,7 @@ export default function CartPage() {
                     <div className="text-center xs:text-left w-full xs:w-auto">
                       <p className="text-xs font-bold text-brand-primary/30 uppercase tracking-[0.2em] mb-1">Subtotal Valuation</p>
                       <div className="flex items-end justify-center xs:justify-start gap-2">
-                         <p className="text-2xl sm:text-4xl font-bold text-brand-primary tracking-tight">₹{(liveProduct.totalPrice || 0).toLocaleString()}</p>
+                        <p className="text-2xl sm:text-4xl font-bold text-brand-primary tracking-tight">₹{(liveProduct.totalPrice || 0).toLocaleString()}</p>
                         {liveProduct.originalTotalPrice > liveProduct.totalPrice && (
                           <span className="text-sm sm:text-xl font-bold text-brand-primary/20 line-through decoration-brand-primary/30 mb-1">₹{(liveProduct.originalTotalPrice || 0).toLocaleString()}</span>
                         )}

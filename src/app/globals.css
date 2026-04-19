@@ -13,7 +13,11 @@
 
 @layer base {
   body {
-    @apply font-sans text-brand-dark antialiased bg-brand-accent;
+    @apply font-sans text-brand-dark antialiased bg-brand-accent selection:bg-transparent;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
   }
 
   h1, h2, h3, h4 {

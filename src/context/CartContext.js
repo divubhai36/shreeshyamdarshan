@@ -17,6 +17,7 @@ const CartContext = createContext({
   cartTotal: 0,
   originalCartTotal: 0,
   cartCount: 0,
+  productCount: 0,
   isAuthenticated: false,
   isLoading: true
 });
@@ -203,10 +204,11 @@ export function CartProvider({ children }) {
   const cartTotal = roundToTwo(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0));
   const originalCartTotal = roundToTwo(cart.reduce((sum, item) => sum + ((item.originalPrice || item.price) * item.quantity), 0));
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const productCount = new Set(cart.map(item => item.id)).size;
 
   return (
     <CartContext.Provider value={{ 
-      cart, addToCart, addMultipleToCart, removeFromCart, updateQuantity, clearCart, cartTotal, originalCartTotal, cartCount,
+      cart, addToCart, addMultipleToCart, removeFromCart, updateQuantity, clearCart, cartTotal, originalCartTotal, cartCount, productCount,
       saved, toggleSave, isProductSaved, isAuthenticated, isLoading: !isReady 
     }}>
       {children}
