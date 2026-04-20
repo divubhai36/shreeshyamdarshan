@@ -68,8 +68,8 @@ export default function InnerSubcategoryPage() {
     <div className="max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-brand-primary">Inner Categories <span className="text-sm font-sans tracking-wide font-normal text-brand-primary/40">(Optional)</span></h1>
-          <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase mt-1">Refine product taxonomy</p>
+          <h1 className="text-4xl font-serif font-bold text-brand-primary">Inner Categories</h1>
+          <p className="text-[10px] font-black text-brand-secondary tracking-[0.4em] uppercase mt-2 opacity-60">Inner Categories Management</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto items-center">
           <div className="relative group w-full sm:w-64">

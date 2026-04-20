@@ -127,16 +127,17 @@ export default function ProductClient({ product, navCategory, subCategory, inner
     dots: false,
     infinite: true,
     speed: 1000,
-    mobileFirst: true,
-    slidesToShow: 2,
+    slidesToShow: 4,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
     arrows: false,
     pauseOnHover: true,
     responsive: [
-      { breakpoint: 768, settings: { slidesToShow: 3 } },
-      { breakpoint: 1024, settings: { slidesToShow: 4 } },
+      { breakpoint: 1280, settings: { slidesToShow: 4 } },
+      { breakpoint: 1024, settings: { slidesToShow: 3 } },
+      { breakpoint: 640,  settings: { slidesToShow: 2 } },
+      { breakpoint: 480,  settings: { slidesToShow: 1.5 } },
     ],
   };
 
@@ -425,7 +426,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                       >
                         <Icon icon="solar:share-linear" className="w-6 h-6 lg:w-8 lg:h-8" />
                       </motion.button>
-                      
+
                       {isAuthenticated && (
                         <motion.div
                           initial={{ opacity: 0, scale: 0.8 }}
@@ -752,14 +753,61 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   {isMounted && (
                     <Slider {...relatedSliderSettings}>
                       {relatedProducts.map((p) => (
-                        <div key={p.id} className="px-2 md:px-4 pb-8 lg:pb-16 pt-6">
-                          <Link href={`/product/${p.id}`} className="block group">
-                            <div className="relative aspect-square rounded-[24px] lg:rounded-[32px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 bg-white border border-brand-primary/5">
-                              <ImageWithFallback src={p.image} alt={p.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover transition-transform duration-1000 group-hover:scale-110" />
-                              <div className="absolute bottom-4 left-4 right-4 z-10 transition-all duration-1000">
-                                <div className="bg-white/95 backdrop-blur-md p-4 lg:p-5 rounded-3xl border border-white/20 shadow-xl group-hover:bg-white/10 group-hover:text-white">
-                                  <p className="text-[11px] lg:text-xs font-serif font-bold truncate">{p.name}</p>
-                                  <p className="text-[10px] lg:text-[11px] font-bold text-brand-secondary mt-1 group-hover:text-white">₹{p.price}</p>
+                        <div key={p.id} className="px-2 md:px-3 pb-10 lg:pb-16 pt-4">
+                          <Link href={`/product/${p.id}`} className="block group relative">
+
+                            {/* Card Shell */}
+                            <div className="relative aspect-[3/4] rounded-[24px] lg:rounded-[36px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 bg-brand-primary/5">
+
+                              {/* Product Image */}
+                              <ImageWithFallback
+                                src={p.image}
+                                alt={p.name}
+                                fill
+                                sizes="(max-width: 768px) 50vw, 25vw"
+                                className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
+                              />
+
+                              {/* Inner Luxury Border on Hover */}
+                              <div className="absolute inset-2 border border-brand-secondary/0 group-hover:border-brand-secondary/40 rounded-[16px] lg:rounded-[28px] transition-colors duration-700 z-10 pointer-events-none" />
+
+                              {/* Gradient shadow from bottom for text readability */}
+                              <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700 z-10 pointer-events-none" />
+
+                              {/* Offer Badge - Aesthetic ribbon */}
+                              {p.isOfferProduct && (
+                                <div className="absolute top-4 left-0 z-20 px-3 py-1 bg-gradient-to-r from-rose-600 to-red-500 text-white text-[8px] lg:text-[9px] font-black uppercase tracking-widest shadow-lg rounded-r-lg border-y border-r border-white/20">
+                                  Offer
+                                </div>
+                              )}
+
+                              {/* Floating Glass Info Panel - Hidden on mobile */}
+                              <div className="hidden md:block absolute bottom-3 left-3 right-3 lg:bottom-4 lg:left-4 lg:right-4 z-20">
+                                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-[16px] lg:rounded-[24px] p-3 lg:p-4 shadow-[0_8px_32px_rgba(0,0,0,0.12)] transform translate-y-2 group-hover:translate-y-0 group-hover:bg-brand-primary/40 lg:group-hover:bg-white/20 transition-all duration-500 ease-out">
+                                  
+                                  {/* Name */}
+                                  <p className="text-white font-serif font-bold text-[12px] lg:text-[15px] leading-tight line-clamp-2 drop-shadow-sm mb-2 group-hover:text-brand-secondary transition-colors">
+                                    {p.name}
+                                  </p>
+
+                                  {/* Price row */}
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-baseline gap-2">
+                                      <span className="text-white font-black text-[12px] lg:text-[14px] drop-shadow-md">
+                                        ₹{p.isOfferProduct && p.offerPrice ? p.offerPrice : p.price}
+                                      </span>
+                                      {p.isOfferProduct && p.offerPrice && p.price > p.offerPrice && (
+                                        <span className="text-white/50 font-bold text-[9px] lg:text-[10px] line-through">
+                                          ₹{p.price}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    {/* Arrow CTA */}
+                                    <div className="w-7 h-7 lg:w-9 lg:h-9 rounded-full bg-white text-brand-primary flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-3 group-hover:translate-x-0 transition-all duration-500 shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
+                                      <Icon icon="lucide:arrow-up-right" className="w-3.5 h-3.5 lg:w-4 lg:h-4 stroke-[2.5]" />
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                             </div>

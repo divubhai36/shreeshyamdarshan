@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 
-export default function ProductCard({ product }) {
+const ProductCard = React.memo(({ product }) => {
   const { toggleSave, isProductSaved, isAuthenticated } = useCart();
   const saved = isProductSaved(product.id);
 
@@ -99,4 +99,6 @@ export default function ProductCard({ product }) {
       </div>
     </motion.div>
   );
-}
+});
+
+export default ProductCard;

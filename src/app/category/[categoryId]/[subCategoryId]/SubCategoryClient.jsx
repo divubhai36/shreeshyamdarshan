@@ -324,7 +324,25 @@ export default function SubCategoryClient({ category, subCategory, products, cat
 
         {/* Product Sections */}
         <div className="space-y-16 lg:space-y-24">
-          {sections.length > 0 ? (
+          {products.length === 0 ? (
+             <motion.div
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="py-32 lg:py-32 flex flex-col items-center justify-center text-center px-6"
+             >
+                <div className="relative mb-8">
+                   <div className="absolute inset-0 bg-brand-secondary/5 blur-[80px] rounded-full scale-150" />
+                   <Icon icon="solar:box-minimalistic-line-duotone" className="h-20 w-20 lg:h-32 lg:w-32 text-brand-primary/10 relative z-10" />
+                </div>
+                <h3 className="text-xl lg:text-3xl font-serif font-bold text-brand-primary uppercase tracking-[0.1em] mb-4">No Products Available</h3>
+                <p className="text-[10px] lg:text-xs font-bold text-brand-primary/30 uppercase tracking-[0.2em] max-w-sm leading-relaxed">
+                   We are currently updating this collection with new divine excellence. Please check back soon.
+                </p>
+                <Link href="/" className="mt-8 px-10 py-4 bg-brand-primary text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-brand-secondary transition-all shadow-xl active:scale-95">
+                   Back to Home
+                </Link>
+             </motion.div>
+          ) : sections.length > 0 ? (
             sections.map((section) => {
               const sectionProducts = getFiltered(products.filter((p) => !p.innerSubId || p.innerSubId === section.dbId));
               return (

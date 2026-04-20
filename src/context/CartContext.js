@@ -112,7 +112,7 @@ export function CartProvider({ children }) {
     }
   });
 
-  const addToCart = (product, quantity = 1, variantName = null, variantPrice = null, originalPrice = null) => {
+  const addToCart = React.useCallback((product, quantity = 1, variantName = null, variantPrice = null, originalPrice = null) => {
     const existing = cart.find(item => item.id === product.id && item.variantName === variantName);
     const finalQty = existing ? existing.quantity + quantity : quantity;
     
@@ -129,9 +129,9 @@ export function CartProvider({ children }) {
     if (isAuthenticated) {
       cartMutation.mutate({ productId: product.id, quantity: finalQty, variantName, price: priceToUse, originalPrice: oldPrice });
     }
-  };
+  }, [cart, isAuthenticated, cartMutation]);
 
-  const addMultipleToCart = (items) => {
+  const addMultipleToCart = React.useCallback((items) => {
     setCart(prev => {
       let nextCart = [...prev];
       items.forEach(({ product, quantity, variantName, variantPrice, originalPrice }) => {
@@ -158,14 +158,14 @@ export function CartProvider({ children }) {
         });
       });
     }
-  };
+  }, [isAuthenticated, cartMutation]);
 
-  const removeFromCart = (id, variantName = null) => {
+  const removeFromCart = React.useCallback((id, variantName = null) => {
     setCart(prev => prev.filter(item => !(item.id === id && item.variantName === variantName)));
     if (isAuthenticated) cartMutation.mutate({ productId: id, quantity: 0, variantName, price: 0, originalPrice: 0 });
-  };
+  }, [isAuthenticated, cartMutation]);
 
-  const updateQuantity = (id, variantName, quantity) => {
+  const updateQuantity = React.useCallback((id, variantName, quantity) => {
     if (quantity < 1) return removeFromCart(id, variantName);
     let itemPrice = 0;
     let itemOriginalPrice = 0;
@@ -178,14 +178,14 @@ export function CartProvider({ children }) {
       return item;
     }));
     if (isAuthenticated) cartMutation.mutate({ productId: id, quantity, variantName, price: itemPrice, originalPrice: itemOriginalPrice });
-  };
+  }, [isAuthenticated, cartMutation, removeFromCart]);
 
-  const clearCart = () => {
+  const clearCart = React.useCallback(() => {
     setCart([]);
     if (isAuthenticated) cartMutation.mutate({ productId: null, quantity: 0, variantName: null, price: 0, originalPrice: 0, action: "CLEAR_CART" });
-  };
+  }, [isAuthenticated, cartMutation]);
 
-  const toggleSave = (product, variantName = null) => {
+  const toggleSave = React.useCallback((product, variantName = null) => {
     const vName = variantName || product.variantName || null;
     const isSaved = saved.some(item => item.id === product.id && item.variantName === vName);
     if (isSaved) {
@@ -197,20 +197,28 @@ export function CartProvider({ children }) {
     if (isAuthenticated) {
       savedMutation.mutate({ productId: product.id, variantName: vName });
     }
-  };
+  }, [saved, isAuthenticated, savedMutation]);
 
-  const isProductSaved = (id, variantName = null) => saved.some(item => item.id === id && (variantName ? item.variantName === variantName : true));
+  const isProductSaved = React.useCallback((id, variantName = null) => 
+    saved.some(item => item.id === id && (variantName ? item.variantName === variantName : true)),
+    [saved]
+  );
 
-  const cartTotal = roundToTwo(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0));
-  const originalCartTotal = roundToTwo(cart.reduce((sum, item) => sum + ((item.originalPrice || item.price) * item.quantity), 0));
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const productCount = new Set(cart.map(item => item.id)).size;
+  const cartTotal = React.useMemo(() => roundToTwo(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)), [cart]);
+  const originalCartTotal = React.useMemo(() => roundToTwo(cart.reduce((sum, item) => sum + ((item.originalPrice || item.price) * item.quantity), 0)), [cart]);
+  const cartCount = React.useMemo(() => cart.reduce((sum, item) => sum + item.quantity, 0), [cart]);
+  const productCount = React.useMemo(() => new Set(cart.map(item => item.id)).size, [cart]);
+
+  const value = React.useMemo(() => ({ 
+    cart, addToCart, addMultipleToCart, removeFromCart, updateQuantity, clearCart, cartTotal, originalCartTotal, cartCount, productCount,
+    saved, toggleSave, isProductSaved, isAuthenticated, isLoading: !isReady 
+  }), [
+    cart, addToCart, addMultipleToCart, removeFromCart, updateQuantity, clearCart, cartTotal, originalCartTotal, cartCount, productCount,
+    saved, toggleSave, isProductSaved, isAuthenticated, isReady
+  ]);
 
   return (
-    <CartContext.Provider value={{ 
-      cart, addToCart, addMultipleToCart, removeFromCart, updateQuantity, clearCart, cartTotal, originalCartTotal, cartCount, productCount,
-      saved, toggleSave, isProductSaved, isAuthenticated, isLoading: !isReady 
-    }}>
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );

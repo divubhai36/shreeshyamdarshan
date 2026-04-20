@@ -2,35 +2,56 @@ import SubCategoryClient from "./SubCategoryClient";
 import prisma from "@/lib/prisma";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
+import { cache } from "react";
 
 export const revalidate = 3600; // Revalidate every hour
 
-export async function generateStaticParams() {
-   const subCategories = await prisma.subCategory.findMany({
-      include: { category: true }
-   });
+const getSubCategoryData = cache(async (subCategoryId) => {
+  try {
+    return await prisma.subCategory.findUnique({
+      where: { slug: subCategoryId },
+      include: {
+         category: true,
+         innerSubCategories: true,
+         products: {
+            where: { isVisible: true },
+            include: { category: true }
+         }
+      }
+    });
+  } catch (err) {
+    console.error("[SubCategory] getSubCategoryData error:", err?.message);
+    return null;
+  }
+});
 
-   return subCategories.map((sub) => ({
-      categoryId: sub.category.slug,
-      subCategoryId: sub.slug,
-   }));
+export async function generateStaticParams() {
+   try {
+      const subCategories = await prisma.subCategory.findMany({
+         include: { category: true }
+      });
+      return subCategories.map((sub) => ({
+         categoryId: sub.category.slug,
+         subCategoryId: sub.slug,
+      }));
+   } catch (err) {
+      console.error("[SubCategory] generateStaticParams error:", err?.message);
+      return [];
+   }
 }
 
 export async function generateMetadata({ params }) {
-   const { categoryId, subCategoryId } = await params;
+   const { subCategoryId } = await params;
 
    if (!subCategoryId) return { title: "Subcategory Not Found" };
 
    try {
-      const dbSub = await prisma.subCategory.findUnique({ 
-         where: { slug: subCategoryId }, 
-         include: { category: true } 
-      });
+      const dbSub = await getSubCategoryData(subCategoryId);
       if (dbSub) {
          return {
             title: `${dbSub.name} - ${dbSub.category.name}`,
             description: `Buy premium ${dbSub.name} for ${dbSub.category.name}.`,
-            alternates: { canonical: `/category/${categoryId}/${subCategoryId}` }
+            alternates: { canonical: `/category/${dbSub.category.slug}/${subCategoryId}` }
          };
       }
    } catch (error) {
@@ -48,50 +69,46 @@ export default async function SubCategoryPage({ params }) {
    }
 
    try {
-       const dbCat = await prisma.category.findUnique({ where: { slug: categoryId } });
-       const dbSub = await prisma.subCategory.findUnique({ where: { slug: subCategoryId } });
+       const dbSub = await getSubCategoryData(subCategoryId);
 
-       if (dbCat && dbSub) {
-      const dbProducts = await prisma.product.findMany({
-         where: { subCategoryId: dbSub.id, isVisible: true },
-         include: { category: true }
-      });
+       if (dbSub && dbSub.category.slug === categoryId) {
+          const mappedProducts = dbSub.products.map(p => ({
+             id: p.id,
+             name: p.name,
+             category: p.category?.name || "Unknown",
+             price: p.price,
+             description: p.description,
+             images: p.images,
+             image: p.images[0] || "/hero.png",
+             isBestSeller: p.isBestSeller,
+             isOfferProduct: p.isOfferProduct,
+             offerPrice: p.offerPrice,
+             innerSubId: p.innerSubId
+          }));
 
-      const dbInnerCats = await prisma.innerSubCategory.findMany({
-         where: { subCategoryId: dbSub.id }
-      });
-
-      const mappedProducts = dbProducts.map(p => ({
-         id: p.id,
-         name: p.name,
-         category: p.category?.name || "Unknown",
-         price: p.price,
-         description: p.description,
-         images: p.images,
-         image: p.images[0] || "/hero.png",
-         isBestSeller: p.isBestSeller,
-         isOfferProduct: p.isOfferProduct,
-         offerPrice: p.offerPrice,
-         innerSubId: p.innerSubId
-      }));
-
-      return <SubCategoryClient
-         category={{ id: dbCat.slug, name: dbCat.name, image: dbCat.imageUrl }}
-         subCategory={{
-            id: dbSub.slug,
-            name: dbSub.name,
-            image: dbSub.imageUrl,
-            sections: dbInnerCats.map(ic => ({
-               id: ic.slug,
-               dbId: ic.id,
-               name: ic.name,
-               image: ic.imageUrl || dbSub.imageUrl // Fallback to subcat image
-            }))
-         }}
-         products={mappedProducts}
-         categoryId={dbCat.slug}
-         />;
-      }
+          return (
+             <SubCategoryClient
+                category={{ 
+                   id: dbSub.category.slug, 
+                   name: dbSub.category.name, 
+                   image: dbSub.category.imageUrl 
+                }}
+                subCategory={{
+                   id: dbSub.slug,
+                   name: dbSub.name,
+                   image: dbSub.imageUrl,
+                   sections: dbSub.innerSubCategories.map(ic => ({
+                      id: ic.slug,
+                      dbId: ic.id,
+                      name: ic.name,
+                      image: ic.imageUrl || dbSub.imageUrl
+                   }))
+                }}
+                products={mappedProducts}
+                categoryId={dbSub.category.slug}
+             />
+          );
+       }
    } catch (err) {
        console.error("SubCategoryPage error:", err);
    }
@@ -114,3 +131,4 @@ export default async function SubCategoryPage({ params }) {
       </div>
    );
 }
+

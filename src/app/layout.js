@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GlobalCartSummary from "@/components/GlobalCartSummary";
 import { Toaster } from "react-hot-toast";
+import NextTopLoader from 'nextjs-toploader';
 
 
 const playfair = Playfair_Display({
@@ -85,6 +86,17 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
+        <NextTopLoader
+          color="#c5a059"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #c5a059,0 0 5px #c5a059"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

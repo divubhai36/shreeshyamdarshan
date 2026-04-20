@@ -87,8 +87,8 @@ export default function ReviewsPage() {
     <div className="max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-brand-primary">Feedback Moderation</h1>
-          <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase mt-1">Manage Wholesaler Reviews</p>
+          <h1 className="text-4xl font-serif font-bold text-brand-primary">Reviews</h1>
+          <p className="text-[10px] font-black text-brand-secondary tracking-[0.4em] uppercase mt-2 opacity-60">Reviews Management</p>
         </div>
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="relative group w-full md:w-80">

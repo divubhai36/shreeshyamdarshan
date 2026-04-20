@@ -62,7 +62,7 @@ export default function NotFound() {
       {/* Decorative Branding Line */}
       <div className="absolute bottom-12 left-0 w-full flex flex-col items-center gap-4 opacity-10">
         <div className="h-px w-24 bg-brand-primary" />
-        <span className="text-[10px] font-black uppercase tracking-[0.6em] text-brand-primary">SS Darshan</span>
+        <span className="text-[10px] font-black uppercase tracking-[0.6em] text-brand-primary">Darshan</span>
       </div>
     </main>
   );

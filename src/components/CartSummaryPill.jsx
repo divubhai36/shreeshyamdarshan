@@ -18,7 +18,7 @@ export default function CartSummaryPill({ onClick, isProcessing = false, isFullW
       whileHover={!isFullWidth ? { scale: 1.01 } : {}}
       whileTap={!isFullWidth ? { scale: 0.98 } : {}}
       onClick={!isProcessing ? onClick : undefined}
-      className={`${isFullWidth ? 'w-full rounded-none border-x-0' : 'w-full sm:w-auto rounded-[24px] sm:rounded-[32px] border'} bg-white/95 p-4 sm:p-5 border-brand-primary/10 shadow-[0_-10px_40px_rgba(0,0,0,0.04),0_20px_50px_-20px_rgba(0,0,0,0.1)] flex items-center justify-between gap-4 pointer-events-auto backdrop-blur-md cursor-pointer group`}
+      className={`${isFullWidth ? 'w-full rounded-none border-x-0' : 'w-full sm:w-auto rounded-[24px] sm:rounded-[32px] border'} bg-white/95 p-4 sm:ps-6! sm:p-3 border-brand-primary/10 shadow-[0_-10px_40px_rgba(0,0,0,0.04),0_20px_50px_-20px_rgba(0,0,0,0.1)] flex items-center justify-between gap-4 pointer-events-auto backdrop-blur-md cursor-pointer group`}
     >
       <div className="min-w-0 flex-grow">
         <div className="flex items-center gap-3 mb-1">

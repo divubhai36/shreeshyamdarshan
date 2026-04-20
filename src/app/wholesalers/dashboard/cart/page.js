@@ -73,8 +73,10 @@ export default function CartPage() {
         // TRIGGER WHATSAPP MESSAGE
         const phone = "917383699199";
         const itemsList = cart.map(item => {
-          const unitLabel = item.unit?.toUpperCase() === "DOZEN" ? "Doz" : "Pcs";
-          return `- *[${item.productId || 'N/A'}]* ${item.name}${item.variantName ? ' (' + item.variantName + ')' : ''}: ${item.quantity} ${unitLabel} x ₹${item.price.toLocaleString()}`;
+          const isDozen = item.unit?.toUpperCase() === "DOZEN";
+          const unitLabel = isDozen ? "Doz" : "Pcs";
+          const displayQty = isDozen ? (item.quantity / 12) : item.quantity;
+          return `- *[${item.productId || 'N/A'}]* ${item.name}${item.variantName ? ' (' + item.variantName + ')' : ''}: ${displayQty} ${unitLabel} x ₹${item.price.toLocaleString()}`;
         }).join('\n');
         const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Wholesale Order Placed!\n*Order ID:* #${data.order.orderNumber}\n*Total Value:* ₹${cartTotal.toLocaleString()}\n\n*Product List:*\n${itemsList}\n\n*Wholesaler Details:* ${data.order.wholesaler?.name || 'Authorized Partner'}\n------------------\nPlease authorize and prepare this inventory for dispatch.`;
         const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
@@ -193,16 +195,32 @@ export default function CartPage() {
         </div>
 
         {cart.length === 0 ? (
-          <div className="bg-white rounded-[32px] sm:rounded-[40px] p-10 sm:p-20 text-center border border-brand-primary/5 shadow-xl">
-            <div className="w-16 h-16 sm:w-20 h-20 bg-brand-accent rounded-full flex items-center justify-center mx-auto mb-6">
-              <Icon icon="solar:cart-large-2-linear" className="w-8 h-8 sm:w-10 sm:h-10 text-brand-primary/20" />
-            </div>
-            <h2 className="text-xl sm:text-2xl font-serif font-bold text-brand-primary mb-3">Your registry is empty</h2>
-            <p className="text-xs sm:text-sm text-brand-primary/40 mb-8 max-w-sm mx-auto">Discover our latest divine collections and curate your wholesale order.</p>
-            <button onClick={() => router.push('/wholesalers/dashboard/collection/ready-stock')} className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-brand-primary text-white px-10 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-brand-secondary transition-all shadow-xl">
-              Explore Ready Stock
-            </button>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-[40px] sm:rounded-[60px] p-6 sm:p-12 text-center border border-brand-primary/5 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] relative overflow-hidden"
+          >
+             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[300px] bg-brand-primary/2 blur-[80px] rounded-full -translate-y-1/2" />
+
+             <div className="relative z-10">
+                <div className="w-24 h-24 sm:w-24 sm:h-24 bg-brand-accent rounded-full flex items-center justify-center mx-auto mb-10 shadow-inner group">
+                   <Icon icon="solar:cart-large-2-linear" className="w-12 h-12 sm:w-16 sm:h-16 text-brand-primary/10 group-hover:scale-110 transition-transform duration-700" />
+                </div>
+                <h2 className="text-2xl sm:text-4xl font-serif font-bold text-brand-primary mb-4 tracking-tight uppercase">Your Registry is Empty</h2>
+                <p className="text-[10px] sm:text-xs font-bold text-brand-primary/30 mb-8 w-full sm:max-w-md mx-auto uppercase tracking-[0.3em] leading-relaxed">
+                   Begin your journey through our divine masterpieces and curate your elite store inventory.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                   <button
+                     onClick={() => router.push('/wholesalers/dashboard/collection/ready-stock')}
+                     className="w-full sm:w-auto inline-flex items-center justify-center gap-4 bg-brand-primary text-white px-12 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-brand-secondary transition-all shadow-xl hover:-translate-y-1"
+                   >
+                     <Icon icon="solar:box-bold" className="w-4 h-4" />
+                     <span>Explore Ready Stock</span>
+                   </button>
+                </div>
+             </div>
+          </motion.div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 lg:gap-12 items-start">
             {/* Left: Product List */}
@@ -264,7 +282,13 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between items-center text-xs font-bold text-brand-primary/40 uppercase tracking-widest">
                     <span>Quantity</span>
-                    <span className="text-brand-primary">{cartCount} Units</span>
+                    <span className="text-brand-primary">
+                      {groupedItems.map(p => {
+                        const isDozen = p.unit?.toUpperCase() === "DOZEN";
+                        const qty = isDozen ? (p.totalQtyInCart / 12) : p.totalQtyInCart;
+                        return `${qty} ${isDozen ? 'Doz' : 'Pcs'}`;
+                      }).join(', ')}
+                    </span>
                   </div>
 
                   {originalCartTotal > cartTotal && (

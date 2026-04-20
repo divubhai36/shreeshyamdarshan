@@ -225,8 +225,8 @@ export default function ProductsPage() {
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
                 <div>
-                    <h1 className="text-3xl font-serif font-bold text-brand-primary">Master Catalog</h1>
-                    <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase mt-1">Administer Inventory Flow</p>
+                    <h1 className="text-4xl font-serif font-bold text-brand-primary">Master Catalog</h1>
+                    <p className="text-[10px] font-black text-brand-secondary tracking-[0.4em] uppercase mt-2 opacity-60">Master Catalog Product Management</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto items-center">
                     <div className="relative group w-full sm:w-80">

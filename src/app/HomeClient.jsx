@@ -356,6 +356,7 @@ export default function HomeClient({ products, categories, reviews }) {
                      image={cat.image}
                      href={`/collections/${cat.id}`}
                      count={cat.subCategories.length}
+                     priority={index < 4}
                   />
                ))}
             </div>

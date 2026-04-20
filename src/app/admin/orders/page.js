@@ -110,12 +110,15 @@ export default function OrdersPage() {
     });
 
     // Add Totals Row
-    const totalQty = order.items.reduce((acc, it) => acc + it.quantity, 0);
+    const totalQtyLabel = order.items.map(it => {
+      const isDozen = it.product?.unit?.toLowerCase() === "dozen";
+      return isDozen ? (it.quantity / 12) + " Doz" : it.quantity + " Pcs";
+    }).join(", ");
     const grandMRP = order.items.reduce((acc, it) => acc + (it.originalPrice || it.price) * it.quantity, 0);
 
     tableData.push([
       { content: "FINAL SUMMARY", colSpan: 3, styles: { halign: 'right', fontStyle: 'bold', fillColor: [248, 244, 235] } },
-      { content: `${totalQty} Pcs`, styles: { halign: 'center', fontStyle: 'bold', fillColor: [248, 244, 235] } },
+      { content: totalQtyLabel, styles: { halign: 'center', fontStyle: 'bold', fillColor: [248, 244, 235] } },
       { content: "Total Amount", styles: { halign: 'right', fontStyle: 'bold', fillColor: [248, 244, 235] } },
       {
         content: `Rs. ${order.totalAmount.toLocaleString()}`,
@@ -289,9 +292,9 @@ export default function OrdersPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
       {/* Unified Header & Search Command Row */}
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-8 mb-12 py-8 border-b border-brand-primary/5">
-        <div className="shrink-0">
-          <h1 className="text-4xl font-serif font-bold text-brand-primary tracking-tight">Order Registry</h1>
-          <p className="text-[10px] font-black text-brand-secondary uppercase tracking-[0.4em] mt-2">B2B Procurement Command</p>
+        <div>
+          <h1 className="text-4xl font-serif font-bold text-brand-primary">Orders</h1>
+          <p className="text-[10px] font-black text-brand-secondary tracking-[0.4em] uppercase mt-2 opacity-60">Orders Management</p>
         </div>
 
         <div className="flex flex-wrap items-end gap-6 w-full xl:w-auto">
@@ -564,7 +567,13 @@ export default function OrdersPage() {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Items Allocated</span>
-                        <span className="text-sm font-black">{viewOrder.items.reduce((acc, it) => acc + it.quantity, 0)} Pcs</span>
+                        <span className="text-sm font-black">
+                          {viewOrder.items.map(it => {
+                            const isDozen = it.product?.unit?.toLowerCase() === "dozen";
+                            const qty = isDozen ? (it.quantity / 12) : it.quantity;
+                            return `${qty} ${isDozen ? 'Doz' : 'Pcs'}`;
+                          }).join(', ')}
+                        </span>
                       </div>
                     </div>
                   </div>

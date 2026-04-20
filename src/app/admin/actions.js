@@ -204,14 +204,24 @@ export async function deleteReview(id) {
 
 // Inquiry Actions
 export async function getInquiries() {
-  return await prisma.inquiry.findMany({
-    orderBy: { createdAt: 'desc' }
-  });
+  try {
+    return await prisma.inquiry.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+  } catch (err) {
+    console.error("[getInquiries] Error - run `prisma generate && prisma db push`:", err?.message);
+    return [];
+  }
 }
 
 export async function deleteInquiry(id) {
-  await prisma.inquiry.delete({
-    where: { id }
-  });
-  revalidatePath('/admin/inquiries');
+  try {
+    await prisma.inquiry.delete({
+      where: { id }
+    });
+    revalidatePath('/admin/inquiries');
+  } catch (err) {
+    console.error("[deleteInquiry] Error:", err?.message);
+    throw new Error("Could not delete inquiry. Please try again.");
+  }
 }

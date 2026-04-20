@@ -139,7 +139,7 @@ export default function CollectionsClient({ category, categoryId, subCategories 
         </div>
 
         {subCategories.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-10 text-center">
             {subCategories.map((sub, index) => (
               <CategoryCard
                 key={sub.id}
@@ -152,11 +152,23 @@ export default function CollectionsClient({ category, categoryId, subCategories 
             ))}
           </div>
         ) : (
-          <div className="py-20 text-center">
-            <p className="text-brand-primary/30 font-serif italic uppercase tracking-widest text-center">
-              No sub-collections available.
-            </p>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="py-20 lg:py-40 flex flex-col items-center justify-center text-center px-6"
+          >
+             <div className="relative mb-6">
+                <div className="absolute inset-0 bg-brand-secondary/5 blur-3xl rounded-full scale-150" />
+                <Icon icon="solar:folder-error-bold-duotone" className="h-16 w-16 lg:h-24 lg:w-24 text-brand-primary/10 relative z-10" />
+             </div>
+             <h3 className="text-lg lg:text-3xl font-serif font-bold text-brand-primary uppercase tracking-widest mb-4">Collection Under Update</h3>
+             <p className="text-[9px] lg:text-xs font-bold text-brand-primary/30 uppercase tracking-[0.3em] max-w-xs leading-relaxed">
+                We are currently handpicking new divine additions for this collection.
+             </p>
+             <Link href="/" className="mt-10 px-8 py-3.5 bg-brand-primary text-white text-[9px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-brand-secondary transition-all active:scale-95">
+                Explore Others
+             </Link>
+          </motion.div>
         )}
       </main>
 

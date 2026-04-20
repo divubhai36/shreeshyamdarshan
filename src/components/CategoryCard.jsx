@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 
-const CategoryCard = ({ label, image, href, count, index }) => {
+const CategoryCard = React.memo(({ label, image, href, count, index, priority = false }) => {
   const [imgSrc, setImgSrc] = React.useState(image);
 
   return (
@@ -20,6 +20,7 @@ const CategoryCard = ({ label, image, href, count, index }) => {
           src={imgSrc || '/hero.png'}
           alt={label}
           fill
+          priority={priority}
           sizes="(max-width: 768px) 50vw, 25vw"
           className="object-cover group-hover:scale-110 transition-transform duration-[1500ms] brightness-90 group-hover:brightness-100"
           onError={() => setImgSrc('/hero.png')}
@@ -40,6 +41,6 @@ const CategoryCard = ({ label, image, href, count, index }) => {
       </motion.div>
     </Link>
   );
-};
+});
 
 export default CategoryCard;

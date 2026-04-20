@@ -22,7 +22,7 @@ export default function GlobalCartSummary() {
 
   return (
     <AnimatePresence>
-      <div className="fixed bottom-0 sm:bottom-5 left-0 right-0 z-[100] px-0 sm:px-10 pointer-events-none flex justify-center sm:justify-end">
+      <div className="fixed bottom-0 sm:bottom-5 left-0 right-0 sm:right-5 z-[100] px-0 pointer-events-none flex justify-center sm:justify-end">
         <div className="w-full sm:w-auto pointer-events-auto">
           <div className="hidden sm:block">
             <CartSummaryPill onClick={() => router.push('/wholesalers/dashboard/cart')} />

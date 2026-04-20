@@ -10,54 +10,72 @@ export const metadata = {
 export const revalidate = 3600; // Revalidate every hour
 
 export default async function Home() {
-   // 1. Fetch Dynamic Database Content
-   const dbProducts = await prisma.product.findMany({ 
-      where: { isVisible: true },
-      include: { category: true, subCategory: true },
-      orderBy: { createdAt: 'desc' }
-   });
-   const dbCategories = await prisma.category.findMany({ include: { subCategories: true } });
+   // Fetch Dynamic Database Content with graceful fallback on DB downtime
+   let products = [];
+   let categories = [];
+   let reviews = [];
 
-   // 2. Map Database to Front-end Schema
-   let products = dbProducts.map(p => ({
-     id: p.id,
-     name: p.name,
-     category: p.category?.name || "Unknown",
-     price: p.price,
-     offerPrice: p.offerPrice,
-     isOfferProduct: p.isOfferProduct,
-     mrp: p.mrp,
-     description: p.description,
-     images: p.images,
-     image: p.images[0] || "/hero.png",
-     isBestSeller: p.isBestSeller
-   }));
-   
-   let categories = dbCategories.map(c => ({
-     id: c.slug,
-     name: c.name,
-     label: c.name,
-     image: c.imageUrl,
-     subCategories: c.subCategories || []
-   }));
+   try {
+      // 1. Fetch products & categories in parallel
+      const [dbProducts, dbCategories] = await Promise.all([
+         prisma.product.findMany({
+            where: { isVisible: true, isBestSeller: true },
+            take: 12,
+            include: { category: true, subCategory: true },
+            orderBy: { createdAt: 'desc' }
+         }),
+         prisma.category.findMany({ include: { subCategories: true } })
+      ]);
 
-    // 4. Fetch Approved Reviews
-    let reviews = [];
-    if (prisma.review) {
-      const dbReviews = await prisma.review.findMany({
-        where: { status: 'APPROVED' },
-        include: { wholesaler: true },
-        orderBy: { createdAt: 'desc' }
-      });
-
-      reviews = dbReviews.map(r => ({
-        id: r.id,
-        name: r.wholesaler?.name || r.dummyName || "Customer",
-        company: r.wholesaler?.companyName || r.dummyCompany || "Verified Buyer",
-        comment: r.comment,
-        rating: r.rating
+      // 2. Map DB → front-end schema
+      products = dbProducts.map(p => ({
+         id: p.id,
+         name: p.name,
+         category: p.category?.name || "Unknown",
+         price: p.price,
+         offerPrice: p.offerPrice,
+         isOfferProduct: p.isOfferProduct,
+         mrp: p.mrp,
+         description: p.description,
+         images: p.images,
+         image: p.images[0] || "/hero.png",
+         isBestSeller: p.isBestSeller
       }));
-    }
+
+      categories = dbCategories.map(c => ({
+         id: c.slug,
+         name: c.name,
+         label: c.name,
+         image: c.imageUrl,
+         subCategories: c.subCategories || []
+      }));
+
+      // 3. Fetch approved reviews
+      try {
+         const dbReviews = await prisma.review.findMany({
+            where: { status: 'APPROVED' },
+            include: { wholesaler: true },
+            orderBy: { createdAt: 'desc' }
+         });
+         reviews = dbReviews.map(r => ({
+            id: r.id,
+            name: r.wholesaler?.name || r.dummyName || "Customer",
+            company: r.wholesaler?.companyName || r.dummyCompany || "Verified Buyer",
+            comment: r.comment,
+            rating: r.rating
+         }));
+      } catch (reviewErr) {
+         console.warn("[Home] Could not fetch reviews:", reviewErr?.message);
+      }
+
+   } catch (dbErr) {
+      console.error("[Home] DB unreachable, falling back to static data:", dbErr?.message);
+      // Fallback: use local JSON so the page still renders
+      products = productData
+         .filter(p => p.isBestSeller)
+         .slice(0, 12)
+         .map(p => ({ ...p, image: p.images?.[0] || p.image || "/hero.png" }));
+   }
     
     // SEO Structured Data
     const jsonLd = {

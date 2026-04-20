@@ -5,15 +5,19 @@ import Link from "next/link";
 export const revalidate = 3600; // Revalidate every hour
 
 export async function generateStaticParams() {
-  const products = await prisma.product.findMany({
-    where: { isVisible: true },
-    select: { id: true },
-    take: 100 // Pre-render top 100 products for instant loading
-  });
-
-  return products.map((product) => ({
-    id: product.id,
-  }));
+  try {
+    const products = await prisma.product.findMany({
+      where: { isVisible: true },
+      select: { id: true },
+      take: 100 // Pre-render top 100 products for instant loading
+    });
+    return products.map((product) => ({
+      id: product.id,
+    }));
+  } catch (err) {
+    console.error("[Product] generateStaticParams error:", err?.message);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }) {
