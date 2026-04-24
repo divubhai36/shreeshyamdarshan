@@ -18,6 +18,8 @@ export default function AdminSidebar() {
     { name: "Orders", path: "/admin/orders", icon: "solar:bill-list-bold-duotone" },
     { name: "Inquiries", path: "/admin/inquiries", icon: "solar:chat-line-bold-duotone" },
     { name: "Reviews", path: "/admin/reviews", icon: "solar:star-fall-bold-duotone" },
+    { name: "Video Gallery", path: "/admin/showcase-videos", icon: "solar:videocamera-record-bold-duotone" },
+    { name: "Review Videos", path: "/admin/review-videos", icon: "solar:play-bold-duotone" },
     { name: "Settings", path: "/admin/settings", icon: "solar:settings-minimalistic-bold-duotone" },
     { name: "Return to Site", path: "/", icon: "solar:globus-bold-duotone" },
   ];

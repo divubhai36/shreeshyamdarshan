@@ -30,20 +30,47 @@ export function CartProvider({ children }) {
   const queryClient = useQueryClient();
   const pathname = usePathname();
 
-  // Check Auth
-  useEffect(() => {
-    const hasSession = document.cookie.split(';').some((item) => item.trim().startsWith('ssd_wholesale_logged=true'));
-    setIsAuthenticated(hasSession);
-  }, [pathname]);
+   // Check Auth & Revalidate Session
+   useEffect(() => {
+     const checkAuth = async () => {
+       const hasLoggedCookie = document.cookie.split(';').some((item) => item.trim().startsWith('ssd_wholesale_logged=true'));
+       
+       if (hasLoggedCookie) {
+         try {
+           const res = await fetch('/api/user/profile');
+           if (res.ok) {
+             const data = await res.json();
+             if (data.success) {
+               setIsAuthenticated(true);
+               localStorage.setItem('ssd_user', JSON.stringify(data.user));
+             }
+           } else if (res.status === 401) {
+             // Token expired or invalid
+             setIsAuthenticated(false);
+             document.cookie = "ssd_wholesale_logged=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+             localStorage.removeItem('ssd_user');
+           }
+         } catch (err) {
+           // Network error, fall back to cookie until next check
+           setIsAuthenticated(true);
+         }
+       } else {
+         setIsAuthenticated(false);
+         localStorage.removeItem('ssd_user');
+       }
+     };
 
-  // Initial local storage load
-  useEffect(() => {
-    const savedCart = localStorage.getItem('ssd_cart');
-    const savedWishlist = localStorage.getItem('ssd_saved');
-    if (savedCart) try { setCart(JSON.parse(savedCart)); } catch (e) {}
-    if (savedWishlist) try { setSaved(JSON.parse(savedWishlist)); } catch (e) {}
-    setIsReady(true);
-  }, []);
+     checkAuth();
+   }, [pathname]);
+
+   // Initial local storage load
+   useEffect(() => {
+     const savedCart = localStorage.getItem('ssd_cart');
+     const savedWishlist = localStorage.getItem('ssd_saved');
+     if (savedCart) try { setCart(JSON.parse(savedCart)); } catch (e) {}
+     if (savedWishlist) try { setSaved(JSON.parse(savedWishlist)); } catch (e) {}
+     setIsReady(true);
+   }, []);
 
   // Server Queries
   const { data: serverSaved } = useQuery({

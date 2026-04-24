@@ -13,48 +13,43 @@ import { useCart } from '@/context/CartContext';
 
 export default function Header() {
   const pathname = usePathname();
-  const { cartCount, saved = [] } = useCart();
-
-  // Hide on Admin, Login and Dashboard pages to prevent layout conflicts
-  const isExcluded = pathname.startsWith('/admin') || pathname === '/login'
-
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(null);
-  const [expandedMobileCat, setExpandedMobileCat] = useState(null);
-  const [isLogged, setIsLogged] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-  const accountRef = useRef(null);
-
-  // Close account menu on outside click
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (accountRef.current && !accountRef.current.contains(event.target)) {
-        setIsAccountMenuOpen(false);
-      }
-    };
-    if (isAccountMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isAccountMenuOpen]);
-
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-    setIsAccountMenuOpen(false);
-    setActiveCategory(null);
-
-    const cookies = document.cookie.split(';');
-    // Check for the UI visibility cookie (since user_session is httpOnly)
-    const hasUserSession = cookies.some((item) => item.trim().startsWith('ssd_wholesale_logged=true'));
-    const hasAdminSession = cookies.some((item) => item.trim().startsWith('admin_session='));
-
-    // Check localStorage fallback for users
-    const storedUser = localStorage.getItem('ssd_user');
-
-    setIsLogged(hasUserSession || hasAdminSession || !!storedUser);
-    setIsAdmin(hasAdminSession);
-  }, [pathname]);
+   const { cartCount, saved = [], isAuthenticated } = useCart();
+ 
+   // Hide on Admin, Login and Dashboard pages to prevent layout conflicts
+   const isExcluded = pathname.startsWith('/admin') || pathname === '/login'
+ 
+   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+   const [activeCategory, setActiveCategory] = useState(null);
+   const [expandedMobileCat, setExpandedMobileCat] = useState(null);
+   const [isLogged, setIsLogged] = useState(false);
+   const [isAdmin, setIsAdmin] = useState(false);
+   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+   const accountRef = useRef(null);
+ 
+   // Close account menu on outside click
+   useEffect(() => {
+     const handleClickOutside = (event) => {
+       if (accountRef.current && !accountRef.current.contains(event.target)) {
+         setIsAccountMenuOpen(false);
+       }
+     };
+     if (isAccountMenuOpen) {
+       document.addEventListener('mousedown', handleClickOutside);
+     }
+     return () => document.removeEventListener('mousedown', handleClickOutside);
+   }, [isAccountMenuOpen]);
+ 
+   useEffect(() => {
+     setIsMobileMenuOpen(false);
+     setIsAccountMenuOpen(false);
+     setActiveCategory(null);
+ 
+     const cookies = document.cookie.split(';');
+     const hasAdminSession = cookies.some((item) => item.trim().startsWith('admin_session='));
+ 
+     setIsAdmin(hasAdminSession);
+     setIsLogged(isAuthenticated || hasAdminSession);
+   }, [pathname, isAuthenticated]);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

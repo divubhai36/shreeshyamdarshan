@@ -197,3 +197,21 @@ model Inquiry {
   status    String   @default("PENDING")
   createdAt DateTime @default(now())
 }
+
+model ShowcaseVideo {
+  id        String   @id @default(cuid())
+  url       String
+  title     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReviewVideo {
+  id        String   @id @default(cuid())
+  url       String
+  title     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

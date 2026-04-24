@@ -14,18 +14,25 @@ export default async function Home() {
    let products = [];
    let categories = [];
    let reviews = [];
+   let reviewVideos = [];
 
    try {
-      // 1. Fetch products & categories in parallel
-      const [dbProducts, dbCategories] = await Promise.all([
+      // 1. Fetch products & categories and videos in parallel for efficiency
+      const [dbProducts, dbCategories, dbReviewVideos] = await Promise.all([
          prisma.product.findMany({
             where: { isVisible: true, isBestSeller: true },
             take: 12,
             include: { category: true, subCategory: true },
             orderBy: { createdAt: 'desc' }
          }),
-         prisma.category.findMany({ include: { subCategories: true } })
+         prisma.category.findMany({ include: { subCategories: true } }),
+         prisma.reviewVideo.findMany({
+            where: { isActive: true },
+            orderBy: { createdAt: 'desc' }
+         }).catch(() => [])
       ]);
+
+      reviewVideos = dbReviewVideos;
 
       // 2. Map DB → front-end schema
       products = dbProducts.map(p => ({
@@ -77,29 +84,34 @@ export default async function Home() {
          .map(p => ({ ...p, image: p.images?.[0] || p.image || "/hero.png" }));
    }
     
-    // SEO Structured Data
-    const jsonLd = {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Shree Shyam Darshan",
-      "url": "https://shreeshyamdarshan.com",
-      "logo": "https://shreeshyamdarshan.com/logo.png",
-      "description": "India's Biggest Manufacturer of Divine Poshaks and Accessories.",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Surat",
-        "addressRegion": "Gujarat",
-        "addressCountry": "India"
-      }
-    };
+     // SEO Structured Data
+     const jsonLd = {
+       "@context": "https://schema.org",
+       "@type": "Organization",
+       "name": "Shree Shyam Darshan",
+       "url": "https://shreeshyamdarshan.com",
+       "logo": "https://shreeshyamdarshan.com/logo.png",
+       "description": "India's Biggest Manufacturer of Divine Poshaks and Accessories.",
+       "address": {
+         "@type": "PostalAddress",
+         "addressLocality": "Surat",
+         "addressRegion": "Gujarat",
+         "addressCountry": "India"
+       }
+     };
 
-    return (
-      <>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <HomeClient products={products} categories={categories} reviews={reviews} />
-      </>
-    );
+      return (
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+          <HomeClient 
+             products={products} 
+             categories={categories} 
+             reviews={reviews} 
+             reviewVideos={reviewVideos}
+          />
+        </>
+      );
 }

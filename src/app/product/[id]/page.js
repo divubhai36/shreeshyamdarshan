@@ -125,13 +125,25 @@ export default async function ProductPage({ params }) {
            }
          };
 
+         // Fetch random showcase videos
+         const showcaseVideos = await prisma.showcaseVideo.findMany({
+             where: { isActive: true }
+         }).then(res => res.sort(() => 0.5 - Math.random()).slice(0, 10));
+
          return (
            <>
              <script
                type="application/ld+json"
                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
              />
-             <ProductClient product={mappedProduct} navCategory={navCat} subCategory={subCat} innerSubCategory={innerSubCat} relatedProducts={mappedRelated} />
+             <ProductClient 
+                product={mappedProduct} 
+                navCategory={navCat} 
+                subCategory={subCat} 
+                innerSubCategory={innerSubCat} 
+                relatedProducts={mappedRelated}
+                showcaseVideos={showcaseVideos}
+             />
            </>
          );
       }

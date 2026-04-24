@@ -225,3 +225,43 @@ export async function deleteInquiry(id) {
     throw new Error("Could not delete inquiry. Please try again.");
   }
 }
+
+// Showcase Video Actions
+export async function getShowcaseVideos() { 
+  return await prisma.showcaseVideo.findMany({ 
+    orderBy: { createdAt: 'desc' } 
+  }); 
+}
+
+export async function createShowcaseVideo(data) { 
+  await prisma.showcaseVideo.create({ data }); 
+  revalidatePath('/admin/showcase-videos'); 
+  revalidatePath('/');
+  revalidatePath('/product/[id]', 'layout');
+}
+
+export async function deleteShowcaseVideo(id) { 
+  await prisma.showcaseVideo.delete({ where: { id } }); 
+  revalidatePath('/admin/showcase-videos'); 
+  revalidatePath('/');
+  revalidatePath('/product/[id]', 'layout');
+}
+
+// Review Video Actions
+export async function getReviewVideos() { 
+  return await prisma.reviewVideo.findMany({ 
+    orderBy: { createdAt: 'desc' } 
+  }); 
+}
+
+export async function createReviewVideo(data) { 
+  await prisma.reviewVideo.create({ data }); 
+  revalidatePath('/admin/review-videos'); 
+  revalidatePath('/');
+}
+
+export async function deleteReviewVideo(id) { 
+  await prisma.reviewVideo.delete({ where: { id } }); 
+  revalidatePath('/admin/review-videos'); 
+  revalidatePath('/');
+}

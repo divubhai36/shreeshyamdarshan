@@ -8,7 +8,7 @@ import CategoryCard from '../components/CategoryCard';
 import Link from 'next/link';
 import ReviewMarquee from '../components/ReviewMarquee';
 
-export default function HomeClient({ products, categories, reviews }) {
+export default function HomeClient({ products, categories, reviews, reviewVideos = [] }) {
    const bestSellers = products.filter(p => p.isBestSeller);
    const [activeVideo, setActiveVideo] = useState(null);
    const signatures = [
@@ -302,17 +302,17 @@ export default function HomeClient({ products, categories, reviews }) {
                whileInView={{ opacity: 1, scale: 1 }}
                viewport={{ once: true }}
                transition={{ duration: 1 }}
-               onClick={() => setActiveVideo("https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4")}
+               // onClick={() => setActiveVideo("https://videourl.mp4")}
                className="relative w-full max-w-5xl mx-auto aspect-[16/9] md:aspect-[21/9] rounded-[40px] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] cursor-pointer group border border-brand-primary/5 bg-white"
             >
-               <video
-                  src="https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4"
+               {/* <video
+                  src="https://videourl.mp4"
                   autoPlay
                   muted
                   loop
                   playsInline
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-               />
+               /> */}
                <div className="absolute inset-0 bg-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
                   <div className="flex flex-col items-center gap-4 text-white">
                      <div className="w-16 h-16 lg:w-24 lg:h-24 rounded-full bg-white/20 backdrop-blur-2xl border border-white/40 flex items-center justify-center scale-90 group-hover:scale-100 transition-transform duration-500">
@@ -425,7 +425,7 @@ export default function HomeClient({ products, categories, reviews }) {
             </div>
          </section>
 
-         <ReviewMarquee reviews={reviews} />
+         <ReviewMarquee reviews={reviews} reviewVideos={reviewVideos} />
 
          <section className="py-0 lg:py-12 bg-white  relative overflow-hidden">
             <div className="absolute top-[-50px] lg:top-[-80px] right-[-90px] lg:right-[150px] p-20 opacity-[0.03] select-none pointer-events-none">
@@ -462,14 +462,14 @@ export default function HomeClient({ products, categories, reviews }) {
                      viewport={{ once: true }}
                      className="relative aspect-video lg:aspect-auto lg:h-[650px] rounded-[40px] overflow-hidden shadow-2xl group border border-brand-primary/5"
                   >
-                     <video
-                        src="https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4"
+                     {/* <video
+                        src=""
                         autoPlay
                         muted
                         loop
                         playsInline
                         className="w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110"
-                     />
+                     /> */}
                      <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/60 to-transparent" />
                   </motion.div>
 
