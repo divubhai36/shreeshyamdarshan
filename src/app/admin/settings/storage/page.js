@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
+import { motion } from 'framer-motion';
 import { getAppConfig, updateAppConfig } from '../../actions';
 // We use server actions/API routes to fetch usage to keep 'fs' out of the browser
 
@@ -11,6 +12,8 @@ export default function StorageSettings() {
     const [usage, setUsage] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [isVerified, setIsVerified] = useState(false);
+    const [passInput, setPassInput] = useState("");
 
     const loadData = async () => {
         setRefreshing(true);
@@ -30,7 +33,69 @@ export default function StorageSettings() {
         }
     };
 
-    useEffect(() => { loadData(); }, []);
+    useEffect(() => { 
+        if (isVerified) loadData(); 
+        else setLoading(false);
+    }, [isVerified]);
+
+    const handleVerify = (e) => {
+        e.preventDefault();
+        if (passInput === "2352") {
+            setIsVerified(true);
+            toast.success("Security Cleared", { icon: '🔐' });
+        } else {
+            toast.error("Unauthorized Access Denied");
+            setPassInput("");
+        }
+    };
+
+    if (!isVerified) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white max-w-md w-full rounded-[48px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] border border-brand-primary/5 p-12 text-center relative overflow-hidden"
+                >
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-brand-secondary via-brand-primary to-brand-secondary" />
+                    
+                    <div className="w-24 h-24 bg-brand-primary/5 rounded-[32px] flex items-center justify-center text-brand-primary mx-auto mb-8 relative">
+                        <div className="absolute inset-0 bg-brand-secondary/10 rounded-[32px] animate-ping opacity-20" />
+                        <Icon icon="solar:shield-keyhole-bold-duotone" className="w-12 h-12 relative z-10" />
+                    </div>
+
+                    <h2 className="text-3xl font-serif font-bold text-brand-primary mb-2 italic">Access Protocol</h2>
+                    <p className="text-[10px] font-black text-brand-secondary tracking-[0.4em] uppercase mb-10 opacity-60">Multi-Node Management Storage</p>
+
+                    <form onSubmit={handleVerify} className="space-y-6">
+                        <div className="relative group">
+                            <input 
+                                type="password" 
+                                value={passInput}
+                                onChange={(e) => setPassInput(e.target.value)}
+                                placeholder="ENTER PIN"
+                                className="w-full bg-brand-primary/5 border-2 border-transparent focus:border-brand-secondary focus:bg-white rounded-[24px] py-5 px-6 text-center text-3xl font-serif font-black tracking-[0.8em] outline-none transition-all placeholder:text-[10px] placeholder:tracking-[0.3em] placeholder:font-black placeholder:uppercase placeholder:text-brand-primary/20 shadow-inner"
+                                autoFocus
+                            />
+                        </div>
+                        
+                        <button 
+                            type="submit"
+                            className="w-full bg-brand-primary text-white py-5 rounded-[24px] font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-brand-primary/20 hover:bg-brand-secondary hover:shadow-brand-secondary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
+                        >
+                            <span>Authorize Access</span>
+                            <Icon icon="solar:arrow-right-up-bold-duotone" className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                        </button>
+                    </form>
+
+                    <p className="mt-8 text-[9px] font-bold text-brand-primary/30 uppercase tracking-widest flex items-center justify-center gap-2">
+                        <Icon icon="solar:lock-bold" className="w-3 h-3" />
+                        End-to-End Encrypted Node Access
+                    </p>
+                </motion.div>
+            </div>
+        );
+    }
 
     const handleSwitchAccount = async (index) => {
         try {

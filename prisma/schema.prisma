@@ -223,3 +223,12 @@ model AppConfig {
   usageThreshold        Float    @default(22.0) // 22GB safety limit
   lastUsageCheck        DateTime @default(now())
 }
+
+model RateLimit {
+  id           String   @id @default(cuid())
+  ip           String   @unique
+  inquiryCount Int      @default(0)
+  loginCount   Int      @default(0)
+  orderCount   Int      @default(0)
+  lastReset    DateTime @default(now())
+}

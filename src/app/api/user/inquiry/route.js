@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function POST(req) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '0.0.0.0';
+    
+    // Rate Limit: 5 inquiries per hour
+    const { allowed } = await checkRateLimit(ip, 'inquiry', 5);
+    if (!allowed) {
+        return NextResponse.json({ 
+            error: "Too many inquiries. Please try again after some time to protect our system." 
+        }, { status: 429 });
+    }
+
     const data = await req.json();
     
     if (!data.name || !data.mobile) {
