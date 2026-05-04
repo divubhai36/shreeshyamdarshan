@@ -5,9 +5,10 @@ export default async function sitemap() {
   const baseUrl = siteConfig.baseUrl;
 
   // 1. Fetch data from DB
-  const [products, categories] = await Promise.all([
+  const [products, categories, blogs] = await Promise.all([
     prisma.product.findMany({ where: { isVisible: true }, select: { id: true, createdAt: true } }),
-    prisma.category.findMany({ include: { subCategories: true } })
+    prisma.category.findMany({ include: { subCategories: true } }),
+    prisma.blogPost.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } })
   ]);
 
   // 2. Base routes
@@ -47,5 +48,21 @@ export default async function sitemap() {
     priority: 0.7,
   }));
 
-  return [...routes, ...collectionRoutes, ...subCategoryRoutes, ...productRoutes];
+  // 6. Blog routes
+  const blogRoutes = [
+    {
+      url: `${baseUrl}/blogs`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    ...blogs.map((blog) => ({
+      url: `${baseUrl}/blogs/${blog.slug}`,
+      lastModified: blog.updatedAt,
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    }))
+  ];
+
+  return [...routes, ...collectionRoutes, ...subCategoryRoutes, ...productRoutes, ...blogRoutes];
 }

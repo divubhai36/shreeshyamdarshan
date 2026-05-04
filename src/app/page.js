@@ -3,8 +3,9 @@ import productData from '../data/products.json';
 import prisma from '@/lib/prisma';
 
 export const metadata = {
-   title: "India's Biggest Manufacturer of Divine Poshaks",
-   description: "Shree Shyam Darshan is the leading manufacturer of Laddu Gopal Poshaks, Shringar sets, and Divine Accessories in Surat, India. Worldwide delivery available.",
+   title: "Shree Shyam Darshan (SSD) | India's Biggest Laddu Gopal Poshak Manufacturer",
+   description: "Shree Shyam Darshan (SSD) - The leading manufacturer & wholesaler of Premium Laddu Gopal Poshaks, NDL, New Darshan Lace, and Divine Accessories in Surat. Best prices and worldwide delivery.",
+   keywords: ["Laddu Gopal Poshak Wholesale", "SSD Poshak", "NDL Surat", "New Darshan Lace", "Deity Dresses Manufacturer", "Shringar Sets India", "Shree Shyam Darshan Surat"],
 };
 
 export const revalidate = 3600; // Revalidate every hour

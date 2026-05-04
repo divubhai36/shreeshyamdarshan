@@ -27,11 +27,11 @@ const inter = Inter({
 export const metadata = {
   metadataBase: new URL(siteConfig.baseUrl),
   title: {
-    default: "Shree Shyam Darshan | India's #1 Divine Poshak Manufacturer",
+    default: "Shree Shyam Darshan (SSD) | India's #1 Divine Poshak & NDL Collection",
     template: "%s | Shree Shyam Darshan"
   },
-  description: "Experience the ultimate divine elegance with Shree Shyam Darshan. We are India's biggest manufacturer of premium Laddu Gopal Poshaks, Shringar, and Accessories. Direct from Surat to your home.",
-  keywords: ["Laddu Gopal Poshaks", "Divine Shringar", "Shree Shyam Darshan", "Surat Poshak Manufacturer", "Handmade Deity Dresses", "Premium Pooja Accessories", "Ladoo Gopal Accessories"],
+  description: "Experience the ultimate divine elegance with Shree Shyam Darshan (SSD). India's biggest manufacturer of premium Laddu Gopal Poshaks, NDL, New Darshan Lace, and Shringar. From Surat to your home.",
+  keywords: ["Laddu Gopal Poshaks", "SSD", "Shree Shyam Darshan", "NDL", "New Darshan Lace", "Surat Poshak Manufacturer", "Handmade Deity Dresses", "Premium Pooja Accessories", "Ladoo Gopal Poshak Price", "SSD Surat"],
   authors: [{ name: "Shree Shyam Darshan" }],
   creator: "Shree Shyam Darshan",
   publisher: "Shree Shyam Darshan",
@@ -145,7 +145,7 @@ export default function RootLayout({ children }) {
           <GlobalCartSummary />
           {children}
           <Footer />
-          <Toaster 
+          <Toaster
             position="top-center"
             toastOptions={{
 

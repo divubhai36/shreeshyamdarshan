@@ -19,8 +19,8 @@ export default function AdminSidebar() {
     { name: "Inquiries", path: "/admin/inquiries", icon: "solar:chat-line-bold-duotone" },
     { name: "Reviews", path: "/admin/reviews", icon: "solar:star-fall-bold-duotone" },
     { name: "Video Gallery", path: "/admin/showcase-videos", icon: "solar:videocamera-record-bold-duotone" },
-    // { name: "Review Videos", path: "/admin/review-videos", icon: "solar:play-bold-duotone" },
-    // { name: "Storage Hub", path: "/admin/settings/storage", icon: "solar:cloud-storage-bold-duotone" },
+    { name: "Blogs", path: "/admin/blogs", icon: "solar:notes-minimalistic-bold-duotone" },
+    { name: "Storage Hub", path: "/admin/settings/storage", icon: "solar:cloud-storage-bold-duotone" },
     { name: "Settings", path: "/admin/settings", icon: "solar:settings-minimalistic-bold-duotone" },
     { name: "Return to Site", path: "/", icon: "solar:globus-bold-duotone" },
   ];

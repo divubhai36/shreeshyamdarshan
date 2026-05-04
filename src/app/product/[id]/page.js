@@ -26,19 +26,23 @@ export async function generateMetadata({ params }) {
   try {
       const dbProduct = await prisma.product.findUnique({ where: { id, isVisible: true } });
       if (dbProduct) {
+          const priceStr = dbProduct.offerPrice ? `₹${dbProduct.offerPrice}` : `₹${dbProduct.price}`;
+          const seoDescription = `${dbProduct.name} available at ${priceStr}. Explore premium divine poshaks (SSD/NDL) direct from our Surat factory. ${dbProduct.description?.slice(0, 100)}...`;
+
           return {
-            title: `${dbProduct.name} | Shree Shyam Darshan`,
-            description: dbProduct.description || `${dbProduct.name}. Buy premium divine poshaks direct from factory.`,
+            title: `${dbProduct.name} - Buy Online | Shree Shyam Darshan`,
+            description: seoDescription,
+            keywords: [`${dbProduct.name}`, "SSD Poshak", "NDL Collection", "Buy Poshak Online", "Surat Divine Fashion"],
             openGraph: {
-              title: dbProduct.name,
-              description: dbProduct.description,
-              images: [{ url: dbProduct.images[0], width: 800, height: 600, alt: dbProduct.name }],
+              title: `${dbProduct.name} | SSD`,
+              description: seoDescription,
+              images: [{ url: dbProduct.images[0], width: 1200, height: 630, alt: dbProduct.name }],
               type: 'website',
             },
             twitter: {
               card: 'summary_large_image',
               title: dbProduct.name,
-              description: dbProduct.description,
+              description: seoDescription,
               images: [dbProduct.images[0]],
             },
             alternates: { canonical: `/product/${id}` }
