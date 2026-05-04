@@ -79,7 +79,12 @@ export default function OrdersPage() {
                   {orders.map((order) => {
                      const originalTotal = order.items.reduce((acc, it) => acc + (it.originalPrice || it.price) * it.quantity, 0);
                      const savings = originalTotal - order.totalAmount;
-                     const totalUnits = order.items.reduce((acc, it) => acc + it.quantity, 0);
+                     // Build per-item qty labels, unit-aware
+                     const unitSummary = order.items.map(it => {
+                       const isDozen = it.product?.unit?.toLowerCase() === "dozen";
+                       const qty = isDozen ? (it.quantity / 12) : it.quantity;
+                       return `${qty} ${isDozen ? 'Doz' : 'Pcs'}`;
+                     }).join(', ');
 
                      const STATUS_DOTS = {
                         PENDING: "bg-amber-500",
@@ -125,7 +130,7 @@ export default function OrdersPage() {
 
                                     <div className="flex flex-col items-end gap-3">
                                        <div className="text-right">
-                                          <p className="text-[10px] font-black text-brand-primary/30 uppercase tracking-widest leading-none mb-1">{totalUnits} Units</p>
+                                          <p className="text-[10px] font-black text-brand-primary/30 uppercase tracking-widest leading-none mb-1">{unitSummary}</p>
                                           <p className="text-[8px] font-bold text-brand-primary/20 uppercase tracking-widest leading-none">{order.items.length} Products</p>
                                        </div>
                                        <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-500 ${activeOrder === order.id ? 'bg-brand-secondary text-white rotate-180 shadow-lg shadow-brand-secondary/20' : 'bg-brand-primary/5 text-brand-primary'}`}>
@@ -184,7 +189,7 @@ export default function OrdersPage() {
                                                    </div>
                                                    <div className="flex items-center gap-2">
                                                       <p className="text-[9px] font-bold text-brand-primary/30 uppercase tracking-tighter">
-                                                         {it.quantity} <span className="lowercase">pcs</span>
+                                                         {it.product?.unit?.toLowerCase() === "dozen" ? (it.quantity / 12) : it.quantity}{" "}<span className="lowercase">{it.product?.unit?.toLowerCase() === "dozen" ? "doz" : "pcs"}</span>
                                                       </p>
                                                       <p className="text-[9px] font-black text-brand-primary/60">
                                                          @ ₹{it.price.toLocaleString()}

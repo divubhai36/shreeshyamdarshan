@@ -56,7 +56,7 @@ export default function LeadPopup() {
 
    const handleSubmit = async (e) => {
       e.preventDefault();
-      
+
       inquiryMutation.mutate(formData);
 
       const phone = "917383699199";
@@ -74,7 +74,7 @@ export default function LeadPopup() {
    return (
       <AnimatePresence>
          {show && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -91,7 +91,7 @@ export default function LeadPopup() {
                >
                   {/* Slim Header - No Scroll Layout */}
                   <div className="shrink-0 bg-brand-primary p-4 md:p-8 relative overflow-hidden flex items-center justify-between border-b border-brand-secondary/20">
-                     <div className="absolute inset-0 bg-[url('/images/hero_2.jpg')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
+                     <div className="absolute inset-0 bg-[url('/images/hero_2.webp')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
                      <div className="absolute inset-0 bg-gradient-to-r from-brand-primary via-brand-primary/80 to-transparent"></div>
 
                      <div className="relative z-10 flex items-center gap-3">
@@ -116,7 +116,7 @@ export default function LeadPopup() {
                   <form onSubmit={handleSubmit} className="p-5 md:p-8 space-y-3.5 md:space-y-6 bg-brand-accent/20 text-left">
                      <div className="text-left group">
                         <div className="flex items-center justify-between mb-1.5 px-1">
-                           <label className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest">Devotee Name</label>
+                           <label className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest">Your Name</label>
                         </div>
                         <div className="relative text-left">
                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-secondary">
@@ -185,7 +185,7 @@ export default function LeadPopup() {
                      </div>
                      <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-3.5 text-left">
                         <div className="text-left group/child">
-                           <label className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest mb-1.5 block ml-1 text-left">Mobile</label>
+                           <label className="text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest mb-1.5 block ml-1 text-left">Mobile Number</label>
                            <div className="relative text-left">
                               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-secondary">
                                  <Icon icon="solar:phone-bold" className="w-4 h-4" />
@@ -224,14 +224,14 @@ export default function LeadPopup() {
 
 
                      <div className="pt-2">
+                        {/* <p className="text-[8px] text-brand-primary/30 font-bold uppercase tracking-[0.2em] text-center ">Privacy is our priority</p> */}
                         <button
                            type="submit"
-                           className="w-full bg-brand-primary text-white font-bold py-4 rounded-xl text-sm uppercase tracking-[0.2em] shadow-lg hover:bg-brand-secondary hover:translate-y-[-2px] active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-center"
+                           className="w-full bg-brand-primary text-white font-bold py-4 rounded-xl text-xs uppercase tracking-[0.2em] shadow-lg hover:bg-brand-secondary hover:translate-y-[-2px] active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-center"
                         >
                            <Icon icon="logos:whatsapp-icon" className="w-5 h-5 text-left" />
                            Inquire on WhatsApp
                         </button>
-                        <p className="text-[8px] text-brand-primary/30 font-bold uppercase tracking-[0.2em] text-center mt-3">Privacy is our priority</p>
                      </div>
                   </form>
                </motion.div>

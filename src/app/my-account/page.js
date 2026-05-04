@@ -72,10 +72,10 @@ export default function MyAccount() {
 
   return (
     <div className="min-h-screen bg-brand-accent/20">
-      
+
       <main className="container mx-auto px-4 lg:px-8 pt-28 lg:pt-36 pb-20 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
-          
+
           {/* Dashboard Profile Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white p-8 lg:p-10 rounded-[40px] border border-brand-primary/5 shadow-xl relative overflow-hidden">
@@ -84,7 +84,7 @@ export default function MyAccount() {
                   <div className="w-16 h-16 rounded-2xl bg-brand-primary text-white flex items-center justify-center text-3xl font-serif font-bold mb-6">
                      P
                   </div>
-                  <h2 className="text-2xl font-serif font-bold text-brand-primary">Partner Portal</h2>
+                  <h2 className="text-2xl font-serif font-bold text-brand-primary">Wholesaler Portal</h2>
                   <p className="text-[10px] text-brand-secondary font-bold uppercase tracking-[0.2em] mt-1">Exclusive B2B Access</p>
                </div>
 
@@ -166,9 +166,9 @@ export default function MyAccount() {
               ) : (
                 <div className="space-y-4">
                    {orders.map((order) => (
-                     <motion.div 
+                     <motion.div
                        layout
-                       key={order.id} 
+                       key={order.id}
                        className="bg-white p-6 lg:p-8 rounded-[40px] border border-brand-primary/5 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
                        onClick={() => setActiveOrder(activeOrder?.id === order.id ? null : order)}
                      >
@@ -200,7 +200,7 @@ export default function MyAccount() {
                        {/* Expandable Order Details */}
                        <AnimatePresence>
                          {activeOrder?.id === order.id && (
-                           <motion.div 
+                           <motion.div
                              initial={{ height: 0, opacity: 0 }}
                              animate={{ height: 'auto', opacity: 1 }}
                              exit={{ height: 0, opacity: 0 }}
@@ -210,7 +210,7 @@ export default function MyAccount() {
                                 {order.items.map((item, idx) => (
                                   <div key={idx} className="flex gap-4 items-center bg-brand-accent/30 p-4 rounded-2xl border border-brand-primary/5">
                                      <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-brand-primary/10">
-                                        <img src={item.product?.images?.[0] || '/hero.png'} className="w-full h-full object-cover" />
+                                        <img src={item.product?.images?.[0] || '/images/hero.webp'} className="w-full h-full object-cover" />
                                      </div>
                                      <div className="text-left">
                                         <p className="text-[10px] font-bold text-brand-primary leading-tight line-clamp-1">{item.product?.name}</p>
@@ -242,7 +242,7 @@ export default function MyAccount() {
 function LinkTab({ icon, label, active = false, path = "#", onClick }) {
   const router = useRouter();
   return (
-    <button 
+    <button
       onClick={() => onClick ? onClick() : (path !== "#" && router.push(path))}
       className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all font-bold text-[10px] uppercase tracking-widest ${active ? 'bg-brand-primary text-white shadow-xl px-6' : 'text-brand-primary/40 hover:bg-brand-primary/5 hover:text-brand-primary px-4'}`}
     >

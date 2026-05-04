@@ -23,7 +23,7 @@ export default function ContactUsClient() {
           className="w-full lg:w-1/2 h-64 lg:h-full relative overflow-hidden"
         >
           <Image
-            src="/images/hero_3.jpg"
+            src="/images/hero_3.webp"
             alt="Divine Sanctuary"
             fill
             priority

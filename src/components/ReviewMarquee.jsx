@@ -5,6 +5,7 @@ import { Icon } from '@iconify/react';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import SmartVideo from './SmartVideo';
 
 const reviews = [
   {
@@ -38,38 +39,6 @@ const reviews = [
     text: "Truly authentic designs. Pricing is very reasonable compared to retail shops. I will definitely buy again for the upcoming festival.",
     rating: 5,
     avatar: "solar:user-circle-bold"
-  },
-  {
-    id: 5,
-    name: "Deepa Nair",
-    location: "Bangalore",
-    text: "The Shringar set is so beautiful. It feels very premium and shiny. My deity looks so divine in this new collection. Thank you team!",
-    rating: 5,
-    avatar: "solar:user-circle-bold"
-  },
-  {
-    id: 6,
-    name: "Meera Das",
-    location: "Varanasi",
-    text: "The fabric quality is outstanding. It doesn't fade after washing. Very happy with the fast delivery to UP.",
-    rating: 5,
-    avatar: "solar:user-circle-bold"
-  },
-  {
-    id: 7,
-    name: "Karan Singh",
-    location: "Chandigarh",
-    text: "Found this store on Instagram and was amazed by the variety. The product looks exactly like the video shown. 10/10 recommended.",
-    rating: 5,
-    avatar: "solar:user-circle-bold"
-  },
-  {
-    id: 8,
-    name: "Anjali Gupta",
-    location: "Lucknow",
-    text: "Superb craftsmanship! The heavy embroidery work is very fine and doesn't have any loose threads. Very premium feel.",
-    rating: 5,
-    avatar: "solar:user-circle-bold"
   }
 ];
 
@@ -92,27 +61,10 @@ const Celebration = () => (
         <Icon icon="solar:star-bold" className="w-4 h-4 md:w-6 md:h-6" />
       </motion.div>
     ))}
-    {[...Array(15)].map((_, i) => (
-      <motion.div
-        key={`petal-${i}`}
-        initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-        animate={{
-          opacity: [0, 1, 0],
-          scale: [0, 1, 0],
-          x: (Math.random() - 0.5) * 500,
-          y: (Math.random() - 0.5) * 500,
-          rotate: Math.random() * 360
-        }}
-        transition={{ duration: 3, ease: "easeOut", repeat: Infinity, repeatDelay: 1 }}
-        className="absolute left-1/2 top-1/2 text-brand-secondary/40 z-50"
-      >
-        <Icon icon="solar:heart-bold" className="w-3 h-3 md:w-5 md:h-5" />
-      </motion.div>
-    ))}
   </div>
 );
 
-const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
+const ReviewMarquee = memo(({ reviews: dbReviews = [], reviewVideos = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [localReviews, setLocalReviews] = useState([]);
@@ -120,7 +72,6 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
   const [editingId, setEditingId] = useState(null);
   const [popupVideo, setPopupVideo] = useState(null);
 
-  // Map db reviews to local format if they exist
   const displayReviews = useMemo(() => {
     return dbReviews.length > 0 ? dbReviews.map(r => ({
       id: r.id,
@@ -133,20 +84,13 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
     })) : reviews;
   }, [dbReviews]);
 
-  const customerVideos = [
-    "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4",
-    "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244607/lv_0_20250325174749_cdcicc.mp4",
-    "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244599/lv_0_20250411143949_iwsj9d.mp4",
-    "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244599/lv_0_20250411143949_iwsj9d.mp4",
-  ];
-
   const videoSliderSettings = {
     dots: false,
-    infinite: true,
+    infinite: reviewVideos.length > 3,
     speed: 800,
     slidesToShow: 3,
     slidesToScroll: 1,
-    autoplay: true,
+    autoplay: reviewVideos.length > 3,
     autoplaySpeed: 4000,
     pauseOnHover: true,
     arrows: false,
@@ -161,32 +105,10 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-       const saved = JSON.parse(localStorage.getItem('customer_feedbacks') || '[]');
-       setLocalReviews(saved);
+      const saved = JSON.parse(localStorage.getItem('customer_feedbacks') || '[]');
+      setLocalReviews(saved);
     }
   }, []);
-
-  // For this demo, we assume the first local review belongs to the current user
-  const userReview = localReviews.find(r => r.isUser !== false); // Simple flag check
-
-  const openForWrite = () => {
-    setEditingId(null);
-    setFormData({ name: '', location: '', text: '', rating: 5 });
-    setIsOpen(true);
-  };
-
-  const openForEdit = () => {
-    if (userReview) {
-      setFormData({
-        name: userReview.name,
-        location: userReview.location,
-        text: userReview.text,
-        rating: userReview.rating
-      });
-      setEditingId(userReview.id);
-      setIsOpen(true);
-    }
-  };
 
   const playSuccessSound = () => {
     try {
@@ -202,14 +124,9 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
         osc.start(audioCtx.currentTime + start);
         osc.stop(audioCtx.currentTime + start + duration);
       };
-      // Play a little sparkly flourish
-      playTone(523.25, 0, 0.1); // C5
-      playTone(659.25, 0.05, 0.1); // E5
-      playTone(783.99, 0.1, 0.1); // G5
-      playTone(1046.50, 0.15, 0.3); // C6
-    } catch (e) {
-      console.error("Audio play failed", e);
-    }
+      playTone(523.25, 0, 0.1);
+      playTone(1046.50, 0.15, 0.3);
+    } catch (e) { }
   };
 
   const handleSubmit = (e) => {
@@ -221,10 +138,7 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
       const newReview = { ...formData, id: Date.now(), status: 'pending', date: new Date().toISOString(), avatar: "solar:user-circle-bold", isUser: true };
       updated = [...localReviews, newReview];
     }
-
-    if (typeof window !== 'undefined') {
-       localStorage.setItem('customer_feedbacks', JSON.stringify(updated));
-    }
+    if (typeof window !== 'undefined') localStorage.setItem('customer_feedbacks', JSON.stringify(updated));
     setLocalReviews(updated);
     playSuccessSound();
     setIsSuccess(true);
@@ -237,15 +151,12 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
     setEditingId(null);
   };
 
-  const allVisibleReviews = [...reviews, ...localReviews];
-
-  {/* Review Card Component for Reusability */ }
   const ReviewCard = ({ review, idx }) => (
     <div
       key={`${review.id}-${idx}`}
       className={`w-[230px] md:w-[260px] p-4 lg:p-5 rounded-[20px] lg:rounded-[24px] border border-brand-primary/5 shadow-sm flex flex-col gap-2.5 group/card transition-all duration-500 text-left bg-white`}
     >
-      <div className="flex items-center gap-2.5 text-left text-left">
+      <div className="flex items-center gap-2.5 text-left">
         <div className={`w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center shadow-sm transition-colors duration-500 text-left ${review.isUser ? 'bg-brand-secondary text-white' : 'bg-white text-brand-secondary group-hover/card:bg-brand-secondary group-hover/card:text-white'}`}>
           <Icon icon={review.avatar || "solar:user-circle-bold"} className="w-6 h-6 text-left" />
         </div>
@@ -260,21 +171,19 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
             ))}
           </div>
         </div>
-        <div className="ml-auto opacity-10 flex flex-col items-center">
-          <Icon icon="lucide:quote" className="w-3.5 h-3.5 text-left" />
+        <div className="ml-auto opacity-10">
+          <Icon icon="lucide:quote" className="w-3.5 h-3.5" />
         </div>
       </div>
-
       <p className="text-brand-primary/70 text-[10px] lg:text-[11px] font-serif leading-relaxed line-clamp-2 text-left">
         "{review.text}"
       </p>
-
-      <div className="flex items-center justify-between mt-auto pt-2 border-t border-brand-primary/5 text-left">
+      <div className="flex items-center justify-between mt-auto pt-2 border-t border-brand-primary/5">
         <div className="flex items-center gap-1 text-[7px] font-bold text-brand-secondary/60 uppercase tracking-widest text-left">
           <Icon icon="solar:verified-check-bold" className="w-2.5 h-2.5 text-left" />
           {review.status === 'pending' ? 'Verification Pending' : 'Verified'}
         </div>
-        <span className="text-[7px] text-brand-primary/20 font-bold uppercase tracking-widest text-left">{review.location}</span>
+        <span className="text-[7px] text-brand-primary/20 font-bold uppercase tracking-widest">{review.location}</span>
       </div>
     </div>
   );
@@ -284,18 +193,16 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
   const [row2, setRow2] = useState([]);
 
   useEffect(() => {
-     if (displayReviews.length > 0) {
-       setHasMounted(true);
-       const shuffled = [...displayReviews].sort(() => 0.5 - Math.random());
-       const half = Math.ceil(shuffled.length / 2);
-       setRow1(shuffled.slice(0, half));
-       setRow2(shuffled.slice(half));
-     }
+    if (displayReviews.length > 0) {
+      setHasMounted(true);
+      const shuffled = [...displayReviews].sort(() => 0.5 - Math.random());
+      const half = Math.ceil(shuffled.length / 2);
+      setRow1(shuffled.slice(0, half));
+      setRow2(shuffled.slice(half));
+    }
   }, [dbReviews]);
 
-  if (!hasMounted) {
-     return <div className="py-10 bg-white/50" />;
-  }
+  if (!hasMounted) return <div className="py-10 bg-white" />;
   const speed = 70 + (localReviews.length * 2);
 
   return (
@@ -310,19 +217,13 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
       </div>
 
       <div className="flex flex-col gap-4 lg:gap-6 relative group py-4 text-left">
-        {/* Global Overlays */}
         <div className="absolute inset-y-0 left-0 w-12 lg:w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
         <div className="absolute inset-y-0 right-0 w-12 lg:w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
 
-        {/* Row 1: Left to Right */}
         <div className="flex overflow-hidden relative text-left pb-1">
           <motion.div
             animate={{ x: ["0%", "-50%"] }}
-            transition={{
-              duration: speed,
-              ease: "linear",
-              repeat: Infinity,
-            }}
+            transition={{ duration: speed, ease: "linear", repeat: Infinity }}
             className="flex gap-4 shrink-0 px-2 text-left"
           >
             {[...row1, ...row1, ...row1].map((review, idx) => (
@@ -331,15 +232,10 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
           </motion.div>
         </div>
 
-        {/* Row 2: Right to Left */}
         <div className="flex overflow-hidden relative text-left pb-1">
           <motion.div
             animate={{ x: ["-50%", "0%"] }}
-            transition={{
-              duration: speed,
-              ease: "linear",
-              repeat: Infinity,
-            }}
+            transition={{ duration: speed, ease: "linear", repeat: Infinity }}
             className="flex gap-4 shrink-0 px-2 text-left"
           >
             {[...row2, ...row2, ...row2].map((review, idx) => (
@@ -347,166 +243,51 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
             ))}
           </motion.div>
         </div>
-        {/* Happy Customer section  */}
-        <div className="mt-6 px-4 md:px-8 max-w-7xl mx-auto w-full text-center">
-          <div className="flex flex-col items-center mb-4 lg:mb-10 text-center">
-            <div className="text-brand-secondary font-bold text-[8px] lg:text-xs tracking-[0.4em] uppercase mb-3">Community Love</div>
-            <h2 className="text-2xl lg:text-4xl font-serif font-bold text-brand-primary uppercase">Happy <span className="italic font-normal">Customers</span></h2>
-            <div className="w-16 h-[1px] bg-brand-primary/10 mt-4"></div>
-          </div>
 
-          <div className="happy-customer-video-slider">
-            <Slider {...videoSliderSettings}>
-              {customerVideos.map((video, idx) => (
-                <div key={idx} className="px-3 mb-4">
-                  <motion.div
-                    whileHover={{ scale: 0.98 }}
-                    className="relative aspect-[9/16] rounded-2xl overflow-hidden shadow-xl border border-brand-primary/5 cursor-pointer group bg-brand-accent/30"
-                    onClick={() => setPopupVideo(video)}
-                  >
-                    <video
-                      src={video}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
-                      <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white mx-auto">
-                        <Icon icon="solar:play-bold" className="w-5 h-5 ml-0.5" />
-                      </div>
-                    </div>
-                    <div className="absolute top-4 left-4 flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                      <span className="text-[8px] font-bold text-white uppercase tracking-widest bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full border border-white/10">Feedback</span>
-                    </div>
-                  </motion.div>
-                </div>
-              ))}
-            </Slider>
-          </div>
-        </div>
-      </div>
+        {reviewVideos && reviewVideos.length > 0 && (
+          <div className="mt-6 px-4 md:px-8 max-w-7xl mx-auto w-full text-center">
+            <div className="flex flex-col items-center mb-4 lg:mb-10 text-center">
+              <div className="text-brand-secondary font-bold text-[8px] lg:text-xs tracking-[0.4em] uppercase mb-3">Community Love</div>
+              <h2 className="text-2xl lg:text-4xl font-serif font-bold text-brand-primary uppercase">Happy <span className="italic font-normal">Customers</span></h2>
+              <div className="w-16 h-[1px] bg-brand-primary/10 mt-4"></div>
+            </div>
 
-      <AnimatePresence>
-        {isOpen && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 lg:p-8">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => !isSuccess && setIsOpen(false)}
-              className="absolute inset-0 bg-brand-primary/40 backdrop-blur-md"
-            />
-
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative bg-white w-full max-w-sm rounded-[32px] lg:rounded-[40px] shadow-2xl overflow-hidden border border-brand-primary/5 text-left"
-            >
-              {!isSuccess ? (
-                <form onSubmit={handleSubmit} className="p-6 lg:p-8 text-left">
-                  <div className="flex items-center justify-between mb-6 text-left">
-                    <h3 className="text-xl lg:text-2xl font-serif font-bold text-brand-primary text-left">
-                      {editingId ? 'Refine Experience' : 'Share Experience'}
-                    </h3>
-                    <button type="button" onClick={() => setIsOpen(false)} className="text-brand-primary/20 hover:text-brand-primary transition-colors">
-                      <Icon icon="lucide:x" className="w-6 h-6" />
-                    </button>
-                  </div>
-
-                  <div className="space-y-4 text-left">
-                    <div className="text-left">
-                      <label className="block text-[8px] font-bold text-brand-primary/40 uppercase tracking-widest mb-1.5 text-left">Your Name</label>
-                      <input
-                        required
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full bg-brand-accent/30 border-none rounded-2xl px-4 py-3 text-xs font-bold text-brand-primary focus:ring-2 focus:ring-brand-secondary/50 transition-all placeholder:text-brand-primary/20 text-left"
-                        placeholder="Your Name"
-                      />
-                    </div>
-                    <div className="text-left">
-                      <label className="block text-[8px] font-bold text-brand-primary/40 uppercase tracking-widest mb-1.5 text-left">Location</label>
-                      <input
-                        required
-                        type="text"
-                        value={formData.location}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="w-full bg-brand-accent/30 border-none rounded-2xl px-4 py-3 text-xs font-bold text-brand-primary focus:ring-2 focus:ring-brand-secondary/50 transition-all placeholder:text-brand-primary/20 text-left"
-                        placeholder="Your Location"
-                      />
-                    </div>
-                    <div className="text-left">
-                      <label className="block text-[8px] font-bold text-brand-primary/40 uppercase tracking-widest mb-1.5 text-left">Ratings</label>
-                      <div className="flex gap-2 text-left">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            type="button"
-                            onClick={() => setFormData({ ...formData, rating: star })}
-                            className={`transition-transform active:scale-95 text-left ${formData.rating >= star ? 'text-brand-secondary' : 'text-brand-primary/10'}`}
-                          >
-                            <Icon icon="solar:star-bold" className="w-6 h-6 text-left" />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="text-left">
-                      <label className="block text-[8px] font-bold text-brand-primary/40 uppercase tracking-widest mb-1.5 text-left">Your Experience</label>
-                      <textarea
-                        required
-                        rows="3"
-                        value={formData.text}
-                        onChange={(e) => setFormData({ ...formData, text: e.target.value })}
-                        className="w-full bg-brand-accent/30 border-none rounded-2xl px-4 py-3 text-xs font-bold text-brand-primary focus:ring-2 focus:ring-brand-secondary/50 transition-all placeholder:text-brand-primary/20 resize-none text-left"
-                        placeholder="Describe your experience..."
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full mt-8 bg-brand-primary text-white font-bold py-4 rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-brand-secondary transition-all active:scale-[0.98] text-center"
-                  >
-                    {editingId ? 'Update Review' : 'Submit Review'}
-                  </button>
-                </form>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="p-10 text-center flex flex-col items-center gap-6 relative"
-                >
-                  <Celebration />
-
-                  <div className="w-16 h-16 lg:w-20 lg:h-20 bg-brand-secondary/10 rounded-full flex items-center justify-center text-brand-secondary shadow-inner relative z-10">
-                    <Icon icon="solar:verified-check-bold" className="w-10 h-10 lg:w-12 lg:h-12" />
-                  </div>
-                  <div className="text-center relative z-10">
-                    <h3 className="text-xl lg:text-2xl font-serif font-bold text-brand-primary mb-2 text-center">Review {editingId ? 'Updated' : 'Submitted'}!</h3>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-orange-600 border border-orange-200 shadow-sm animate-pulse mb-4">
-                      <Icon icon="lucide:clock" className="w-3 h-3" />
-                      <span className="text-[8px] font-bold uppercase tracking-widest">Status: Pending Verification</span>
-                    </div>
-                    <p className="text-brand-primary/40 text-[10px] font-bold uppercase tracking-widest text-center leading-relaxed mb-6">Thank you for your devotion.<br />Our team will verify it shortly.</p>
-
-                    <button
-                      onClick={handleCloseSuccess}
-                      className="px-8 py-3 bg-brand-primary text-white rounded-full text-[9px] font-bold uppercase tracking-widest hover:bg-brand-secondary transition-all shadow-lg active:scale-95"
+            <div className="happy-customer-video-slider">
+              <Slider {...videoSliderSettings}>
+                {reviewVideos.map((video, idx) => (
+                  <div key={video.id || idx} className="px-3 mb-4">
+                    <motion.div
+                      whileHover={{ scale: 0.98 }}
+                      className="relative aspect-[9/16] rounded-2xl overflow-hidden shadow-xl border border-brand-primary/5 cursor-pointer group bg-brand-accent/30"
+                      onClick={() => setPopupVideo(video.url)}
                     >
-                      Close
-                    </button>
+                      <SmartVideo
+                        id={video.id}
+                        url={video.url}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="w-full h-full"
+                      />
+                      <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0 text-center">
+                        <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white mx-auto">
+                          <Icon icon="solar:play-bold" className="w-5 h-5 ml-0.5" />
+                        </div>
+                        {video.title && <p className="text-white text-[10px] font-bold mt-2 truncate uppercase tracking-widest">{video.title}</p>}
+                      </div>
+                      <div className="absolute top-4 left-4 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                        <span className="text-[8px] font-bold text-white uppercase tracking-widest bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full border border-white/10">Feedback</span>
+                      </div>
+                    </motion.div>
                   </div>
-                </motion.div>
-              )}
-            </motion.div>
+                ))}
+              </Slider>
+            </div>
           </div>
         )}
-      </AnimatePresence>
+      </div>
 
       <AnimatePresence>
         {popupVideo && (
@@ -526,7 +307,6 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
             >
               <Icon icon="lucide:x" className="w-8 h-8" />
             </button>
-
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -534,18 +314,11 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [] }) => {
               className="relative w-full max-w-[450px] aspect-[9/16] max-h-[90vh] rounded-[40px] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)] border border-white/20"
               onClick={(e) => e.stopPropagation()}
             >
-              <video
-                src={popupVideo}
-                autoPlay
-                controls
-                playsInline
-                className="w-full h-full object-cover"
-              />
+              <video src={popupVideo.startsWith('shree') ? `https://res.cloudinary.com/duxn4yj3a/video/upload/f_auto,q_auto/${popupVideo}` : popupVideo} autoPlay controls playsInline className="w-full h-full object-cover" />
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
     </section>
   );
 });

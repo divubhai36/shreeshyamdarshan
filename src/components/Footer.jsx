@@ -16,7 +16,7 @@ export default function Footer() {
     <footer className="pt-10 pb-10 bg-brand-primary text-white overflow-hidden relative">
       <div className="absolute inset-0 opacity-5 mix-blend-overlay pointer-events-none">
         <Image
-          src="/images/hero_2.jpg"
+          src="/images/hero_2.webp"
           alt="Shree Shyam Darshan Background"
           fill
           sizes="100vw"
@@ -34,11 +34,11 @@ export default function Footer() {
                 SHREE SHYAM <span className="text-brand-secondary italic">DARSHAN</span>
               </h2>
               <p className="text-[8px] lg:text-[10px] tracking-[0.3em] font-medium text-white/40 uppercase mt-1 text-left">
-                laddu gopal poshak and shringar
+                India's #1 Divine Poshak (SSD) & NDL Collection
               </p>
             </Link>
             <p className="text-white/50 text-xs lg:text-sm leading-relaxed italic max-w-xs text-left">
-              "Adorning Divinity with Elegance and Love. We craft every piece with deep devotion, ensuring your deity is adorned with unparalleled grace."
+              "Experience the ultimate divine elegance with Shree Shyam Darshan (SSD). India's biggest manufacturer of premium Laddu Gopal Poshaks, NDL, and New Darshan Lace in Surat."
             </p>
             <div className="flex gap-4">
               <a href="https://www.instagram.com/shree.shyam.darshan_?igsh=MWx6dWVqcWZmbWkzcw%3D%3D" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group">
@@ -60,7 +60,7 @@ export default function Footer() {
           <div className="text-left">
             <h3 className="text-[11px] lg:text-xs font-bold tracking-[0.4em] uppercase mb-8 lg:mb-10 text-brand-secondary">Quick Links</h3>
             <ul className="space-y-4">
-              {['Home', 'Collections', 'About Us', 'Contact Us'].map((item) => (
+              {['Home', 'Collections', 'Blogs', 'About Us', 'Contact Us'].map((item) => (
                 <li key={item}>
                   <Link
                     href={item === 'Home' ? '/' : `/${item.toLowerCase().replace(' ', '-')}`}
@@ -123,8 +123,8 @@ export default function Footer() {
             © 2026 Shree Shyam Darshan • Crafted for Devotion
           </p>
           <div className="flex gap-8 text-[8px] lg:text-[10px] font-bold tracking-widest text-white/20 uppercase">
-            <Link href="#" className="hover:text-white transition-all">Privacy</Link>
-            <Link href="#" className="hover:text-white transition-all">Terms</Link>
+            <Link href="/privacy-policy" className="hover:text-white transition-all">Privacy</Link>
+            <Link href="/terms-and-conditions" className="hover:text-white transition-all">Terms</Link>
           </div>
         </div>
       </div>

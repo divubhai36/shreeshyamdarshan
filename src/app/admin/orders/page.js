@@ -45,7 +45,7 @@ export default function OrdersPage() {
 
     // Pre-load all item images
     const imagesArray = await Promise.all(
-      order.items.map(item => getBase64Image(item.product?.images?.[0] || '/hero.png'))
+      order.items.map(item => getBase64Image(item.product?.images?.[0] || '/images/hero.webp'))
     );
 
     // Header
@@ -77,7 +77,7 @@ export default function OrdersPage() {
     doc.text(order.wholesaler.name, 120, 52);
     doc.setFontSize(10);
     doc.setTextColor(71, 85, 105);
-    doc.text(order.wholesaler.companyName || "Partner", 120, 58);
+    doc.text(order.wholesaler.companyName || "Wholesaler", 120, 58);
     doc.text(`Phone: ${order.wholesaler.phone || "N/A"}`, 120, 64);
     if (order.wholesaler.address) {
       const splitAddr = doc.splitTextToSize(order.wholesaler.address, 70);
@@ -110,12 +110,15 @@ export default function OrdersPage() {
     });
 
     // Add Totals Row
-    const totalQty = order.items.reduce((acc, it) => acc + it.quantity, 0);
+    const totalQtyLabel = order.items.map(it => {
+      const isDozen = it.product?.unit?.toLowerCase() === "dozen";
+      return isDozen ? (it.quantity / 12) + " Doz" : it.quantity + " Pcs";
+    }).join(", ");
     const grandMRP = order.items.reduce((acc, it) => acc + (it.originalPrice || it.price) * it.quantity, 0);
 
     tableData.push([
       { content: "FINAL SUMMARY", colSpan: 3, styles: { halign: 'right', fontStyle: 'bold', fillColor: [248, 244, 235] } },
-      { content: `${totalQty} Pcs`, styles: { halign: 'center', fontStyle: 'bold', fillColor: [248, 244, 235] } },
+      { content: totalQtyLabel, styles: { halign: 'center', fontStyle: 'bold', fillColor: [248, 244, 235] } },
       { content: "Total Amount", styles: { halign: 'right', fontStyle: 'bold', fillColor: [248, 244, 235] } },
       {
         content: `Rs. ${order.totalAmount.toLocaleString()}`,
@@ -289,9 +292,9 @@ export default function OrdersPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
       {/* Unified Header & Search Command Row */}
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-8 mb-12 py-8 border-b border-brand-primary/5">
-        <div className="shrink-0">
-          <h1 className="text-4xl font-serif font-bold text-brand-primary tracking-tight">Order Registry</h1>
-          <p className="text-[10px] font-black text-brand-secondary uppercase tracking-[0.4em] mt-2">B2B Procurement Command</p>
+        <div>
+          <h1 className="text-4xl font-serif font-bold text-brand-primary">Orders</h1>
+          <p className="text-[10px] font-black text-brand-secondary tracking-[0.4em] uppercase mt-2 opacity-60">Orders Management</p>
         </div>
 
         <div className="flex flex-wrap items-end gap-6 w-full xl:w-auto">
@@ -400,7 +403,7 @@ export default function OrdersPage() {
                 <tr>
                   <td colSpan="5" className="p-32 text-center">
                     <Icon icon="line-md:loading-loop" className="w-12 h-12 text-brand-secondary mx-auto" />
-                    <p className="text-[10px] font-black text-brand-primary/20 uppercase tracking-widest mt-4">Syncing Registry...</p>
+                    <p className="text-[10px] font-black text-brand-primary/20 uppercase tracking-widest mt-4">Loading Registry...</p>
                   </td>
                 </tr>
               ) : filteredOrders.length === 0 ? (
@@ -420,7 +423,7 @@ export default function OrdersPage() {
                 </td>
                 <td className="p-6">
                   <p className="font-bold text-brand-primary">{o.wholesaler?.name}</p>
-                  <p className="text-[10px] text-brand-primary/40 font-medium uppercase tracking-widest">{o.wholesaler?.companyName || 'Private Partner'}</p>
+                  <p className="text-[10px] text-brand-primary/40 font-medium uppercase tracking-widest">{o.wholesaler?.companyName || 'Private Wholesaler'}</p>
                 </td>
                 <td className="p-6">
                   <p className="font-bold text-black">₹{o.totalAmount.toLocaleString()}</p>
@@ -516,7 +519,7 @@ export default function OrdersPage() {
                   <label className="text-[10px] font-black text-brand-primary/20 uppercase tracking-[0.3em] block mb-3">B2B Wholesaler Profile</label>
                   <div className="p-5 bg-brand-primary/2 rounded-[24px] border border-brand-primary/5">
                     <p className="text-xl font-serif font-bold text-brand-primary leading-tight">{viewOrder.wholesaler.name}</p>
-                    <p className="text-xs font-bold text-brand-secondary mt-2 uppercase tracking-widest">{viewOrder.wholesaler.companyName || 'Private Partner'}</p>
+                    <p className="text-xs font-bold text-brand-secondary mt-2 uppercase tracking-widest">{viewOrder.wholesaler.companyName || 'Private Wholesaler'}</p>
 
                     <div className="mt-8 space-y-4">
                       <div className="flex items-center gap-3">
@@ -564,7 +567,13 @@ export default function OrdersPage() {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Items Allocated</span>
-                        <span className="text-sm font-black">{viewOrder.items.reduce((acc, it) => acc + it.quantity, 0)} Pcs</span>
+                        <span className="text-sm font-black">
+                          {viewOrder.items.map(it => {
+                            const isDozen = it.product?.unit?.toLowerCase() === "dozen";
+                            const qty = isDozen ? (it.quantity / 12) : it.quantity;
+                            return `${qty} ${isDozen ? 'Doz' : 'Pcs'}`;
+                          }).join(', ')}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -588,7 +597,7 @@ export default function OrdersPage() {
                     <div key={idx} className="flex items-center p-4 bg-white rounded-[24px] border border-brand-primary/5 hover:border-brand-secondary/30 transition-all gap-6 shadow-sm hover:shadow-lg group">
                       {/* Product Visual */}
                       <div className="w-20 h-20 rounded-xl overflow-hidden bg-brand-primary/5 border border-brand-primary/5 shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-500">
-                        <img src={item.product?.images?.[0] || '/hero.png'} alt={item.product?.name} className="w-full h-full object-cover" />
+                        <img src={item.product?.images?.[0] || '/images/hero.webp'} alt={item.product?.name} className="w-full h-full object-cover" />
                       </div>
 
                       {/* Details Center */}

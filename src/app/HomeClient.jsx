@@ -8,7 +8,7 @@ import CategoryCard from '../components/CategoryCard';
 import Link from 'next/link';
 import ReviewMarquee from '../components/ReviewMarquee';
 
-export default function HomeClient({ products, categories, reviews }) {
+export default function HomeClient({ products, categories, reviews, reviewVideos = [] }) {
    const bestSellers = products.filter(p => p.isBestSeller);
    const [activeVideo, setActiveVideo] = useState(null);
    const signatures = [
@@ -153,7 +153,7 @@ export default function HomeClient({ products, categories, reviews }) {
                               transition={{ delay: 0.4 }}
                               className="text-white/60 text-base lg:text-lg font-serif italic max-w-xl leading-relaxed"
                            >
-                              Access curated inventories marked with our signature partner margins. These limited-edition masterpieces are currently available at competitive prices specifically for our authorized wholesalers.
+                              Access curated inventories marked with our signature Wholesaler margins. These limited-edition masterpieces are currently available at competitive prices specifically for our authorized wholesalers.
                            </motion.p>
 
                            <motion.div
@@ -179,7 +179,7 @@ export default function HomeClient({ products, categories, reviews }) {
                                     <Icon icon="solar:ticket-sale-bold-duotone" className="w-12 h-12 text-white" />
                                  </div>
                                  <h4 className="text-white text-xl font-serif">Bulk Margins</h4>
-                                 <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">Live Inventory Refined For Partners</p>
+                                 <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">Live Inventory Refined For Wholesalers</p>
                               </div>
                            </div>
                         </div> */}
@@ -236,7 +236,7 @@ export default function HomeClient({ products, categories, reviews }) {
                      >
                         {/* Animated Patterns */}
                         <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity">
-                           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/silk.png')]" />
+                           <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')]" />
                         </div>
 
                         <div className="hidden sm:block shrink-0 translate-x-12 group-hover:translate-x-0 opacity-0 group-hover:opacity-20 transition-all duration-700">
@@ -302,18 +302,43 @@ export default function HomeClient({ products, categories, reviews }) {
                whileInView={{ opacity: 1, scale: 1 }}
                viewport={{ once: true }}
                transition={{ duration: 1 }}
-               onClick={() => setActiveVideo("https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4")}
+               // onClick={() => setActiveVideo("https://videourl.mp4")}
                className="relative w-full max-w-5xl mx-auto aspect-[16/9] md:aspect-[21/9] rounded-[40px] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] cursor-pointer group border border-brand-primary/5 bg-white"
             >
-               <video
-                  src="https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-               />
-               <div className="absolute inset-0 bg-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+               {/* Featured Video or Brand Fallback */}
+               <div className="absolute inset-0 bg-linear-to-br from-brand-primary via-brand-primary/90 to-brand-primary/80 flex items-center justify-center overflow-hidden">
+                  {/* Subtle Background Pattern */}
+                  <div className="absolute inset-0 opacity-10 pointer-events-none">
+                     <Icon icon="solar:star-ring-bold-duotone" className="w-[800px] h-[800px] absolute -top-1/4 -right-1/4 animate-spin-slow" />
+                  </div>
+
+                  {/* SSD Branding Fallback */}
+                  <motion.div
+                     initial={{ opacity: 0, y: 20 }}
+                     whileInView={{ opacity: 1, y: 0 }}
+                     className="relative z-10 flex flex-col items-center"
+                  >
+                     <span className="font-serif italic text-[120px] md:text-[250px] font-black text-white/3 tracking-tighter absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none">
+                        SSD
+                     </span>
+                     <div className="flex flex-col items-center">
+                        <h3 className="text-6xl md:text-9xl font-serif font-black text-brand-secondary drop-shadow-2xl italic leading-none">SSD</h3>
+                        <p className="text-lg md:text-2xl font-bold text-brand-secondary/60 tracking-[0.5em] uppercase mt-0">Tour</p>
+                     </div>
+                     <div className="h-0.5 w-12 bg-brand-secondary/20 mt-6 rounded-full" />
+                  </motion.div>
+
+                  {/* Optional Video - Uncomment to use */}
+                  {/* <video
+                     src="https://videourl.mp4"
+                     autoPlay
+                     muted
+                     loop
+                     playsInline
+                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 z-20"
+                  /> */}
+               </div>
+               <div className="z-20 absolute inset-0 bg-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
                   <div className="flex flex-col items-center gap-4 text-white">
                      <div className="w-16 h-16 lg:w-24 lg:h-24 rounded-full bg-white/20 backdrop-blur-2xl border border-white/40 flex items-center justify-center scale-90 group-hover:scale-100 transition-transform duration-500">
                         <Icon icon="solar:play-bold" className="w-8 h-8 lg:w-12 lg:h-12 ml-1" />
@@ -356,6 +381,7 @@ export default function HomeClient({ products, categories, reviews }) {
                      image={cat.image}
                      href={`/collections/${cat.id}`}
                      count={cat.subCategories.length}
+                     priority={index < 4}
                   />
                ))}
             </div>
@@ -424,7 +450,7 @@ export default function HomeClient({ products, categories, reviews }) {
             </div>
          </section>
 
-         <ReviewMarquee reviews={reviews} />
+         <ReviewMarquee reviews={reviews} reviewVideos={reviewVideos} />
 
          <section className="py-0 lg:py-12 bg-white  relative overflow-hidden">
             <div className="absolute top-[-50px] lg:top-[-80px] right-[-90px] lg:right-[150px] p-20 opacity-[0.03] select-none pointer-events-none">
@@ -459,17 +485,38 @@ export default function HomeClient({ products, categories, reviews }) {
                      initial={{ opacity: 0, x: -30 }}
                      whileInView={{ opacity: 1, x: 0 }}
                      viewport={{ once: true }}
-                     className="relative aspect-video lg:aspect-auto lg:h-[650px] rounded-[40px] overflow-hidden shadow-2xl group border border-brand-primary/5"
+                     className="relative aspect-video lg:aspect-auto lg:h-[650px] rounded-[40px] overflow-hidden shadow-2xl group border border-brand-primary/5 flex items-center justify-center bg-linear-to-br from-brand-primary via-brand-primary/95 to-brand-primary/90"
                   >
-                     <video
-                        src="https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244206/reel6_1_ijdsaw.mp4"
+                     {/* Subtle Background Pattern */}
+                     <div className="absolute inset-0 opacity-10 pointer-events-none">
+                        <Icon icon="solar:star-ring-bold-duotone" className="w-[600px] h-[600px] absolute -top-1/4 -right-1/4 animate-spin-slow" />
+                     </div>
+
+                     {/* SSD Branding Fallback */}
+                     <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        className="relative z-10 flex flex-col items-center"
+                     >
+                        <span className="font-serif italic text-[100px] md:text-[200px] font-black text-white/3 tracking-tighter absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none">
+                           SSD
+                        </span>
+                        <div className="flex flex-col items-center">
+                           <h3 className="text-5xl md:text-8xl font-serif font-black text-brand-secondary drop-shadow-2xl italic leading-none">SSD</h3>
+                           <p className="text-base md:text-xl font-bold text-brand-secondary/60 tracking-[0.5em] uppercase mt-0">Location</p>
+                        </div>
+                        <div className="h-0.5 w-10 bg-brand-secondary/20 mt-6 rounded-full" />
+                     </motion.div>
+
+                     {/* Optional Video - Uncomment to use */}
+                     {/* <video
+                        src=""
                         autoPlay
                         muted
                         loop
                         playsInline
-                        className="w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110"
-                     />
-                     <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/60 to-transparent" />
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110 z-20"
+                     /> */}
                   </motion.div>
 
                   <div className="flex flex-col gap-6 lg:gap-10">
@@ -488,6 +535,7 @@ export default function HomeClient({ products, categories, reviews }) {
                            <motion.div
                               initial={{ opacity: 0, y: 10 }}
                               whileInView={{ opacity: 1, y: 0 }}
+                              viewport={{ once: true }}
                               className="flex items-center gap-3 sm:gap-4 mb-6 lg:mb-10"
                            >
                               <div className="relative flex items-center justify-center">
@@ -503,6 +551,7 @@ export default function HomeClient({ products, categories, reviews }) {
                                  <motion.div
                                     initial={{ scaleX: 0 }}
                                     whileInView={{ scaleX: 1 }}
+                                    viewport={{ once: true }}
                                     className="absolute -bottom-1 lg:-bottom-2 left-0 w-full h-1 bg-brand-secondary/30 origin-left"
                                  />
                               </span>
@@ -565,7 +614,7 @@ export default function HomeClient({ products, categories, reviews }) {
                         </div>
                         <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-brand-secondary/5 rounded-full blur-[120px] pointer-events-none animate-pulse" />
                         <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-brand-primary/5 rounded-full blur-[100px] pointer-events-none" />
-                        <div className="absolute inset-0 opacity-[0.02] mix-blend-overlay pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/silk.png')]" />
+                        <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay pointer-events-none bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')]" />
                      </motion.div>
                   </div>
                </div>
@@ -599,7 +648,7 @@ export default function HomeClient({ products, categories, reviews }) {
                      onClick={(e) => e.stopPropagation()}
                   >
                      <video
-                        src={activeVideo}
+                        src={activeVideo.startsWith('shree') ? `https://res.cloudinary.com/duxn4yj3a/video/upload/f_auto,q_auto/${activeVideo}` : activeVideo}
                         autoPlay
                         controls
                         playsInline

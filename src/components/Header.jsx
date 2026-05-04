@@ -13,48 +13,43 @@ import { useCart } from '@/context/CartContext';
 
 export default function Header() {
   const pathname = usePathname();
-  const { cartCount, saved = [] } = useCart();
+   const { cartCount, saved = [], isAuthenticated } = useCart();
 
-  // Hide on Admin, Login and Dashboard pages to prevent layout conflicts
-  const isExcluded = pathname.startsWith('/admin') || pathname === '/login'
+   // Hide on Admin, Login and Dashboard pages to prevent layout conflicts
+   const isExcluded = pathname.startsWith('/admin') || pathname === '/login'
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(null);
-  const [expandedMobileCat, setExpandedMobileCat] = useState(null);
-  const [isLogged, setIsLogged] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-  const accountRef = useRef(null);
+   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+   const [activeCategory, setActiveCategory] = useState(null);
+   const [expandedMobileCat, setExpandedMobileCat] = useState(null);
+   const [isLogged, setIsLogged] = useState(false);
+   const [isAdmin, setIsAdmin] = useState(false);
+   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+   const accountRef = useRef(null);
 
-  // Close account menu on outside click
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (accountRef.current && !accountRef.current.contains(event.target)) {
-        setIsAccountMenuOpen(false);
-      }
-    };
-    if (isAccountMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isAccountMenuOpen]);
+   // Close account menu on outside click
+   useEffect(() => {
+     const handleClickOutside = (event) => {
+       if (accountRef.current && !accountRef.current.contains(event.target)) {
+         setIsAccountMenuOpen(false);
+       }
+     };
+     if (isAccountMenuOpen) {
+       document.addEventListener('mousedown', handleClickOutside);
+     }
+     return () => document.removeEventListener('mousedown', handleClickOutside);
+   }, [isAccountMenuOpen]);
 
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-    setIsAccountMenuOpen(false);
-    setActiveCategory(null);
+   useEffect(() => {
+     setIsMobileMenuOpen(false);
+     setIsAccountMenuOpen(false);
+     setActiveCategory(null);
 
-    const cookies = document.cookie.split(';');
-    // Check for the UI visibility cookie (since user_session is httpOnly)
-    const hasUserSession = cookies.some((item) => item.trim().startsWith('ssd_wholesale_logged=true'));
-    const hasAdminSession = cookies.some((item) => item.trim().startsWith('admin_session='));
+     const cookies = document.cookie.split(';');
+     const hasAdminSession = cookies.some((item) => item.trim().startsWith('admin_session='));
 
-    // Check localStorage fallback for users
-    const storedUser = localStorage.getItem('ssd_user');
-
-    setIsLogged(hasUserSession || hasAdminSession || !!storedUser);
-    setIsAdmin(hasAdminSession);
-  }, [pathname]);
+     setIsAdmin(hasAdminSession);
+     setIsLogged(isAuthenticated || hasAdminSession);
+   }, [pathname, isAuthenticated]);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -99,9 +94,13 @@ export default function Header() {
             <h1 className="text-lg sm:text-xl lg:text-xl font-serif font-bold text-brand-primary tracking-[0.02em] sm:tracking-[0.05em] lg:tracking-[0.1em] uppercase group-hover:text-brand-secondary transition-colors whitespace-nowrap">
               SHREE SHYAM <span className="text-brand-secondary">DARSHAN</span>
             </h1>
-            <p className="text-[8px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] font-medium text-brand-primary/40 uppercase whitespace-nowrap">
-              laddu gopal poshak and shringar
-            </p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <div className="h-[0.5px] w-3 bg-brand-secondary/40 group-hover:w-6 transition-all duration-700"></div>
+              <p className="text-[7px] sm:text-[8px] tracking-[0.3em] font-bold text-brand-primary/40 uppercase whitespace-nowrap group-hover:text-brand-primary/70 transition-colors">
+                Premium Laddu Gopal Poshak
+              </p>
+              <div className="h-[0.5px] w-3 bg-brand-secondary/40 group-hover:w-6 transition-all duration-700"></div>
+            </div>
           </Link>
 
 
@@ -168,7 +167,7 @@ export default function Header() {
                           <div className="grid grid-cols-12 gap-10">
 
                             {/* Left: Category Info */}
-                            <div className="col-span-3 border-r border-brand-primary/5 pr-10">
+                            <div className="col-span-3 border-r border-brand-primary/5 pr-2">
                               <h3 className="text-2xl font-serif font-bold text-brand-primary mb-3 uppercase tracking-tight">
                                 {cat.name}
                               </h3>
@@ -263,7 +262,7 @@ export default function Header() {
                   >
                     <div className="p-6 border-b border-brand-primary/5 bg-brand-primary/2">
                       <p className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-secondary mb-1">Account Control</p>
-                      <h4 className="text-sm font-serif font-bold text-brand-primary uppercase leading-1.5 tracking-wider">Wholseler Dashboard</h4>
+                      <h4 className="text-sm font-serif font-bold text-brand-primary uppercase leading-1.5 tracking-wider">Wholesaler Dashboard</h4>
                     </div>
 
                     <div className="p-2">
@@ -350,8 +349,16 @@ export default function Header() {
             >
               {/* Unified Header */}
               <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-                <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-bold tracking-[0.2em] text-brand-primary uppercase">
-                  SHREE SHYAM
+                <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col group relative">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-serif font-bold tracking-[0.1em] text-brand-primary uppercase">
+                      SHREE SHYAM
+                    </h2>
+                    {/* <div className="h-px w-6 bg-brand-secondary/40 group-hover:w-10 transition-all duration-700"></div> */}
+                  </div>
+                  <h3 className="text-[11px] font-bold tracking-[0.4em] text-brand-secondary uppercase -mt-0.5 ml-1">
+                    DARSHAN
+                  </h3>
                 </Link>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-brand-primary/40 hover:text-brand-primary">
                   <Icon icon="lucide:x" className="w-5 h-5" />
@@ -362,7 +369,7 @@ export default function Header() {
                 {/* 1. Integrated Wholesaler Links (Small & Clean) */}
                 {isLogged && (
                   <div className="px-6 py-4 mb-4 bg-brand-accent/30 border-y border-brand-primary/5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-secondary mb-3">Partner Desk</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-secondary mb-3">Wholesaler Desk</p>
                     <div className="space-y-3">
                       {[
                         { href: "/wholesalers/dashboard/collection/offers", label: "Discount Offers", icon: "solar:ticket-sale-linear" },
@@ -461,8 +468,13 @@ export default function Header() {
           >
             {/* Top Bar Navigation */}
             <div className="w-full flex justify-end md:justify-between items-center p-6 lg:p-12 fixed top-0 left-0 z-10 bg-white/80 backdrop-blur-md">
-              <div className="text-[16px] font-bold text-brand-primary/20 uppercase tracking-[0.4em] hidden md:block italic font-serif">
-                Shree Shyam Darshan
+              <div className="hidden md:flex flex-col gap-0.5 opacity-40">
+                <div className="text-[18px] font-serif font-bold text-brand-primary uppercase tracking-[0.2em] leading-none">
+                  Shree Shyam
+                </div>
+                <div className="text-[10px] font-bold text-brand-secondary uppercase tracking-[0.5em] ml-0.5">
+                  Darshan
+                </div>
               </div>
               <button
                 onClick={() => {
@@ -644,15 +656,18 @@ export default function Header() {
                       </div>
                     ) : (
                       <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="py-32 flex flex-col items-center text-center"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="py-32 lg:py-48 flex flex-col items-center text-center bg-brand-accent/5 rounded-[48px] border border-brand-primary/5"
                       >
-                        <div className="w-16 h-16 bg-brand-primary/5 rounded-full flex items-center justify-center mb-6 text-brand-primary/20">
-                          <Icon icon="solar:magnifer-zoom-out-broken" className="w-8 h-8" />
+                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-8 shadow-xl text-brand-primary/10">
+                          <Icon icon="solar:magnifer-zoom-out-broken" className="w-10 h-10" />
                         </div>
-                        <h3 className="text-2xl font-serif italic text-brand-primary mb-3">No Masterpieces Found</h3>
-                        <p className="text-[9px] font-bold text-brand-primary/20 uppercase tracking-[0.3em] max-w-[200px] leading-relaxed">Try alternative terms or browse our core essence</p>
+                        <h3 className="text-xl lg:text-3xl font-serif font-bold text-brand-primary mb-4 uppercase tracking-[0.1em]">No Results Found</h3>
+                        <div className="w-12 h-[1px] bg-brand-secondary/30 mb-6" />
+                        <p className="text-[10px] font-bold text-brand-primary/30 uppercase tracking-[0.3em] max-w-xs leading-relaxed">
+                           We couldn't find any masterpieces matching "<span className="text-brand-primary/60">{searchQuery}</span>". Try different keywords or browse our divine categories.
+                        </p>
                       </motion.div>
                     )}
                   </motion.div>

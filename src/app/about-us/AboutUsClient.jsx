@@ -14,7 +14,7 @@ export default function AboutUsClient() {
     <div className="min-h-screen bg-brand-accent pb-12 lg:pb-20 text-left">
 
       <section className="pt-24 lg:pt-32 pb-12 lg:pb-20 bg-brand-primary text-white relative overflow-hidden text-center">
-        <div className="absolute inset-0 opacity-15 bg-[url('/images/hero_2.jpg')] bg-cover bg-center mix-blend-overlay scale-110"></div>
+        <div className="absolute inset-0 opacity-15 bg-[url('/images/hero_2.webp')] bg-cover bg-center mix-blend-overlay scale-110"></div>
         <div className="container mx-auto px-4 text-center relative z-10 max-w-7xl">
            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
              <p className="text-brand-secondary font-bold tracking-[0.4em] lg:tracking-[0.6em] uppercase mb-4 text-[10px] lg:text-sm text-center">Who We Are</p>
@@ -31,7 +31,7 @@ export default function AboutUsClient() {
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
               <motion.div initial={{ opacity: 0, x: -25 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="relative">
                  <div className="aspect-[4/5] rounded-[40px] lg:rounded-[60px] overflow-hidden shadow-2xl border-2 border-white relative">
-                    <Image src="/images/poshak-1.jpg" alt="Devotion" fill className="object-cover" />
+                    <Image src="/images/poshak-1.webp" alt="Devotion" fill className="object-cover" />
                  </div>
                  <div className="absolute -bottom-8 -right-8 w-40 h-40 lg:w-64 lg:h-64 bg-brand-secondary/90 rounded-[30px] lg:rounded-[50px] p-6 lg:p-10 flex flex-col justify-center text-white shadow-2xl backdrop-blur-md">
                     <h4 className="text-3xl lg:text-5xl font-serif font-bold mb-2">1000+</h4>
@@ -102,7 +102,7 @@ export default function AboutUsClient() {
 
       <section className="py-20 lg:py-32 container mx-auto px-4 text-center max-w-7xl">
          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="bg-brand-secondary p-10 lg:p-20 rounded-[40px] lg:rounded-[60px] text-white shadow-2xl relative overflow-hidden text-center">
-            <div className="absolute inset-0 opacity-10 bg-[url('/images/hero_3.jpg')] bg-cover bg-center mix-blend-overlay"></div>
+            <div className="absolute inset-0 opacity-10 bg-[url('/images/hero_3.webp')] bg-cover bg-center mix-blend-overlay"></div>
             <div className="relative z-10 space-y-8 lg:space-y-12 text-center">
                <h2 className="text-3xl lg:text-6xl font-serif font-bold italic leading-tight max-w-4xl mx-auto text-center">"Adorn Your Divine Masterpiece Today"</h2>
                <div className="text-center">

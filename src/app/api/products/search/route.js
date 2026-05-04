@@ -70,7 +70,7 @@ export async function GET(req) {
         category: p.category.name,
         section: p.innerSubCategory?.name,
         price: p.price,
-        image: p.images[0] || "/hero.png",
+        image: p.images[0] || "/images/hero.webp",
       })),
       collections
     });

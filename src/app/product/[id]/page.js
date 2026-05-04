@@ -5,15 +5,19 @@ import Link from "next/link";
 export const revalidate = 3600; // Revalidate every hour
 
 export async function generateStaticParams() {
-  const products = await prisma.product.findMany({
-    where: { isVisible: true },
-    select: { id: true },
-    take: 100 // Pre-render top 100 products for instant loading
-  });
-
-  return products.map((product) => ({
-    id: product.id,
-  }));
+  try {
+    const products = await prisma.product.findMany({
+      where: { isVisible: true },
+      select: { id: true },
+      take: 100 // Pre-render top 100 products for instant loading
+    });
+    return products.map((product) => ({
+      id: product.id,
+    }));
+  } catch (err) {
+    console.error("[Product] generateStaticParams error:", err?.message);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }) {
@@ -22,19 +26,23 @@ export async function generateMetadata({ params }) {
   try {
       const dbProduct = await prisma.product.findUnique({ where: { id, isVisible: true } });
       if (dbProduct) {
+          const priceStr = dbProduct.offerPrice ? `₹${dbProduct.offerPrice}` : `₹${dbProduct.price}`;
+          const seoDescription = `${dbProduct.name} available at ${priceStr}. Explore premium divine poshaks (SSD/NDL) direct from our Surat factory. ${dbProduct.description?.slice(0, 100)}...`;
+
           return {
-            title: `${dbProduct.name} | Shree Shyam Darshan`,
-            description: dbProduct.description || `${dbProduct.name}. Buy premium divine poshaks direct from factory.`,
+            title: `${dbProduct.name} - Buy Online | Shree Shyam Darshan`,
+            description: seoDescription,
+            keywords: [`${dbProduct.name}`, "SSD Poshak", "NDL Collection", "Buy Poshak Online", "Surat Divine Fashion"],
             openGraph: {
-              title: dbProduct.name,
-              description: dbProduct.description,
-              images: [{ url: dbProduct.images[0], width: 800, height: 600, alt: dbProduct.name }],
+              title: `${dbProduct.name} | SSD`,
+              description: seoDescription,
+              images: [{ url: dbProduct.images[0], width: 1200, height: 630, alt: dbProduct.name }],
               type: 'website',
             },
             twitter: {
               card: 'summary_large_image',
               title: dbProduct.name,
-              description: dbProduct.description,
+              description: seoDescription,
               images: [dbProduct.images[0]],
             },
             alternates: { canonical: `/product/${id}` }
@@ -70,7 +78,7 @@ export default async function ProductPage({ params }) {
              innerCategory: dbProduct.innerSubCategory?.name || null,
              price: dbProduct.price,
              description: dbProduct.description,
-             image: dbProduct.images[0] || "/hero.png",
+             image: dbProduct.images[0] || "/images/hero.webp",
              images: dbProduct.images,
              videos: dbProduct.videos,
              isBestSeller: dbProduct.isBestSeller,
@@ -96,7 +104,7 @@ export default async function ProductPage({ params }) {
              isOfferProduct: p.isOfferProduct,
              category: dbProduct.category?.name || "Unknown",
              images: p.images,
-             image: p.images[0] || "/hero.png"
+             image: p.images[0] || "/images/hero.webp"
          }));
 
          const navCat = { id: dbProduct.category.slug, name: dbProduct.category.name };
@@ -121,13 +129,25 @@ export default async function ProductPage({ params }) {
            }
          };
 
+         // Fetch random showcase videos
+         const showcaseVideos = await prisma.showcaseVideo.findMany({
+             where: { isActive: true }
+         }).then(res => res.sort(() => 0.5 - Math.random()).slice(0, 10));
+
          return (
            <>
              <script
                type="application/ld+json"
                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
              />
-             <ProductClient product={mappedProduct} navCategory={navCat} subCategory={subCat} innerSubCategory={innerSubCat} relatedProducts={mappedRelated} />
+             <ProductClient 
+                product={mappedProduct} 
+                navCategory={navCat} 
+                subCategory={subCat} 
+                innerSubCategory={innerSubCat} 
+                relatedProducts={mappedRelated}
+                showcaseVideos={showcaseVideos}
+             />
            </>
          );
       }

@@ -27,7 +27,7 @@ export async function GET() {
       variantName: item.variantName === "BASE" ? null : item.variantName,
       price: item.price, 
       originalPrice: item.originalPrice || item.price,
-      image: item.product.images[0] || "/hero.png"
+      image: item.product.images[0] || "/images/hero.webp"
     }));
 
     return NextResponse.json({ success: true, cart: mappedCart });

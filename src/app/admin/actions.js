@@ -3,24 +3,41 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { roundToTwo } from "@/lib/utils";
+import { deleteFromAllAccounts } from "@/lib/cloudinary";
 
 // Category Actions
 export async function getCategories() { return await prisma.category.findMany({ orderBy: { createdAt: 'desc' } }); }
 export async function createCategory(data) { await prisma.category.create({ data }); revalidatePath('/admin/categories'); }
 export async function updateCategory(id, data) { await prisma.category.update({ where: { id }, data }); revalidatePath('/admin/categories'); }
-export async function deleteCategory(id) { await prisma.category.delete({ where: { id } }); revalidatePath('/admin/categories'); }
+export async function deleteCategory(id) { 
+  const item = await prisma.category.findUnique({ where: { id } });
+  if (item?.imageUrl) await deleteFromAllAccounts(item.imageUrl, 'image');
+  if (item?.videos?.length > 0) await deleteFromAllAccounts(item.videos, 'video');
+  await prisma.category.delete({ where: { id } }); 
+  revalidatePath('/admin/categories'); 
+}
 
 // Subcategory Actions
 export async function getSubCategories() { return await prisma.subCategory.findMany({ include: { category: true }, orderBy: { name: 'asc' } }); }
 export async function createSubCategory(data) { await prisma.subCategory.create({ data }); revalidatePath('/admin/subcategories'); }
 export async function updateSubCategory(id, data) { await prisma.subCategory.update({ where: { id }, data }); revalidatePath('/admin/subcategories'); }
-export async function deleteSubCategory(id) { await prisma.subCategory.delete({ where: { id } }); revalidatePath('/admin/subcategories'); }
+export async function deleteSubCategory(id) { 
+  const item = await prisma.subCategory.findUnique({ where: { id } });
+  if (item?.imageUrl) await deleteFromAllAccounts(item.imageUrl, 'image');
+  await prisma.subCategory.delete({ where: { id } }); 
+  revalidatePath('/admin/subcategories'); 
+}
 
 // InnerSubcategory Actions
 export async function getInnerSubCategories() { return await prisma.innerSubCategory.findMany({ include: { subCategory: { include: { category: true } } }, orderBy: { name: 'asc' } }); }
 export async function createInnerSubCategory(data) { await prisma.innerSubCategory.create({ data }); revalidatePath('/admin/inner-subcategories'); }
 export async function updateInnerSubCategory(id, data) { await prisma.innerSubCategory.update({ where: { id }, data }); revalidatePath('/admin/inner-subcategories'); }
-export async function deleteInnerSubCategory(id) { await prisma.innerSubCategory.delete({ where: { id } }); revalidatePath('/admin/inner-subcategories'); }
+export async function deleteInnerSubCategory(id) { 
+  const item = await prisma.innerSubCategory.findUnique({ where: { id } });
+  if (item?.imageUrl) await deleteFromAllAccounts(item.imageUrl, 'image');
+  await prisma.innerSubCategory.delete({ where: { id } }); 
+  revalidatePath('/admin/inner-subcategories'); 
+}
 
 // Wholesaler Actions
 export async function getWholesalers() { return await prisma.wholesaler.findMany({ orderBy: { createdAt: 'desc' } }); }
@@ -159,7 +176,13 @@ export async function updateProduct(id, data) {
   }
 }
 
-export async function deleteProduct(id) { await prisma.product.delete({ where: { id } }); revalidatePath('/admin/products'); }
+export async function deleteProduct(id) { 
+  const item = await prisma.product.findUnique({ where: { id } });
+  if (item?.images?.length > 0) await deleteFromAllAccounts(item.images, 'image');
+  if (item?.videos?.length > 0) await deleteFromAllAccounts(item.videos, 'video');
+  await prisma.product.delete({ where: { id } }); 
+  revalidatePath('/admin/products'); 
+}
 
 // Review Actions
 export async function getReviews() {
@@ -204,14 +227,91 @@ export async function deleteReview(id) {
 
 // Inquiry Actions
 export async function getInquiries() {
-  return await prisma.inquiry.findMany({
-    orderBy: { createdAt: 'desc' }
-  });
+  try {
+    return await prisma.inquiry.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+  } catch (err) {
+    console.error("[getInquiries] Error - run `prisma generate && prisma db push`:", err?.message);
+    return [];
+  }
 }
 
 export async function deleteInquiry(id) {
-  await prisma.inquiry.delete({
-    where: { id }
+  try {
+    await prisma.inquiry.delete({
+      where: { id }
+    });
+    revalidatePath('/admin/inquiries');
+  } catch (err) {
+    console.error("[deleteInquiry] Error:", err?.message);
+    throw new Error("Could not delete inquiry. Please try again.");
+  }
+}
+
+// Showcase Video Actions
+export async function getShowcaseVideos() { 
+  return await prisma.showcaseVideo.findMany({ 
+    orderBy: { createdAt: 'desc' } 
+  }); 
+}
+
+export async function createShowcaseVideo(data) { 
+  await prisma.showcaseVideo.create({ data }); 
+  revalidatePath('/admin/showcase-videos'); 
+  revalidatePath('/');
+  revalidatePath('/product/[id]', 'layout');
+}
+
+export async function deleteShowcaseVideo(id) { 
+  const item = await prisma.showcaseVideo.findUnique({ where: { id } });
+  if (item?.url?.startsWith('shree')) {
+    await deleteFromAllAccounts(item.url, 'video');
+  }
+  await prisma.showcaseVideo.delete({ where: { id } }); 
+  revalidatePath('/admin/showcase-videos'); 
+  revalidatePath('/');
+  revalidatePath('/product/[id]', 'layout');
+}
+
+// Review Video Actions
+export async function getReviewVideos() { 
+  return await prisma.reviewVideo.findMany({ 
+    orderBy: { createdAt: 'desc' } 
+  }); 
+}
+
+export async function createReviewVideo(data) { 
+  await prisma.reviewVideo.create({ data }); 
+  revalidatePath('/admin/review-videos'); 
+  revalidatePath('/');
+}
+
+export async function deleteReviewVideo(id) { 
+  const item = await prisma.reviewVideo.findUnique({ where: { id } });
+  if (item?.url?.startsWith('shree')) {
+    await deleteFromAllAccounts(item.url, 'video');
+  }
+  await prisma.reviewVideo.delete({ where: { id } }); 
+  revalidatePath('/admin/review-videos'); 
+  revalidatePath('/');
+}
+
+// AppConfig Actions (Cloudinary Management)
+export async function getAppConfig() {
+  let config = await prisma.appConfig.findUnique({ where: { id: 1 } });
+  if (!config) {
+    config = await prisma.appConfig.create({
+      data: { id: 1, activeCloudinaryIndex: 0 }
+    });
+  }
+  return config;
+}
+
+export async function updateAppConfig(data) {
+  await prisma.appConfig.update({
+    where: { id: 1 },
+    data
   });
-  revalidatePath('/admin/inquiries');
+  revalidatePath('/admin/settings/storage');
 }

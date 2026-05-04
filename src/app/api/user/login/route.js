@@ -3,9 +3,20 @@ import { cookies } from "next/headers";
 import { encrypt } from "@/lib/session";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function POST(req) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '0.0.0.0';
+    
+    // Rate Limit: 10 login attempts per hour
+    const { allowed } = await checkRateLimit(ip, 'login', 10);
+    if (!allowed) {
+        return NextResponse.json({ 
+            error: "Too many login attempts. Please try again later for security reasons." 
+        }, { status: 429 });
+    }
+
     const { phone, password } = await req.json();
 
     const user = await prisma.wholesaler.findUnique({

@@ -26,7 +26,7 @@ export default function InquiriesPage() {
     }
   };
 
-  const filteredData = data.filter(i => 
+  const filteredData = data.filter(i =>
     i.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     i.mobile?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     i.product?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -37,8 +37,8 @@ export default function InquiriesPage() {
     <div className="max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-brand-primary">Inquiry Vault</h1>
-          <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase mt-1">Direct Leads from Website</p>
+          <h1 className="text-4xl font-serif font-bold text-brand-primary">Inquiries</h1>
+          <p className="text-[10px] font-black text-brand-secondary tracking-[0.4em] uppercase mt-2 opacity-60">Inquiries Management</p>
         </div>
         <div className="relative group w-full md:w-80">
           <Icon icon="solar:magnifer-linear" className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary/20 w-4 h-4 group-focus-within:text-brand-secondary transition-colors" />
@@ -96,8 +96,8 @@ export default function InquiriesPage() {
                 </td>
                 <td className="p-6 text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <a 
-                      href={`https://wa.me/${i.mobile.replace(/\D/g, '')}`} 
+                    <a
+                      href={`https://wa.me/${i.mobile.replace(/\D/g, '')}`}
                       target="_blank"
                       className="p-3 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
                       title="Contact on WhatsApp"

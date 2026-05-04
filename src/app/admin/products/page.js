@@ -7,6 +7,9 @@ import CustomSelect from "@/components/CustomSelect";
 import toast from "react-hot-toast";
 import { roundToTwo } from "@/lib/utils";
 
+import { useCloudinary } from "@/hooks/useCloudinary";
+import { compressAndResizeImage } from "@/lib/imageProcessor";
+import { deleteFromAllAccounts } from "@/lib/cloudinary";
 
 export default function ProductsPage() {
     const [data, setData] = useState([]);
@@ -21,15 +24,17 @@ export default function ProductsPage() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
 
+    const { uploadToAllAccounts, uploading: isCloudSyncing } = useCloudinary();
     const initForm = { productId: "", name: "", slug: "", description: "", wholesalerDescription: "", mrp: 0, price: 0, offerPrice: 0, discountPercent: 0, categoryId: "", subCategoryId: "", innerSubId: null, images: [], videos: [], isBestSeller: false, isOfferProduct: false, isReadyStock: false, showWashCare: false, allowToBuy: true, details: [], variants: [], unit: "PIECE", isVisible: true };
     const [form, setForm] = useState(initForm);
     const [errors, setErrors] = useState({});
-    const [uploadingImage, setUploadingImage] = useState(false);
-    const [uploadingVideo, setUploadingVideo] = useState(false);
-    const [isDraggingImage, setIsDraggingImage] = useState(false);
-    const [isDraggingVideo, setIsDraggingVideo] = useState(false);
-    const [pendingUploads, setPendingUploads] = useState([]); // [{id, previewUrl, type}]
+
+    // States for "Upload on Submit"
+    const [selectedImages, setSelectedImages] = useState([]); // { file, preview }
+    const [pendingVideos, setPendingVideos] = useState([]); // { file, preview }
+
     const [isSaving, setIsSaving] = useState(false);
+    const [deletedMedia, setDeletedMedia] = useState([]); // Track IDs to delete from Cloudinary on save
 
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -42,47 +47,49 @@ export default function ProductsPage() {
     };
 
     const handleUpload = async (e, type, droppedFiles = null) => {
-        const files = droppedFiles || Array.from(e.target.files);
+        let files = droppedFiles || Array.from(e.target.files);
         if (!files || files.length === 0) return;
 
-        if (type === 'image') setUploadingImage(true);
-        else setUploadingVideo(true);
+        if (type === 'video') {
+            // 5MB Limit check
+            const maxSize = 5 * 1024 * 1024;
+            const oversized = files.find(f => f.size > maxSize);
+            if (oversized) {
+                toast.error(`"${oversized.name}" is too large! Max 5MB allowed.`);
+                return;
+            }
 
-        const newPending = files.map(file => ({
-            id: Math.random().toString(36).substr(2, 9),
-            previewUrl: URL.createObjectURL(file),
-            type: type
-        }));
-
-        setPendingUploads(prev => [...prev, ...newPending]);
-
-        try {
-            await Promise.all(files.map(async (file, idx) => {
-                try {
-                    const fd = new FormData();
-                    fd.append("file", file);
-                    const res = await fetch("/api/upload", { method: "POST", body: fd });
-                    const dt = await res.json();
-
-                    if (dt.url) {
-                        setForm(prev => ({
-                            ...prev,
-                            [type === 'image' ? 'images' : 'videos']: [...prev[type === 'image' ? 'images' : 'videos'], dt.url]
-                        }));
-                    }
-                } catch (err) {
-                    toast.error(`One ${type} failed to upload`);
-                } finally {
-                    setPendingUploads(prev => prev.filter(p => p.id !== newPending[idx].id));
-                }
+            const currentCount = form.videos.length + pendingVideos.length;
+            const remaining = 5 - currentCount;
+            if (remaining <= 0) {
+                toast.error("Video limit reached (Max 5)");
+                return;
+            }
+            const newVideos = files.slice(0, remaining).map(file => ({
+                file,
+                preview: URL.createObjectURL(file)
             }));
+            setPendingVideos(prev => [...prev, ...newVideos]);
+            return;
+        }
 
-            toast.success("Media Uploaded Successfully");
+        const currentCount = form.images.length + selectedImages.length;
+        const remaining = 10 - currentCount;
+
+        if (remaining <= 0) {
+            toast.error("Maximum 10 images allowed per product.");
+            return;
+        }
+
+        const filesToProcess = files.slice(0, remaining);
+
+        // toast.loading("Processing Image...", { id: 'process' });
+        try {
+            const processed = await Promise.all(filesToProcess.map(f => compressAndResizeImage(f, 'product')));
+            setSelectedImages(prev => [...prev, ...processed]);
+            // toast.success(`${processed.length} Images Prepped for Sync`, { id: 'process' });
         } catch (err) {
-            toast.error("Media batch failed. System check required.");
-        } finally {
-            if (type === 'image') setUploadingImage(false);
-            else setUploadingVideo(false);
+            toast.error("Image optimization failed", { id: 'process' });
         }
     };
 
@@ -141,7 +148,7 @@ export default function ProductsPage() {
         }
 
         if (s === 4) {
-            if (form.images.length === 0) {
+            if (form.images.length === 0 && selectedImages.length === 0) {
                 newErrors.images = "At least one visual masterpiece (image) is required";
             }
         }
@@ -159,48 +166,77 @@ export default function ProductsPage() {
     const handleSubmit = async () => {
         if (!validateStep(step)) return;
 
-        // Multi-step logic only for ADDing product
         if (!editingId && step < 4) {
             setStep(s => s + 1);
             return;
         }
 
-        // Wait for uploads if on Step 4
-        if (step === 4 && (uploadingImage || uploadingVideo)) {
-            toast.error("Assets: Media is still uploading...");
-            return;
-        }
-
-        const payload = {
-            ...form,
-            mrp: roundToTwo(form.mrp),
-            price: roundToTwo(form.price),
-            offerPrice: form.isOfferProduct ? roundToTwo(form.price * (1 - form.discountPercent / 100)) : roundToTwo(form.price),
-            variants: form.variants.map(v => ({ ...v, price: roundToTwo(v.price) })),
-            discountPercent: parseInt(form.discountPercent),
-            showWashCare: !!form.showWashCare,
-            isReadyStock: !!form.isReadyStock,
-            allowToBuy: !!form.allowToBuy,
-            isVisible: !!form.isVisible,
-            unit: form.unit || "PIECE"
-        };
-        if (!payload.innerSubId) payload.innerSubId = null;
+        let currentForm = { ...form };
 
         try {
             setIsSaving(true);
+            const itemsToDelete = [...deletedMedia]; // Copy before state clear
+
+            // 1. Sync Images to All Nodes
+            if (selectedImages.length > 0) {
+                toast.loading(`Uploading...`, { id: 'save' });
+                const uploadedIds = [];
+                for (const item of selectedImages) {
+                    const res = await uploadToAllAccounts(item.file);
+                    uploadedIds.push(res.public_id);
+                }
+                currentForm.images = [...currentForm.images, ...uploadedIds];
+            }
+
+            // 2. Sync Videos to All Nodes
+            if (pendingVideos.length > 0) {
+                toast.loading(`Uploading...`, { id: 'save' });
+                const uploadedIds = [];
+                for (const item of pendingVideos) {
+                    const res = await uploadToAllAccounts(item.file, 'video');
+                    uploadedIds.push(res.public_id);
+                }
+                currentForm.videos = [...currentForm.videos, ...uploadedIds];
+            }
+
+            toast.loading("Recording Masterpiece in DB...", { id: 'save' });
+
+            const payload = {
+                ...currentForm,
+                mrp: roundToTwo(currentForm.mrp),
+                price: roundToTwo(currentForm.price),
+                offerPrice: currentForm.isOfferProduct ? roundToTwo(currentForm.price * (1 - currentForm.discountPercent / 100)) : roundToTwo(currentForm.price),
+                variants: currentForm.variants.map(v => ({ ...v, price: roundToTwo(v.price) })),
+                discountPercent: parseInt(currentForm.discountPercent),
+                showWashCare: !!currentForm.showWashCare,
+                isReadyStock: !!currentForm.isReadyStock,
+                allowToBuy: !!currentForm.allowToBuy,
+                isVisible: !!currentForm.isVisible,
+                unit: currentForm.unit || "PIECE"
+            };
+
             if (editingId) {
                 await updateProduct(editingId, payload);
-                toast.success("Masterpiece Refined");
-                setIsOpen(false);
-                loadData();
+                if (itemsToDelete.length > 0) {
+                    const imagesToDelete = itemsToDelete.filter(item => item.type === 'image').map(item => item.id);
+                    const videosToDelete = itemsToDelete.filter(item => item.type === 'video').map(item => item.id);
+                    
+                    if (imagesToDelete.length > 0) await deleteFromAllAccounts(imagesToDelete, 'image');
+                    if (videosToDelete.length > 0) await deleteFromAllAccounts(videosToDelete, 'video');
+                }
+                toast.success("Product Updated Successfully", { id: 'save' });
+                setDeletedMedia([]);
             } else {
                 await createProduct(payload);
-                toast.success("New Masterpiece Injected");
-                setIsOpen(false);
-                loadData();
+                toast.success("Product Added Successfully", { id: 'save' });
             }
+
+            setIsOpen(false);
+            setSelectedImages([]);
+            setPendingVideos([]);
+            loadData();
         } catch (err) {
-            toast.error(err.message || "Failed to save masterpiece. Check connection.");
+            toast.error(err.message || "Sync failed. Media was not saved.", { id: 'save' });
         } finally {
             setIsSaving(false);
         }
@@ -225,8 +261,8 @@ export default function ProductsPage() {
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
                 <div>
-                    <h1 className="text-3xl font-serif font-bold text-brand-primary">Master Catalog</h1>
-                    <p className="text-xs font-bold text-brand-secondary tracking-widest uppercase mt-1">Administer Inventory Flow</p>
+                    <h1 className="text-4xl font-serif font-bold text-brand-primary">Master Catalog</h1>
+                    <p className="text-[10px] font-black text-brand-secondary tracking-[0.4em] uppercase mt-2 opacity-60">Master Catalog Product Management</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto items-center">
                     <div className="relative group w-full sm:w-80">
@@ -267,7 +303,11 @@ export default function ProductsPage() {
                                 <tr key={p.id} className="hover:bg-brand-primary/[0.02] transition-colors">
                                     <td className="p-5">
                                         <div className="w-12 h-14 bg-gray-100 rounded-lg overflow-hidden border border-black/5">
-                                            {p.images[0] ? <img src={p.images[0]} className="w-full h-full object-cover" /> : <div className="flex items-center justify-center h-full"><Icon icon="lucide:image" className="opacity-20" /></div>}
+                                            {p.images[0] ? (
+                                                <img src={p.images[0].startsWith('shree') ? `https://res.cloudinary.com/dumbddcvh/image/upload/${p.images[0]}` : p.images[0]} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="flex items-center justify-center h-full"><Icon icon="lucide:image" className="opacity-20" /></div>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="p-5">
@@ -927,7 +967,7 @@ export default function ProductsPage() {
                                                 </div>
                                                 <div className="group">
                                                     <label className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-secondary/40 block mb-3 px-1 group-focus-within:text-brand-secondary transition-colors">Wholesale Only Description</label>
-                                                    <textarea value={form.wholesalerDescription} onChange={e => setForm({ ...form, wholesalerDescription: e.target.value })} className="w-full p-6 border border-brand-secondary/10 rounded-[32px] bg-brand-secondary/5 text-[13px] font-bold text-brand-primary h-40 resize-none focus:border-brand-secondary/40 outline-none transition-all shadow-inner leading-relaxed" placeholder="Confidential insights for our valued partners..." />
+                                                    <textarea value={form.wholesalerDescription} onChange={e => setForm({ ...form, wholesalerDescription: e.target.value })} className="w-full p-6 border border-brand-secondary/10 rounded-[32px] bg-brand-secondary/5 text-[13px] font-bold text-brand-primary h-40 resize-none focus:border-brand-secondary/40 outline-none transition-all shadow-inner leading-relaxed" placeholder="Confidential insights for our valued Wholesaler..." />
                                                 </div>
                                             </div>
                                         </div>
@@ -951,20 +991,34 @@ export default function ProductsPage() {
                                                 <div>
                                                     <span className="text-[8px] font-black uppercase tracking-[0.3em] text-brand-primary/20 mb-4 block underline underline-offset-8">Imagery Gallary</span>
                                                     <div
-                                                        onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
-                                                        onDragLeave={() => setIsDraggingImage(false)}
-                                                        onDrop={(e) => { e.preventDefault(); setIsDraggingImage(false); handleUpload(null, 'image', Array.from(e.dataTransfer.files)); }}
-                                                        className={`grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 p-4 rounded-3xl border-2 border-dashed transition-all ${isDraggingImage ? 'border-brand-secondary bg-brand-secondary/5 scale-[1.02]' : errors.images ? 'border-red-500 bg-red-50/10' : 'border-gray-100 hover:border-brand-primary/20'}`}
+                                                        onDragOver={(e) => { e.preventDefault(); }}
+                                                        onDrop={(e) => { e.preventDefault(); handleUpload(null, 'image', Array.from(e.dataTransfer.files)); }}
+                                                        className={`grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 p-4 rounded-3xl border-2 border-dashed transition-all ${errors.images ? 'border-red-500 bg-red-50/10' : 'border-gray-100 hover:border-brand-primary/20'}`}
                                                     >
+                                                        {/* Existing Images */}
                                                         {form.images.map((img, i) => (
-                                                            <div key={i} className="aspect-[3/4] rounded-2xl overflow-hidden border border-black/5 relative group shadow-sm transition-transform hover:scale-105">
-                                                                <img src={img} className="w-full h-full object-cover" />
-                                                                <button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="solar:trash-bin-trash-bold" className="text-white w-6 h-6" /></button>
+                                                            <div key={`ex-${i}`} className="aspect-[3/4] rounded-2xl overflow-hidden border border-black/5 relative group shadow-sm transition-transform hover:scale-105">
+                                                                <img src={img.startsWith('shree') ? `https://res.cloudinary.com/dumbddcvh/image/upload/${img}` : img} className="w-full h-full object-cover" />
+                                                                <button type="button" onClick={() => {
+                                                                    setDeletedMedia(prev => [...prev, { id: img, type: 'image' }]);
+                                                                    setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) });
+                                                                }} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="solar:trash-bin-trash-bold" className="text-white w-6 h-6" /></button>
                                                             </div>
                                                         ))}
-                                                        <div className={`aspect-[3/4] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingImage ? 'border-brand-secondary' : errors.images ? 'border-red-400 bg-red-50/20' : 'border-gray-200'}`}>
-                                                            {uploadingImage ? <Icon icon="line-md:loading-loop" className="text-brand-secondary w-8 h-8" /> : <><Icon icon="solar:camera-add-bold-duotone" className={`w-8 h-8 ${isDraggingImage ? 'text-brand-secondary' : errors.images ? 'text-red-400' : 'text-gray-300'}`} /><span className={`text-[7px] font-black uppercase mt-2 ${errors.images ? 'text-red-400' : 'text-gray-400'}`}>Capture Image</span></>}
-                                                            <input type="file" multiple disabled={uploadingImage} onChange={(e) => { handleUpload(e, 'image'); if (errors.images) setErrors(prev => ({ ...prev, images: null })); }} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+
+                                                        {/* Selected Pending Images */}
+                                                        {selectedImages.map((item, i) => (
+                                                            <div key={`pnd-${i}`} className="aspect-[3/4] rounded-2xl overflow-hidden border border-brand-secondary/30 relative group shadow-md transition-transform hover:scale-105 bg-brand-secondary/5">
+                                                                <img src={item.preview} className="w-full h-full object-cover opacity-80" />
+                                                                <div className="absolute top-1 right-1 bg-brand-secondary text-white p-1 rounded-full"><Icon icon="solar:cloud-upload-bold" className="w-3 h-3" /></div>
+                                                                <button type="button" onClick={() => setSelectedImages(prev => prev.filter((_, idx) => idx !== i))} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="lucide:x" className="text-white w-6 h-6" /></button>
+                                                            </div>
+                                                        ))}
+
+                                                        <div className={`aspect-[3/4] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${errors.images ? 'border-red-400 bg-red-50/20' : 'border-gray-200'}`}>
+                                                            <Icon icon="solar:camera-add-bold-duotone" className={`w-8 h-8 ${errors.images ? 'text-red-400' : 'text-gray-300'}`} />
+                                                            <span className={`text-[7px] font-black uppercase mt-2 ${errors.images ? 'text-red-400' : 'text-gray-400'}`}>Capture Image</span>
+                                                            <input type="file" multiple disabled={isCloudSyncing} onChange={(e) => { handleUpload(e, 'image'); if (errors.images) setErrors(prev => ({ ...prev, images: null })); }} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
                                                         </div>
                                                     </div>
                                                     {errors.images && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-2 ml-1">{errors.images}</p>}
@@ -973,20 +1027,34 @@ export default function ProductsPage() {
                                                 <div>
                                                     <span className="text-[8px] font-black uppercase tracking-[0.3em] text-brand-primary/20 mb-4 block underline underline-offset-8">Videos Gallery</span>
                                                     <div
-                                                        onDragOver={(e) => { e.preventDefault(); setIsDraggingVideo(true); }}
-                                                        onDragLeave={() => setIsDraggingVideo(false)}
-                                                        onDrop={(e) => { e.preventDefault(); setIsDraggingVideo(false); handleUpload(null, 'video', Array.from(e.dataTransfer.files)); }}
-                                                        className={`flex gap-4 overflow-x-auto pt-2 pb-4 no-scrollbar p-4 rounded-3xl border-2 border-dashed transition-all ${isDraggingVideo ? 'border-brand-secondary bg-brand-secondary/5 scale-[1.02]' : 'border-gray-100 hover:border-brand-primary/20'}`}
+                                                        onDragOver={(e) => { e.preventDefault(); }}
+                                                        onDrop={(e) => { e.preventDefault(); handleUpload(null, 'video', Array.from(e.dataTransfer.files)); }}
+                                                        className={`flex gap-4 overflow-x-auto pt-2 pb-4 no-scrollbar p-4 rounded-3xl border-2 border-dashed transition-all border-gray-100 hover:border-brand-primary/20`}
                                                     >
+                                                        {/* Existing Videos */}
                                                         {form.videos.map((vid, i) => (
-                                                            <div key={i} className="w-48 h-28 shrink-0 rounded-2xl overflow-hidden border bg-black relative group shadow-lg">
-                                                                <video src={vid} className="w-full h-full object-cover" />
-                                                                <button type="button" onClick={() => setForm({ ...form, videos: form.videos.filter((_, idx) => idx !== i) })} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="solar:trash-bin-trash-bold" className="text-white w-6 h-6" /></button>
+                                                            <div key={`vx-${i}`} className="w-48 h-28 shrink-0 rounded-2xl overflow-hidden border bg-black relative group shadow-lg">
+                                                                <video src={vid.startsWith('shree') ? `https://res.cloudinary.com/duxn4yj3a/video/upload/f_auto,q_auto/${vid}` : vid} className="w-full h-full object-cover" />
+                                                                <button type="button" onClick={() => {
+                                                                    setDeletedMedia(prev => [...prev, { id: vid, type: 'video' }]);
+                                                                    setForm({ ...form, videos: form.videos.filter((_, idx) => idx !== i) });
+                                                                }} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="solar:trash-bin-trash-bold" className="text-white w-6 h-6" /></button>
                                                             </div>
                                                         ))}
-                                                        <div className={`w-48 h-28 shrink-0 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all ${isDraggingVideo ? 'border-brand-secondary' : 'border-gray-200'}`}>
-                                                            {uploadingVideo ? <Icon icon="line-md:loading-loop" className="w-8 h-8 text-brand-secondary" /> : <><Icon icon="solar:videocamera-add-bold-duotone" className={`w-8 h-8 ${isDraggingVideo ? 'text-brand-secondary' : 'text-gray-300'}`} /><span className="text-[8px] font-black uppercase mt-2 text-gray-400 tracking-widest">Inject Motion</span></>}
-                                                            <input type="file" multiple disabled={uploadingVideo} onChange={(e) => handleUpload(e, 'video')} className="absolute inset-0 opacity-0 cursor-pointer" accept="video/*" />
+
+                                                        {/* Pending Videos */}
+                                                        {pendingVideos.map((item, i) => (
+                                                            <div key={`vp-${i}`} className="w-48 h-28 shrink-0 rounded-2xl overflow-hidden border bg-black relative group shadow-lg border-brand-secondary/30">
+                                                                <video src={item.preview} className="w-full h-full object-cover opacity-60" />
+                                                                <div className="absolute top-1 right-1 bg-brand-secondary text-white p-1 rounded-full"><Icon icon="solar:cloud-upload-bold" className="w-3 h-3" /></div>
+                                                                <button type="button" onClick={() => setPendingVideos(prev => prev.filter((_, idx) => idx !== i))} className="absolute inset-0 bg-red-500/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"><Icon icon="lucide:x" className="text-white w-6 h-6" /></button>
+                                                            </div>
+                                                        ))}
+
+                                                        <div className={`w-48 h-28 shrink-0 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer transition-all border-gray-200`}>
+                                                            <Icon icon="solar:videocamera-add-bold-duotone" className={`w-8 h-8 text-gray-300`} />
+                                                            <span className="text-[8px] font-black uppercase mt-2 text-gray-400 tracking-widest">Inject Motion</span>
+                                                            <input type="file" multiple disabled={isCloudSyncing} onChange={(e) => handleUpload(e, 'video')} className="absolute inset-0 opacity-0 cursor-pointer" accept="video/*" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -997,7 +1065,7 @@ export default function ProductsPage() {
                             )}
 
                             <div className="pt-10 border-t border-brand-primary/5 flex justify-between items-center mt-auto">
-                                <button type="button" onClick={() => setIsOpen(false)} className="px-8 py-5 rounded-[24px] text-[11px] font-black uppercase tracking-[0.2em] text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100">Cancel</button>
+                                <button type="button" onClick={() => { setIsOpen(false); setDeletedMedia([]); }} className="px-8 py-5 rounded-[24px] text-[11px] font-black uppercase tracking-[0.2em] text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100">Cancel</button>
 
                                 <div className="flex gap-4">
                                     {step > 1 && (
@@ -1010,16 +1078,16 @@ export default function ProductsPage() {
                                         </button>
                                     ) : (
                                         !editingId && (
-                                            <button type="button" onClick={handleSubmit} disabled={uploadingImage || uploadingVideo || isSaving} className="px-20 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/30 text-[11px] flex items-center gap-3">
-                                                {isSaving ? <Icon icon="line-md:loading-loop" className="w-5 h-5" /> : <Icon icon="lucide:save" className="w-5 h-5" />}
-                                                {isSaving ? 'Saving...' : 'Save Product'}
+                                            <button type="button" onClick={handleSubmit} disabled={isCloudSyncing || isSaving} className="px-20 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/30 text-[11px] flex items-center gap-3">
+                                                {isSaving || isCloudSyncing ? <Icon icon="line-md:loading-loop" className="w-5 h-5" /> : <Icon icon="lucide:save" className="w-5 h-5" />}
+                                                {isSaving || isCloudSyncing ? 'Uploading...' : 'Save Product'}
                                             </button>
                                         )
                                     )}
-                                    {editingId && (
-                                        <button type="button" onClick={handleSubmit} disabled={uploadingImage || uploadingVideo || isSaving} className="px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl shadow-brand-primary/10 text-[11px] flex items-center gap-3">
-                                            {isSaving ? <Icon icon="line-md:loading-loop" className="w-5 h-5" /> : <Icon icon="lucide:save" className="w-5 h-5" />}
-                                            {isSaving ? 'Saving...' : 'Save'}
+                                    {editingId && step === 4 && (
+                                        <button type="button" onClick={handleSubmit} disabled={isCloudSyncing || isSaving} className="px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl shadow-brand-primary/10 text-[11px] flex items-center gap-3">
+                                            {isSaving || isCloudSyncing ? <Icon icon="line-md:loading-loop" className="w-5 h-5" /> : <Icon icon="lucide:save" className="w-5 h-5" />}
+                                            {isSaving || isCloudSyncing ? 'Uploading...' : 'Update Product'}
                                         </button>
                                     )}
 

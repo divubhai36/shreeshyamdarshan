@@ -14,6 +14,16 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '0.0.0.0';
+    
+    // Rate Limit: 50 orders per hour (Safe for wholesalers)
+    const { allowed } = await checkRateLimit(ip, 'order', 50);
+    if (!allowed) {
+        return NextResponse.json({ 
+            error: "Too many orders in a short time. Please wait a moment." 
+        }, { status: 429 });
+    }
+
     const { items, totalAmount } = await req.json();
 
     if (!items || items.length === 0) {

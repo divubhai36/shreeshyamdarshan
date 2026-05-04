@@ -197,3 +197,52 @@ model Inquiry {
   status    String   @default("PENDING")
   createdAt DateTime @default(now())
 }
+
+model ShowcaseVideo {
+  id        String   @id @default(cuid())
+  url       String
+  title     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReviewVideo {
+  id        String   @id @default(cuid())
+  url       String
+  title     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AppConfig {
+  id                    Int      @id @default(1)
+  activeCloudinaryIndex Int      @default(0) // 0 for Acc 1, 1 for Acc 2, 2 for Acc 3
+  isAutoSwitchEnabled   Boolean  @default(true)
+  usageThreshold        Float    @default(22.0) // 22GB safety limit
+  lastUsageCheck        DateTime @default(now())
+}
+
+model RateLimit {
+  id           String   @id @default(cuid())
+  ip           String   @unique
+  inquiryCount Int      @default(0)
+  loginCount   Int      @default(0)
+  orderCount   Int      @default(0)
+  lastReset    DateTime @default(now())
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   @db.Text
+  excerpt     String   @db.Text
+  image       String?
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+}

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import SmartImage from "@/components/SmartImage";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
@@ -11,23 +11,9 @@ import "slick-carousel/slick/slick-theme.css";
 import { toast } from "react-hot-toast";
 import { roundToTwo } from "@/lib/utils";
 
-const ImageWithFallback = ({ src, alt, ...props }) => {
-  const [imgSrc, setImgSrc] = useState(src);
-  useEffect(() => {
-    setImgSrc(src);
-  }, [src]);
+// Replacing old fallback with global SmartImage
 
-  return (
-    <Image
-      {...props}
-      src={imgSrc || '/hero.png'}
-      alt={alt}
-      onError={() => setImgSrc('/hero.png')}
-    />
-  );
-};
-
-export default function ProductClient({ product, navCategory, subCategory, innerSubCategory, relatedProducts }) {
+export default function ProductClient({ product, navCategory, subCategory, innerSubCategory, relatedProducts, showcaseVideos = [] }) {
   const { cart, addToCart, addMultipleToCart, removeFromCart, toggleSave, isProductSaved, isAuthenticated } = useCart();
   const saved = isProductSaved(product.id);
 
@@ -127,18 +113,88 @@ export default function ProductClient({ product, navCategory, subCategory, inner
     dots: false,
     infinite: true,
     speed: 1000,
-    mobileFirst: true,
-    slidesToShow: 2,
+    slidesToShow: 4,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
     arrows: false,
     pauseOnHover: true,
-    responsive: [
-      { breakpoint: 768, settings: { slidesToShow: 3 } },
-      { breakpoint: 1024, settings: { slidesToShow: 4 } },
-    ],
   };
+
+  const relatedMobileSettings = {
+    dots: false,
+    infinite: true,
+    speed: 1000,
+    slidesToShow: 1,
+    centerMode: true,
+    centerPadding: '50px',
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: false,
+    pauseOnHover: true,
+  };
+
+  const relatedProductsList = relatedProducts.map((p) => (
+    <div key={p.id} className="px-2 md:px-3 pb-10 lg:pb-16 pt-4">
+      <Link href={`/product/${p.id}`} className="block group relative">
+
+        {/* Card Shell */}
+        <div className="relative aspect-[3/4] rounded-[24px] lg:rounded-[36px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 bg-brand-primary/5">
+
+          {/* Product Image */}
+          <SmartImage
+            id={p.image}
+            alt={p.name}
+            className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
+          />
+
+          {/* Inner Luxury Border on Hover */}
+          <div className="absolute inset-2 border border-brand-secondary/0 group-hover:border-brand-secondary/40 rounded-[16px] lg:rounded-[28px] transition-colors duration-700 z-10 pointer-events-none" />
+
+          {/* Gradient shadow from bottom for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 md:opacity-60 group-hover:opacity-80 transition-opacity duration-700 z-10 pointer-events-none" />
+
+          {/* Offer Badge - Aesthetic ribbon */}
+          {p.isOfferProduct && (
+            <div className="absolute top-4 left-0 z-20 px-3 py-1 bg-gradient-to-r from-rose-600 to-red-500 text-white text-[8px] lg:text-[9px] font-black uppercase tracking-widest shadow-lg rounded-r-lg border-y border-r border-white/20">
+              Offer
+            </div>
+          )}
+
+          {/* Floating Glass Info Panel */}
+          <div className="absolute bottom-3 left-3 right-3 lg:bottom-4 lg:left-4 lg:right-4 z-20">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-[16px] lg:rounded-[24px] p-3 lg:p-4 shadow-[0_8px_32px_rgba(0,0,0,0.12)] transform translate-y-0 md:translate-y-2 group-hover:translate-y-0 group-hover:bg-brand-primary/40 lg:group-hover:bg-white/20 transition-all duration-500 ease-out">
+
+              {/* Name */}
+              <p className="text-white font-serif font-bold text-[11px] lg:text-[15px] leading-tight line-clamp-2 drop-shadow-sm mb-1.5 lg:mb-2 group-hover:text-brand-secondary transition-colors">
+                {p.name}
+              </p>
+
+              {/* Price row */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-white font-black text-[11px] lg:text-[14px] drop-shadow-md">
+                    ₹{p.isOfferProduct && p.offerPrice ? p.offerPrice : p.price}
+                  </span>
+                  {p.isOfferProduct && p.offerPrice && p.price > p.offerPrice && (
+                    <span className="text-white/50 font-bold text-[8px] lg:text-[10px] line-through">
+                      ₹{p.price}
+                    </span>
+                  )}
+                </div>
+
+                {/* Arrow CTA */}
+                <div className="w-6 h-6 lg:w-9 lg:h-9 rounded-full bg-white text-brand-primary flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 -translate-x-0 md:-translate-x-3 md:group-hover:translate-x-0 transition-all duration-500 shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
+                  <Icon icon="lucide:arrow-up-right" className="w-3 h-3 lg:w-4 lg:h-4 stroke-[2.5]" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </div>
+  ));
 
   const handleWhatsApp = async () => {
     const phone = "917383699199";
@@ -358,13 +414,11 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   className="relative aspect-square overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5"
                 >
                   <div className="relative w-full h-full">
-                    <ImageWithFallback
-                      src={productImages[activeImageIdx]}
+                    <SmartImage
+                      id={productImages[activeImageIdx]}
                       alt={product.name}
-                      fill
-                      priority
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      className="object-cover"
+                      priority={true}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   {/* Final Perfected Diagonal Sash */}
@@ -389,12 +443,10 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                           : "border-transparent opacity-60 hover:opacity-100"
                           }`}
                       >
-                        <ImageWithFallback
-                          src={img}
+                        <SmartImage
+                          id={img}
                           alt={`${product.name} thumbnail ${idx + 1}`}
-                          fill
-                          sizes="(max-width: 768px) 80px, 120px"
-                          className="object-cover rounded-xl"
+                          className="w-full h-full object-cover rounded-xl"
                         />
                       </button>
                     ))}
@@ -425,7 +477,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                       >
                         <Icon icon="solar:share-linear" className="w-6 h-6 lg:w-8 lg:h-8" />
                       </motion.button>
-                      
+
                       {isAuthenticated && (
                         <motion.div
                           initial={{ opacity: 0, scale: 0.8 }}
@@ -682,65 +734,67 @@ export default function ProductClient({ product, navCategory, subCategory, inner
               </div>
             </div>
 
-            <section className="pt-10 lg:pt-20 border-t border-brand-primary/5 px-0">
-              <div className="container mx-auto px-4 max-w-7xl text-center">
-                <div className="flex flex-col items-center mb-0 lg:mb-8">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-0.5 bg-brand-secondary/40"></div>
-                    <span className="text-brand-secondary text-[10px] lg:text-xs font-bold uppercase tracking-[0.4em]">Cinematic Quality</span>
-                    <div className="w-12 h-0.5 bg-brand-secondary/40"></div>
+            {showcaseVideos.length > 0 && (
+              <section className="pt-10 lg:pt-20 border-t border-brand-primary/5 px-0">
+                <div className="container mx-auto px-4 max-w-7xl text-center">
+                  <div className="flex flex-col items-center mb-0 lg:mb-8">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-0.5 bg-brand-secondary/40"></div>
+                      <span className="text-brand-secondary text-[10px] lg:text-xs font-bold uppercase tracking-[0.4em]">Cinematic Quality</span>
+                      <div className="w-12 h-0.5 bg-brand-secondary/40"></div>
+                    </div>
+                    <h2 className="text-4xl lg:text-7xl font-serif font-bold text-brand-primary uppercase leading-tight tracking-tighter">
+                      Divine <span className="italic font-normal text-brand-secondary">Details</span>
+                    </h2>
+                    <p className="text-[10px] lg:text-xs text-brand-primary/40 font-bold uppercase tracking-[0.3em] mt-8 max-w-md mx-auto leading-relaxed">
+                      Experience our craft through the lens of devotion. Each thread tells a story of heritage and love.
+                    </p>
                   </div>
-                  <h2 className="text-4xl lg:text-7xl font-serif font-bold text-brand-primary uppercase leading-tight tracking-tighter">
-                    Divine <span className="italic font-normal text-brand-secondary">Details</span>
-                  </h2>
-                  <p className="text-[10px] lg:text-xs text-brand-primary/40 font-bold uppercase tracking-[0.3em] mt-8 max-w-md mx-auto leading-relaxed">
-                    Experience our craft through the lens of devotion. Each thread tells a story of heritage and love.
-                  </p>
-                </div>
 
-                <div className="story-slider-wrapper relative -mx-4 group">
-                  {isMounted && (
-                    <Slider
-                      dots={false}
-                      infinite={true}
-                      speed={800}
-                      slidesToScroll={1}
-                      autoplay={true}
-                      autoplaySpeed={3000}
-                      arrows={false}
-                      mobileFirst={true}
-                      slidesToShow={3}
-                      responsive={[
-                        {
-                          breakpoint: 1024,
-                          settings: {
-                            slidesToShow: 4,
+                  <div className="story-slider-wrapper relative -mx-4 group">
+                    {isMounted && (
+                      <Slider
+                        dots={false}
+                        infinite={true}
+                        speed={800}
+                        slidesToScroll={1}
+                        autoplay={true}
+                        autoplaySpeed={3000}
+                        arrows={false}
+                        mobileFirst={true}
+                        slidesToShow={3}
+                        responsive={[
+                          {
+                            breakpoint: 1024,
+                            settings: {
+                              slidesToShow: 4,
+                            },
                           },
-                        },
-                        {
-                          breakpoint: 1280,
-                          settings: {
-                            slidesToShow: 5,
+                          {
+                            breakpoint: 1280,
+                            settings: {
+                              slidesToShow: 5,
+                            },
                           },
-                        },
-                      ]}
-                      className="story-slider"
-                    >
-                      {[{ url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244607/lv_0_20250325174749_cdcicc.mp4", title: "Handwork" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244604/lv_0_20250426151713_exrd5i.mp4", title: "Fabric Shine" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244599/lv_0_20250411143949_iwsj9d.mp4" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244607/lv_0_20250325174749_cdcicc.mp4", title: "Handwork" }, { url: "https://res.cloudinary.com/dg4hyioqu/video/upload/v1775244604/lv_0_20250426151713_exrd5i.mp4", title: "Fabric Shine" },].map((video, idx) => (
-                        <div key={idx} className="px-2 md:px-4 py-8 pb-10">
-                          <motion.div whileHover={{ y: -10 }} onClick={() => setActiveVideo(video.url)} className="group relative aspect-9/16 overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5">
-                            <video src={video.url} autoPlay muted loop playsInline className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                            <div className="absolute inset-0 bg-linear-to-t from-brand-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
-                              <h3 className="text-xl lg:text-xl font-serif text-white">Watch Story</h3>
-                            </div>
-                          </motion.div>
-                        </div>
-                      ))}
-                    </Slider>
-                  )}
+                        ]}
+                        className="story-slider"
+                      >
+                        {showcaseVideos.map((video, idx) => (
+                          <div key={idx} className="px-2 md:px-4 py-8 pb-10">
+                            <motion.div whileHover={{ y: -10 }} onClick={() => setActiveVideo(video.url)} className="group relative aspect-9/16 overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5">
+                              <video src={video.url.startsWith('shree') ? `https://res.cloudinary.com/duxn4yj3a/video/upload/f_auto,q_auto/${video.url}` : video.url} autoPlay muted loop playsInline className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                              <div className="absolute inset-0 bg-linear-to-t from-brand-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
+                                <h3 className="text-xl lg:text-xl font-serif text-white">{video.title || "Watch Story"}</h3>
+                              </div>
+                            </motion.div>
+                          </div>
+                        ))}
+                      </Slider>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </section>
+              </section>
+            )}
 
             {relatedProducts.length > 0 && (
               <div className="pt-12 lg:pt-16">
@@ -750,23 +804,21 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                 </div>
                 <div className="related-products-slider -mx-4">
                   {isMounted && (
-                    <Slider {...relatedSliderSettings}>
-                      {relatedProducts.map((p) => (
-                        <div key={p.id} className="px-2 md:px-4 pb-8 lg:pb-16 pt-6">
-                          <Link href={`/product/${p.id}`} className="block group">
-                            <div className="relative aspect-square rounded-[24px] lg:rounded-[32px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 bg-white border border-brand-primary/5">
-                              <ImageWithFallback src={p.image} alt={p.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover transition-transform duration-1000 group-hover:scale-110" />
-                              <div className="absolute bottom-4 left-4 right-4 z-10 transition-all duration-1000">
-                                <div className="bg-white/95 backdrop-blur-md p-4 lg:p-5 rounded-3xl border border-white/20 shadow-xl group-hover:bg-white/10 group-hover:text-white">
-                                  <p className="text-[11px] lg:text-xs font-serif font-bold truncate">{p.name}</p>
-                                  <p className="text-[10px] lg:text-[11px] font-bold text-brand-secondary mt-1 group-hover:text-white">₹{p.price}</p>
-                                </div>
-                              </div>
-                            </div>
-                          </Link>
-                        </div>
-                      ))}
-                    </Slider>
+                    <>
+                      {/* Desktop Slider - Force 4 slides */}
+                      <div className="hidden md:block">
+                        <Slider {...relatedSliderSettings}>
+                          {relatedProductsList}
+                        </Slider>
+                      </div>
+
+                      {/* Mobile Slider - Force 1.5 centered slides */}
+                      <div className="md:hidden">
+                        <Slider {...relatedMobileSettings}>
+                          {relatedProductsList}
+                        </Slider>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -944,7 +996,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-100 bg-brand-primary/95 flex items-center justify-center p-4 backdrop-blur-3xl" onClick={() => setActiveVideo(null)}>
               <button onClick={() => setActiveVideo(null)} className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white z-20"><Icon icon="lucide:x" className="w-6 h-6" /></button>
               <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-[450px] aspect-9/16 rounded-[40px] overflow-hidden">
-                <video src={activeVideo} autoPlay controls playsInline className="w-full h-full object-cover" />
+                <video src={activeVideo.startsWith('shree') ? `https://res.cloudinary.com/duxn4yj3a/video/upload/f_auto,q_auto/${activeVideo}` : activeVideo} autoPlay controls playsInline className="w-full h-full object-cover" />
               </motion.div>
             </motion.div>
           )}

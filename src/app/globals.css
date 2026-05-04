@@ -13,7 +13,11 @@
 
 @layer base {
   body {
-    @apply font-sans text-brand-dark antialiased bg-brand-accent;
+    @apply font-sans text-brand-dark antialiased bg-brand-accent selection:bg-transparent;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
   }
 
   h1, h2, h3, h4 {
@@ -68,6 +72,15 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite ease-in-out;
 }
 
 .sidebar-scrollbar::-webkit-scrollbar {
