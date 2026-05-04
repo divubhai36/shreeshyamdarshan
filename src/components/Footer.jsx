@@ -34,11 +34,11 @@ export default function Footer() {
                 SHREE SHYAM <span className="text-brand-secondary italic">DARSHAN</span>
               </h2>
               <p className="text-[8px] lg:text-[10px] tracking-[0.3em] font-medium text-white/40 uppercase mt-1 text-left">
-                laddu gopal poshak and shringar
+                India's #1 Divine Poshak (SSD) & NDL Collection
               </p>
             </Link>
             <p className="text-white/50 text-xs lg:text-sm leading-relaxed italic max-w-xs text-left">
-              "Adorning Divinity with Elegance and Love. We craft every piece with deep devotion, ensuring your deity is adorned with unparalleled grace."
+              "Experience the ultimate divine elegance with Shree Shyam Darshan (SSD). India's biggest manufacturer of premium Laddu Gopal Poshaks, NDL, and New Darshan Lace in Surat."
             </p>
             <div className="flex gap-4">
               <a href="https://www.instagram.com/shree.shyam.darshan_?igsh=MWx6dWVqcWZmbWkzcw%3D%3D" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-secondary hover:border-brand-secondary transition-all group">
@@ -60,7 +60,7 @@ export default function Footer() {
           <div className="text-left">
             <h3 className="text-[11px] lg:text-xs font-bold tracking-[0.4em] uppercase mb-8 lg:mb-10 text-brand-secondary">Quick Links</h3>
             <ul className="space-y-4">
-              {['Home', 'Collections', 'About Us', 'Contact Us'].map((item) => (
+              {['Home', 'Collections', 'Blogs', 'About Us', 'Contact Us'].map((item) => (
                 <li key={item}>
                   <Link
                     href={item === 'Home' ? '/' : `/${item.toLowerCase().replace(' ', '-')}`}

@@ -1,9 +1,7 @@
 "use client";
-import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 
-// These are client-side stubs that will call the real server actions
-// In Next.js App Router, it's better to keep actions separate
+// These are client-side wrappers that call our API routes
+// We don't need prisma or revalidatePath here because the logic is in the API route
 
 export async function getBlogs() {
   const res = await fetch('/api/blogs');
