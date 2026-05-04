@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
 import SmartImage from '@/components/SmartImage';
+import BlogHeader from './BlogHeader';
 
 export const revalidate = 3600;
 
@@ -20,17 +21,9 @@ export default async function BlogsPage() {
     return (
         <main className="min-h-screen bg-brand-accent pb-20">
             {/* Header */}
-            <div className="bg-brand-primary text-white py-24 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <Icon icon="solar:globus-bold-duotone" className="w-[800px] h-[800px] absolute -top-40 -right-40" />
-                </div>
-                <div className="container mx-auto px-4 text-center relative z-10">
-                    <h1 className="text-4xl lg:text-6xl font-serif font-black mb-4">Divine Insights</h1>
-                    <p className="text-brand-secondary text-xs lg:text-sm font-black uppercase tracking-[0.4em] opacity-80">Chronicles of Shree Shyam Darshan</p>
-                </div>
-            </div>
+            <BlogHeader />
 
-            <div className="container mx-auto px-4 max-w-6xl -mt-12">
+            <div className="container mx-auto px-4 max-w-6xl -mt-12 relative z-20">
                 {blogs.length === 0 ? (
                     <div className="bg-white rounded-[40px] p-20 text-center shadow-xl shadow-brand-primary/5">
                         <Icon icon="solar:notes-minimalistic-bold-duotone" className="w-20 h-20 text-brand-primary/10 mx-auto mb-6" />

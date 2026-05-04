@@ -5,6 +5,7 @@ import siteConfig from "@/config/site";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GlobalCartSummary from "@/components/GlobalCartSummary";
+import SecurityProvider from "@/components/SecurityProvider";
 import { Toaster } from "react-hot-toast";
 import NextTopLoader from 'nextjs-toploader';
 
@@ -86,6 +87,7 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
+        <SecurityProvider />
         <NextTopLoader
           color="#c5a059"
           initialPosition={0.08}
