@@ -87,8 +87,8 @@ export default function AdminDashboard() {
 
   const statItems = stats ? [
     { title: "Total Products",    value: fmt(stats.products),           icon: "solar:bag-bold-duotone",                          color: "text-emerald-600", bg: "bg-emerald-500/10", href: "/admin/products" },
-    { title: "Active Partners",   value: fmt(stats.activeWholesalers), icon: "solar:users-group-rounded-bold-duotone",          color: "text-blue-600",    bg: "bg-blue-500/10",    href: "/admin/wholesalers", sub: `${fmt(stats.totalWholesalers)} total` },
-    { title: "Discount Products", value: fmt(stats.offerProducts),     icon: "solar:tag-price-bold-duotone",                    color: "text-orange-500",  bg: "bg-orange-500/10",  href: "/admin/products",    sub: "isOfferProduct = true" },
+    { title: "Active Wholesalers",   value: fmt(stats.activeWholesalers), icon: "solar:users-group-rounded-bold-duotone",          color: "text-blue-600",    bg: "bg-blue-500/10",    href: "/admin/wholesalers", sub: `${fmt(stats.totalWholesalers)} total` },
+    { title: "Discount Products", value: fmt(stats.offerProducts),     icon: "solar:tag-price-bold-duotone",                    color: "text-orange-500",  bg: "bg-orange-500/10",  href: "/admin/products",    sub: "" },
     { title: "Ready Stock",       value: fmt(stats.readyStockProducts), icon: "solar:box-minimalistic-bold-duotone",             color: "text-cyan-600",    bg: "bg-cyan-500/10",    href: "/admin/products",    sub: "Available for quick dispatch" },
     { title: "Pending Reviews",   value: fmt(stats.reviews),           icon: "solar:star-fall-bold-duotone",                    color: "text-rose-500",    bg: "bg-rose-500/10",    href: "/admin/reviews" },
     { title: "Categories",        value: fmt(stats.categories),        icon: "solar:folder-2-bold-duotone",                     color: "text-indigo-600",  bg: "bg-indigo-500/10",  href: "/admin/categories",  sub: `${fmt(stats.subCategories)} sub-categories` },
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
 
   const quickActions = [
     { icon: "solar:add-square-bold-duotone",      label: "New Product",     href: "/admin/products",         color: "text-emerald-600", bg: "bg-emerald-500/10" },
-    { icon: "solar:user-plus-bold-duotone",       label: "Add Partner",     href: "/admin/wholesalers",      color: "text-blue-600",    bg: "bg-blue-500/10" },
+    { icon: "solar:user-plus-bold-duotone",       label: "Add Wholesaler",     href: "/admin/wholesalers",      color: "text-blue-600",    bg: "bg-blue-500/10" },
     { icon: "solar:folder-with-files-bold-duotone", label: "Add Category",  href: "/admin/categories",       color: "text-indigo-600",  bg: "bg-indigo-500/10" },
     { icon: "solar:bill-list-bold-duotone",       label: "View Orders",     href: "/admin/orders",           color: "text-amber-600",   bg: "bg-amber-500/10" },
     { icon: "solar:chat-line-bold-duotone",       label: "Inquiries",       href: "/admin/inquiries",        color: "text-cyan-600",    bg: "bg-cyan-500/10" },
@@ -167,7 +167,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* ── Two Column: Recent Orders + New Partners ─────────── */}
+      {/* ── Two Column: Recent Orders + New Wholesalers ─────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Recent Orders */}
@@ -224,7 +224,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-[24px] border border-black/5 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-black/5 flex items-center justify-between">
             <div>
-              <h2 className="font-serif font-bold text-brand-primary text-lg">New Partners</h2>
+              <h2 className="font-serif font-bold text-brand-primary text-lg">New Wholesalers</h2>
               <p className="text-[9px] font-bold uppercase tracking-widest text-brand-primary/30">Recently joined wholesalers</p>
             </div>
             <Link href="/admin/wholesalers" className="text-[10px] font-bold uppercase tracking-widest text-brand-secondary hover:underline flex items-center gap-1">
@@ -263,7 +263,7 @@ export default function AdminDashboard() {
             ) : (
               <div className="py-12 text-center">
                 <Icon icon="solar:users-group-rounded-broken" className="w-10 h-10 text-brand-primary/10 mx-auto mb-3" />
-                <p className="text-[11px] font-bold text-brand-primary/30 uppercase tracking-wider">No partners yet</p>
+                <p className="text-[11px] font-bold text-brand-primary/30 uppercase tracking-wider">No Wholesaler yet</p>
               </div>
             )}
           </div>

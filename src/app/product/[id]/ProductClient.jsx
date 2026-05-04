@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import SmartImage from "@/components/SmartImage";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
@@ -11,21 +11,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { toast } from "react-hot-toast";
 import { roundToTwo } from "@/lib/utils";
 
-const ImageWithFallback = ({ src, alt, ...props }) => {
-  const [imgSrc, setImgSrc] = useState(src);
-  useEffect(() => {
-    setImgSrc(src);
-  }, [src]);
-
-  return (
-    <Image
-      {...props}
-      src={imgSrc || '/hero.png'}
-      alt={alt}
-      onError={() => setImgSrc('/hero.png')}
-    />
-  );
-};
+// Replacing old fallback with global SmartImage
 
 export default function ProductClient({ product, navCategory, subCategory, innerSubCategory, relatedProducts, showcaseVideos = [] }) {
   const { cart, addToCart, addMultipleToCart, removeFromCart, toggleSave, isProductSaved, isAuthenticated } = useCart();
@@ -157,12 +143,10 @@ export default function ProductClient({ product, navCategory, subCategory, inner
         <div className="relative aspect-[3/4] rounded-[24px] lg:rounded-[36px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 bg-brand-primary/5">
 
           {/* Product Image */}
-          <ImageWithFallback
-            src={p.image}
+          <SmartImage
+            id={p.image}
             alt={p.name}
-            fill
-            sizes="(max-width: 768px) 50vw, 25vw"
-            className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
           />
 
           {/* Inner Luxury Border on Hover */}
@@ -430,13 +414,11 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   className="relative aspect-square overflow-hidden rounded-3xl md:rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] bg-white border border-brand-primary/5"
                 >
                   <div className="relative w-full h-full">
-                    <ImageWithFallback
-                      src={productImages[activeImageIdx]}
+                    <SmartImage
+                      id={productImages[activeImageIdx]}
                       alt={product.name}
-                      fill
-                      priority
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      className="object-cover"
+                      priority={true}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   {/* Final Perfected Diagonal Sash */}
@@ -461,12 +443,10 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                           : "border-transparent opacity-60 hover:opacity-100"
                           }`}
                       >
-                        <ImageWithFallback
-                          src={img}
+                        <SmartImage
+                          id={img}
                           alt={`${product.name} thumbnail ${idx + 1}`}
-                          fill
-                          sizes="(max-width: 768px) 80px, 120px"
-                          className="object-cover rounded-xl"
+                          className="w-full h-full object-cover rounded-xl"
                         />
                       </button>
                     ))}
@@ -802,7 +782,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                         {showcaseVideos.map((video, idx) => (
                           <div key={idx} className="px-2 md:px-4 py-8 pb-10">
                             <motion.div whileHover={{ y: -10 }} onClick={() => setActiveVideo(video.url)} className="group relative aspect-9/16 overflow-hidden rounded-[24px] lg:rounded-[48px] shadow-2xl cursor-pointer bg-brand-primary/5">
-                              <video src={video.url} autoPlay muted loop playsInline className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                              <video src={video.url.startsWith('shree') ? `https://res.cloudinary.com/duxn4yj3a/video/upload/f_auto,q_auto/${video.url}` : video.url} autoPlay muted loop playsInline className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
                               <div className="absolute inset-0 bg-linear-to-t from-brand-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
                                 <h3 className="text-xl lg:text-xl font-serif text-white">{video.title || "Watch Story"}</h3>
                               </div>
@@ -1016,7 +996,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-100 bg-brand-primary/95 flex items-center justify-center p-4 backdrop-blur-3xl" onClick={() => setActiveVideo(null)}>
               <button onClick={() => setActiveVideo(null)} className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white z-20"><Icon icon="lucide:x" className="w-6 h-6" /></button>
               <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-[450px] aspect-9/16 rounded-[40px] overflow-hidden">
-                <video src={activeVideo} autoPlay controls playsInline className="w-full h-full object-cover" />
+                <video src={activeVideo.startsWith('shree') ? `https://res.cloudinary.com/duxn4yj3a/video/upload/f_auto,q_auto/${activeVideo}` : activeVideo} autoPlay controls playsInline className="w-full h-full object-cover" />
               </motion.div>
             </motion.div>
           )}

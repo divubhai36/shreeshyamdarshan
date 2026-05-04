@@ -3,14 +3,18 @@ import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { getShowcaseVideos, createShowcaseVideo, deleteShowcaseVideo } from "../actions";
 import toast from "react-hot-toast";
+import { useCloudinary } from "@/hooks/useCloudinary";
 
 export default function ShowcaseVideosPage() {
+  const { uploadToAllAccounts, uploading: isCloudSyncing } = useCloudinary();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [form, setForm] = useState({ title: "", url: "" });
   const [activeTab, setActiveTab] = useState("upload"); // "upload" or "link"
-  const [uploading, setUploading] = useState(false);
+
+  // Local states for "Upload on Submit"
+  const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
 
   useEffect(() => { loadData(); }, []);
@@ -30,44 +34,43 @@ export default function ShowcaseVideosPage() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Show thumbnail/preview on the spot
+    // 5MB Limit check
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error("File too large! Maximum size allowed is 5MB.");
+      e.target.value = "";
+      return;
+    }
+
+    // Local preview only
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
-    setUploading(true);
-
-    const fd = new FormData();
-    fd.append("file", file);
-
-    try {
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const upData = await res.json();
-
-      if (upData.url) {
-        setForm(prev => ({ ...prev, url: upData.url }));
-        toast.success("Video uploaded successfully");
-      } else {
-        toast.error(upData.error || "Upload failed");
-      }
-    } catch (err) {
-      toast.error("Video upload failed");
-    } finally {
-      setUploading(false);
-    }
+    setSelectedFile(file);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.url) return toast.error("Please provide a video URL or upload one");
+    if (!form.url && !selectedFile) return toast.error("Please provide a video URL or upload one");
+
+    let currentForm = { ...form };
 
     try {
-      await createShowcaseVideo(form);
-      toast.success("Showcase video added");
+      if (selectedFile) {
+        toast.loading("Uploading Reel...", { id: 'reel' });
+        const res = await uploadToAllAccounts(selectedFile, 'video');
+        currentForm.url = res.public_id;
+      }
+
+      toast.loading("Adding to Showcase...", { id: 'reel' });
+      await createShowcaseVideo(currentForm);
+      toast.success("Showcase video added", { id: 'reel' });
       setIsOpen(false);
       setForm({ title: "", url: "" });
+      setSelectedFile(null);
       setPreviewUrl("");
       loadData();
     } catch (err) {
-      toast.error("Failed to add video");
+      toast.error("Failed to add video. Sync error.", { id: 'reel' });
     }
   };
 
@@ -112,7 +115,7 @@ export default function ShowcaseVideosPage() {
           {data.map((video) => (
             <div key={video.id} className="bg-white rounded-3xl shadow-sm border border-brand-primary/5 overflow-hidden group relative aspect-[9/16]">
               <video
-                src={video.url}
+                src={video.url.startsWith('shree') ? `https://res.cloudinary.com/duxn4yj3a/video/upload/f_auto,q_auto/${video.url}` : video.url}
                 className="w-full h-full object-cover"
                 autoPlay
                 muted
@@ -192,12 +195,14 @@ export default function ShowcaseVideosPage() {
 
                 {activeTab === "upload" ? (
                   <div>
-                    <label className="text-[9px] uppercase font-black tracking-[0.15em] text-brand-primary mb-1.5 block leading-none">Upload portrait reel (9:16)</label>
+                    <label className="text-[9px] uppercase font-black tracking-[0.15em] text-brand-primary mb-1.5 block leading-none">
+                      Upload portrait reel (9:16) <span className="font-medium text-red-500 ml-1">- Max 5MB</span>
+                    </label>
                     <div className="relative group aspect-[9/16] bg-brand-primary/5 rounded-2xl overflow-hidden border-2 border-dashed border-brand-primary/10 hover:border-brand-secondary/50 transition-colors max-w-[180px] mx-auto">
                       {(previewUrl || form.url) && activeTab === "upload" ? (
                         <div className="relative w-full h-full">
-                           <video src={previewUrl || form.url} className={`w-full h-full object-cover ${uploading ? 'opacity-40' : ''}`} autoPlay muted loop key={previewUrl || form.url} />
-                           {uploading && (
+                           <video src={previewUrl || (form.url.startsWith('shree') ? `https://res.cloudinary.com/duxn4yj3a/video/upload/f_auto,q_auto/${form.url}` : form.url)} className={`w-full h-full object-cover ${isCloudSyncing ? 'opacity-40' : ''}`} autoPlay muted loop key={previewUrl || form.url} />
+                           {isCloudSyncing && (
                               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20">
                                  <Icon icon="line-md:loading-loop" className="w-10 h-10 text-white mb-2" />
                                  <span className="text-[10px] font-black uppercase tracking-widest text-white drop-shadow-md">Uploading...</span>
@@ -211,14 +216,14 @@ export default function ShowcaseVideosPage() {
                         </div>
                       )}
 
-                      {!uploading && (
+                      {!isCloudSyncing && (
                         <div className="absolute inset-0 bg-brand-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px]">
                           <div className="bg-white text-brand-primary px-4 py-1.5 rounded-full font-bold text-[8px] uppercase tracking-widest shadow-xl">
                             {form.url || previewUrl ? 'Replace' : 'Upload'}
                           </div>
                         </div>
                       )}
-                      <input type="file" onChange={handleVideoUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="video/*" disabled={uploading} />
+                      <input type="file" onChange={handleVideoUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="video/*" disabled={isCloudSyncing} />
                     </div>
                   </div>
                 ) : (
@@ -254,11 +259,11 @@ export default function ShowcaseVideosPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={uploading || !form.url}
+                  disabled={isCloudSyncing || (!form.url && !selectedFile)}
                   className="flex-3 py-3.5 bg-brand-primary text-white rounded-xl font-bold uppercase tracking-[0.15em] text-[10px] shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                 >
                   <Icon icon="solar:check-read-bold-duotone" className="w-4 h-4" />
-                  Add to Gallery
+                  {isCloudSyncing ? 'Uploading...' : 'Add to Gallery'}
                 </button>
               </div>
             </form>

@@ -5,6 +5,7 @@ import { Icon } from '@iconify/react';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import SmartVideo from './SmartVideo';
 
 const reviews = [
   {
@@ -104,8 +105,8 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [], reviewVideos = [] }) => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-       const saved = JSON.parse(localStorage.getItem('customer_feedbacks') || '[]');
-       setLocalReviews(saved);
+      const saved = JSON.parse(localStorage.getItem('customer_feedbacks') || '[]');
+      setLocalReviews(saved);
     }
   }, []);
 
@@ -123,9 +124,9 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [], reviewVideos = [] }) => {
         osc.start(audioCtx.currentTime + start);
         osc.stop(audioCtx.currentTime + start + duration);
       };
-      playTone(523.25, 0, 0.1); 
+      playTone(523.25, 0, 0.1);
       playTone(1046.50, 0.15, 0.3);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const handleSubmit = (e) => {
@@ -192,13 +193,13 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [], reviewVideos = [] }) => {
   const [row2, setRow2] = useState([]);
 
   useEffect(() => {
-     if (displayReviews.length > 0) {
-       setHasMounted(true);
-       const shuffled = [...displayReviews].sort(() => 0.5 - Math.random());
-       const half = Math.ceil(shuffled.length / 2);
-       setRow1(shuffled.slice(0, half));
-       setRow2(shuffled.slice(half));
-     }
+    if (displayReviews.length > 0) {
+      setHasMounted(true);
+      const shuffled = [...displayReviews].sort(() => 0.5 - Math.random());
+      const half = Math.ceil(shuffled.length / 2);
+      setRow1(shuffled.slice(0, half));
+      setRow2(shuffled.slice(half));
+    }
   }, [dbReviews]);
 
   if (!hasMounted) return <div className="py-10 bg-white" />;
@@ -260,13 +261,14 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [], reviewVideos = [] }) => {
                       className="relative aspect-[9/16] rounded-2xl overflow-hidden shadow-xl border border-brand-primary/5 cursor-pointer group bg-brand-accent/30"
                       onClick={() => setPopupVideo(video.url)}
                     >
-                      <video
-                        src={video.url}
+                      <SmartVideo
+                        id={video.id}
+                        url={video.url}
                         autoPlay
                         muted
                         loop
                         playsInline
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                        className="w-full h-full"
                       />
                       <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0 text-center">
                         <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white mx-auto">
@@ -312,7 +314,7 @@ const ReviewMarquee = memo(({ reviews: dbReviews = [], reviewVideos = [] }) => {
               className="relative w-full max-w-[450px] aspect-[9/16] max-h-[90vh] rounded-[40px] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)] border border-white/20"
               onClick={(e) => e.stopPropagation()}
             >
-              <video src={popupVideo} autoPlay controls playsInline className="w-full h-full object-cover" />
+              <video src={popupVideo.startsWith('shree') ? `https://res.cloudinary.com/duxn4yj3a/video/upload/f_auto,q_auto/${popupVideo}` : popupVideo} autoPlay controls playsInline className="w-full h-full object-cover" />
             </motion.div>
           </motion.div>
         )}

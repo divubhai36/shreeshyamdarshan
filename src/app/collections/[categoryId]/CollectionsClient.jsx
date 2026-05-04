@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 import CategoryCard from "@/components/CategoryCard";
-import Image from "next/image";
+import SmartImage from "@/components/SmartImage";
 
 export default function CollectionsClient({ category, categoryId, subCategories }) {
   const [activeVideo, setActiveVideo] = useState(null);
@@ -23,8 +23,6 @@ export default function CollectionsClient({ category, categoryId, subCategories 
     window.scrollTo(0, 0);
   }, [categoryId]);
 
-
-
   return (
     <div className="min-h-screen bg-brand-accent/30 overflow-x-hidden text-left">
       {/* Category Header Banner */}
@@ -35,13 +33,11 @@ export default function CollectionsClient({ category, categoryId, subCategories 
           transition={{ duration: 1.5 }}
           className="w-full h-full relative"
         >
-
-          <Image
-            src={category.image}
+          <SmartImage
+            id={category.image}
             alt={category.name || category.label}
-            fill
             priority
-            className="object-cover opacity-40 brightness-50"
+            className="w-full h-full object-cover opacity-40 brightness-50"
           />
         </motion.div>
         <div className="absolute inset-0 flex flex-col items-center justify-center pt-16 lg:pt-20 gap-4 lg:gap-8 text-center text-white px-4 z-10">

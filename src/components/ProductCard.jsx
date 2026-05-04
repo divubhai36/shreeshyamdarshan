@@ -2,16 +2,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import SmartImage from './SmartImage';
 
 const ProductCard = React.memo(({ product }) => {
   const { toggleSave, isProductSaved, isAuthenticated } = useCart();
   const saved = isProductSaved(product.id);
 
-  const [imgSrc, setImgSrc] = React.useState(product.images?.[0] || product.image);
-  const [hoverImgSrc, setHoverImgSrc] = React.useState(product.images?.[1] || null);
+  const imgSrc = product.images?.[0] || product.image;
+  const hoverImgSrc = product.images?.[1] || null;
 
   return (
     <motion.div
@@ -35,23 +35,17 @@ const ProductCard = React.memo(({ product }) => {
         </div>
 
         <div className="relative w-full h-full">
-          <Image
-            src={imgSrc || '/hero.png'}
+          <SmartImage
+            id={imgSrc || 'shree_placeholder'}
             alt={product.name}
-            fill
-            sizes="(max-width: 768px) 50vw, 25vw"
-            className={`object-cover transition-all duration-1000 ease-in-out group-hover:scale-110 ${product.images?.length > 1 ? 'group-hover:opacity-0' : ''}`}
-            onError={() => setImgSrc('/hero.png')}
+            className={`w-full h-full object-cover transition-all duration-1000 ease-in-out group-hover:scale-110 ${product.images?.length > 1 ? 'group-hover:opacity-0' : ''}`}
           />
 
           {product.images?.length > 1 && (
-            <Image
-              src={hoverImgSrc || '/hero.png'}
+            <SmartImage
+              id={hoverImgSrc || 'shree_placeholder'}
               alt={product.name}
-              fill
-              sizes="(max-width: 768px) 50vw, 25vw"
-              className="absolute inset-0 object-cover scale-125 group-hover:scale-110 opacity-0 group-hover:opacity-100 transition-all duration-1000 ease-in-out"
-              onError={() => setHoverImgSrc('/hero.png')}
+              className="absolute inset-0 w-full h-full object-cover scale-125 group-hover:scale-110 opacity-0 group-hover:opacity-100 transition-all duration-1000 ease-in-out"
             />
           )}
         </div>

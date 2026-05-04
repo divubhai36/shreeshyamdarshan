@@ -74,7 +74,7 @@ export default async function ProductPage({ params }) {
              innerCategory: dbProduct.innerSubCategory?.name || null,
              price: dbProduct.price,
              description: dbProduct.description,
-             image: dbProduct.images[0] || "/hero.png",
+             image: dbProduct.images[0] || "/images/hero.webp",
              images: dbProduct.images,
              videos: dbProduct.videos,
              isBestSeller: dbProduct.isBestSeller,
@@ -100,7 +100,7 @@ export default async function ProductPage({ params }) {
              isOfferProduct: p.isOfferProduct,
              category: dbProduct.category?.name || "Unknown",
              images: p.images,
-             image: p.images[0] || "/hero.png"
+             image: p.images[0] || "/images/hero.webp"
          }));
 
          const navCat = { id: dbProduct.category.slug, name: dbProduct.category.name };

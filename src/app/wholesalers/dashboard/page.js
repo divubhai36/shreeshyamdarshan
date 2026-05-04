@@ -44,7 +44,7 @@ export default function WholesalerDashboard() {
               {user?.name?.charAt(0) || 'W'}
             </div>
             <div className="flex-grow">
-              <h1 className="text-2xl font-serif font-bold text-brand-primary">{user?.name || 'Valued Partner'}</h1>
+              <h1 className="text-2xl font-serif font-bold text-brand-primary">{user?.name || 'Valued Wholesaler'}</h1>
               <p className="text-[10px] text-brand-secondary font-bold uppercase tracking-[0.2em] mt-1">SSD Elite Wholesaler</p>
             </div>
             <button onClick={handleLogout} className="p-3 bg-rose-50 text-rose-500 rounded-2xl hover:bg-rose-100 transition-colors">

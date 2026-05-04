@@ -227,7 +227,7 @@ export default function ReviewsPage() {
                 <div>
                   <label className="block text-[10px] font-bold text-brand-primary/40 uppercase tracking-widest mb-2 ml-1">Select Wholesaler</label>
                   <CustomSelect
-                    placeholder="Choose a partner account..."
+                    placeholder="Choose a wholesaler account..."
                     options={wholesalers.map(w => ({ value: w.id, label: `${w.name} (${w.companyName || 'No Company'})` }))}
                     value={newReview.wholesalerId}
                     onChange={(val) => setNewReview({ ...newReview, wholesalerId: val })}

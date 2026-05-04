@@ -23,7 +23,7 @@ export async function GET() {
     const mappedSaved = savedProducts.map(s => ({
       ...s.product,
       id: s.product.id,
-      image: s.product.images[0] || "/hero.png",
+      image: s.product.images[0] || "/images/hero.webp",
       variantName: s.variantName === "BASE" ? null : s.variantName
     }));
 

@@ -215,3 +215,11 @@ model ReviewVideo {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model AppConfig {
+  id                    Int      @id @default(1)
+  activeCloudinaryIndex Int      @default(0) // 0 for Acc 1, 1 for Acc 2, 2 for Acc 3
+  isAutoSwitchEnabled   Boolean  @default(true)
+  usageThreshold        Float    @default(22.0) // 22GB safety limit
+  lastUsageCheck        DateTime @default(now())
+}

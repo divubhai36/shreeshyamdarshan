@@ -2,315 +2,315 @@
   {
     "id": "dresses",
     "name": "DRESSES",
-    "image": "/hero.png",
+    "image": "/images/hero.webp",
     "subCategories": [
       {
         "id": "laddu-gopal-poshak",
         "name": "laddu gopal poshak",
-        "image": "/images/poshak-1.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": [
           {
             "name": "REGULAR",
-            "image": "/images/poshak-1.jpg"
+            "image": "/images/poshak-1.webp"
           },
           {
             "name": "BANDHANI",
-            "image": "/images/poshak-2.jpg"
+            "image": "/images/poshak-1.webp"
           },
           {
             "name": "LERIYU",
-            "image": "/images/heavy_dress_1.jpg"
+            "image": "/images/heavy_dress_1.webp"
           },
           {
             "name": "PREMIUM (3 PCS SET)",
-            "image": "/images/western_dress_1.jpg"
+            "image": "/images/western_dress_1.webp"
           },
           {
             "name": "EXCLUSIVE (4 PCS SET)",
-            "image": "/images/winter_dress_1.jpg"
+            "image": "/images/winter_dress_1.webp"
           },
           {
             "name": "WOOLAN",
-            "image": "/images/pagdi_1.jpg"
+            "image": "/images/pagdi_1.webp"
           },
           {
             "name": "VALVET (SENIL)",
-            "image": "/images/jewellery-1.jpg"
+            "image": "/images/jewellery-1.webp"
           },
           {
             "name": "COTTON",
-            "image": "/images/jewellery_set_1.jpg"
+            "image": "/images/jewellery_set_1.webp"
           },
           {
             "name": "KALKATTI BOX PACKING",
-            "image": "/images/singhasan_1.jpg"
+            "image": "/images/singhasan_1.webp"
           },
           {
             "name": "JARKAN DIAMOND",
-            "image": "/images/furniture-1.jpg"
+            "image": "/images/furniture-1.webp"
           },
           {
             "name": "JARDOSI HANDWORK",
-            "image": "/images/hero_1.jpg"
+            "image": "/images/hero_1.webp"
           },
           {
             "name": "CHAPTI VASTRA",
-            "image": "/images/hero_2.jpg"
+            "image": "/images/hero_2.webp"
           }
         ]
       },
       {
         "id": "lengha-fatka",
         "name": "LENGHA FATKA",
-        "image": "/images/heavy_dress_1.jpg",
+        "image": "/images/heavy_dress_1.webp",
         "sections": [
           {
             "name": "REGULAR",
-            "image": "/images/hero_3.jpg"
+            "image": "/images/hero_3.webp"
           },
           {
             "name": "BANDHANI",
-            "image": "/hero.png"
+            "image": "/images/hero.webp"
           },
           {
             "name": "PREMIUM",
-            "image": "/shringar.png"
+            "image": "/images/shringar.webp"
           },
           {
             "name": "HANDWORK BEADS",
-            "image": "/furniture.png"
+            "image": "/images/furniture.webp"
           },
           {
             "name": "WOOLAN",
-            "image": "/aasan.png"
+            "image": "/images/aasan.webp"
           },
           {
             "name": "VALVET (SENIL)",
-            "image": "/accessories.png"
+            "image": "/images/accessories.webp"
           },
           {
             "name": "COTTON",
-            "image": "/idol.png"
+            "image": "/images/idol.webp"
           },
           {
             "name": "KALKATTI BOX PACKING",
-            "image": "/images/poshak-1.jpg"
+            "image": "/images/poshak-1.webp"
           },
           {
             "name": "JARKAN DIAMOND",
-            "image": "/images/poshak-2.jpg"
+            "image": "/images/poshak-1.webp"
           }
         ]
       },
       {
         "id": "maa-durga-ji",
         "name": "MAA DURGA JI",
-        "image": "/images/poshak-2.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": [
           {
             "name": "REGULAR",
-            "image": "/images/heavy_dress_1.jpg"
+            "image": "/images/heavy_dress_1.webp"
           },
           {
             "name": "BANDHANI",
-            "image": "/images/western_dress_1.jpg"
+            "image": "/images/western_dress_1.webp"
           },
           {
             "name": "EXCLUSIVE",
-            "image": "/images/winter_dress_1.jpg"
+            "image": "/images/winter_dress_1.webp"
           },
           {
             "name": "HANDWORK BEADS",
-            "image": "/images/pagdi_1.jpg"
+            "image": "/images/pagdi_1.webp"
           },
           {
             "name": "VALVET (SENIL)",
-            "image": "/images/jewellery-1.jpg"
+            "image": "/images/jewellery-1.webp"
           },
           {
             "name": "KALKATTI BOX PACKING",
-            "image": "/images/jewellery_set_1.jpg"
+            "image": "/images/jewellery_set_1.webp"
           }
         ]
       },
       {
         "id": "radhe-krishna-set",
         "name": "RADHE KRISHNA SET",
-        "image": "/images/heavy_dress_1.jpg",
+        "image": "/images/heavy_dress_1.webp",
         "sections": [
           {
             "name": "REGULAR",
-            "image": "/images/singhasan_1.jpg"
+            "image": "/images/singhasan_1.webp"
           },
           {
             "name": "BANDHANI",
-            "image": "/images/furniture-1.jpg"
+            "image": "/images/furniture-1.webp"
           },
           {
             "name": "HANDWORK BEADS",
-            "image": "/images/hero_1.jpg"
+            "image": "/images/hero_1.webp"
           },
           {
             "name": "WOOLAN",
-            "image": "/images/hero_2.jpg"
+            "image": "/images/hero_2.webp"
           },
           {
             "name": "VALVET (SENIL)",
-            "image": "/images/hero_3.jpg"
+            "image": "/images/hero_3.webp"
           },
           {
             "name": "KALKATTI BOX PACKING",
-            "image": "/hero.png"
+            "image": "/images/hero.webp"
           }
         ]
       },
       {
         "id": "jama",
         "name": "JAMA",
-        "image": "/images/poshak-1.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": [
           {
             "name": "REGULAR",
-            "image": "/shringar.png"
+            "image": "/images/shringar.webp"
           },
           {
             "name": "BANDHANI",
-            "image": "/furniture.png"
+            "image": "/images/furniture.webp"
           },
           {
             "name": "PREMIUM",
-            "image": "/aasan.png"
+            "image": "/images/aasan.webp"
           },
           {
             "name": "VALVET (SENIL)",
-            "image": "/accessories.png"
+            "image": "/images/accessories.webp"
           },
           {
             "name": "HANDWORK BEADS",
-            "image": "/idol.png"
+            "image": "/images/idol.webp"
           },
           {
             "name": "CHAPTI VASTRA",
-            "image": "/images/poshak-1.jpg"
+            "image": "/images/poshak-1.webp"
           }
         ]
       },
       {
         "id": "night-wear",
         "name": "NIGHT WEAR",
-        "image": "/images/poshak-2.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": [
           {
             "name": "REGULAR",
-            "image": "/images/poshak-2.jpg"
+            "image": "/images/poshak-1.webp"
           },
           {
             "name": "WOOLAN",
-            "image": "/images/heavy_dress_1.jpg"
+            "image": "/images/heavy_dress_1.webp"
           },
           {
             "name": "COTTON",
-            "image": "/images/western_dress_1.jpg"
+            "image": "/images/western_dress_1.webp"
           },
           {
             "name": "PONCHU SUIT",
-            "image": "/images/winter_dress_1.jpg"
+            "image": "/images/winter_dress_1.webp"
           },
           {
             "name": "PANTY",
-            "image": "/images/pagdi_1.jpg"
+            "image": "/images/pagdi_1.webp"
           },
           {
             "name": "JABHO-DHOTI",
-            "image": "/images/jewellery-1.jpg"
+            "image": "/images/jewellery-1.webp"
           }
         ]
       },
       {
         "id": "mukut-dresses",
         "name": "MUKUT",
-        "image": "/images/pagdi_1.jpg",
+        "image": "/images/pagdi_1.webp",
         "sections": [
           {
             "name": "REGULAR",
-            "image": "/images/jewellery_set_1.jpg"
+            "image": "/images/jewellery_set_1.webp"
           },
           {
             "name": "PREMIUM",
-            "image": "/images/singhasan_1.jpg"
+            "image": "/images/singhasan_1.webp"
           },
           {
             "name": "HANDWORK BEADS",
-            "image": "/images/furniture-1.jpg"
+            "image": "/images/furniture-1.webp"
           },
           {
             "name": "BANDHANI",
-            "image": "/images/hero_1.jpg"
+            "image": "/images/hero_1.webp"
           },
           {
             "name": "JARKAN DIAMOND",
-            "image": "/images/hero_2.jpg"
+            "image": "/images/hero_2.webp"
           }
         ]
       },
       {
         "id": "ram-darbar-set",
         "name": "RAM DARBAR SET",
-        "image": "/images/hero_3.jpg",
+        "image": "/images/hero_3.webp",
         "sections": []
       },
       {
         "id": "hanumanji-poshak",
         "name": "HANUMAJNI POSHAK",
-        "image": "/hero.png",
+        "image": "/images/hero.webp",
         "sections": []
       },
       {
         "id": "ghanshyam-maharaj",
         "name": "GANSHYAM MAHARAJ",
-        "image": "/shringar.png",
+        "image": "/images/shringar.webp",
         "sections": []
       },
       {
         "id": "ramdevpir-poshak",
         "name": "RAMDEVPIR POSHAK",
-        "image": "/furniture.png",
+        "image": "/images/furniture.webp",
         "sections": []
       },
       {
         "id": "sai-baba",
         "name": "SAI BABA",
-        "image": "/aasan.png",
+        "image": "/images/aasan.webp",
         "sections": []
       },
       {
         "id": "ganesh-laxmi",
         "name": "GANESH LAXMI",
-        "image": "/accessories.png",
+        "image": "/images/accessories.webp",
         "sections": []
       },
       {
         "id": "ganpati-khes",
         "name": "GANPATI KHES",
-        "image": "/idol.png",
+        "image": "/images/idol.webp",
         "sections": []
       },
       {
         "id": "ganpati-mukut",
         "name": "GANPATI MUKUT",
-        "image": "/images/poshak-1.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": []
       },
       {
         "id": "dhoti-fatka",
         "name": "DHOTI FATKA",
-        "image": "/images/poshak-2.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": []
       },
       {
         "id": "chira-vastra",
         "name": "CHIRA VASTRA",
-        "image": "/images/heavy_dress_1.jpg",
+        "image": "/images/heavy_dress_1.webp",
         "sections": []
       }
     ]
@@ -318,198 +318,198 @@
   {
     "id": "shringar",
     "name": "SHRINGAR",
-    "image": "/shringar.png",
+    "image": "/images/shringar.webp",
     "subCategories": [
       {
         "id": "paghadi",
         "name": "PAGHADI",
-        "image": "/images/pagdi_1.jpg",
+        "image": "/images/pagdi_1.webp",
         "sections": [
           {
             "name": "PLAN",
-            "image": "/images/western_dress_1.jpg"
+            "image": "/images/western_dress_1.webp"
           },
           {
             "name": "BANDHANI",
-            "image": "/images/winter_dress_1.jpg"
+            "image": "/images/winter_dress_1.webp"
           },
           {
             "name": "NET",
-            "image": "/images/pagdi_1.jpg"
+            "image": "/images/pagdi_1.webp"
           },
           {
             "name": "HANDWORK BEADS",
-            "image": "/images/jewellery-1.jpg"
+            "image": "/images/jewellery-1.webp"
           }
         ]
       },
       {
         "id": "mala",
         "name": "MALA",
-        "image": "/images/jewellery_set_1.jpg",
+        "image": "/images/jewellery_set_1.webp",
         "sections": [
           {
             "name": "MOTI MALA",
-            "image": "/images/jewellery_set_1.jpg"
+            "image": "/images/jewellery_set_1.webp"
           },
           {
             "name": "DIAMOND MALA",
-            "image": "/images/singhasan_1.jpg"
+            "image": "/images/singhasan_1.webp"
           },
           {
             "name": "JEKO MOTI MALA",
-            "image": "/images/furniture-1.jpg"
+            "image": "/images/furniture-1.webp"
           },
           {
             "name": "GINNI MALA",
-            "image": "/images/hero_1.jpg"
+            "image": "/images/hero_1.webp"
           },
           {
             "name": "VYEJANTI MALA",
-            "image": "/images/hero_2.jpg"
+            "image": "/images/hero_2.webp"
           },
           {
             "name": "GUNJA MALA",
-            "image": "/images/hero_3.jpg"
+            "image": "/images/hero_3.webp"
           },
           {
             "name": "TULSI MALA",
-            "image": "/hero.png"
+            "image": "/images/hero.webp"
           },
           {
             "name": "RUDRAX MALA",
-            "image": "/shringar.png"
+            "image": "/images/shringar.webp"
           }
         ]
       },
       {
         "id": "kada",
         "name": "KADA",
-        "image": "/images/jewellery-1.jpg",
+        "image": "/images/jewellery-1.webp",
         "sections": [
           {
             "name": "DIAMOND KADA",
-            "image": "/furniture.png"
+            "image": "/images/furniture.webp"
           },
           {
             "name": "MOTI KADA",
-            "image": "/aasan.png"
+            "image": "/images/aasan.webp"
           },
           {
             "name": "JEKO MOTI KADA",
-            "image": "/accessories.png"
+            "image": "/images/accessories.webp"
           }
         ]
       },
       {
         "id": "mukut-shringar",
         "name": "MUKUT",
-        "image": "/images/pagdi_1.jpg",
+        "image": "/images/pagdi_1.webp",
         "sections": [
           {
             "name": "DIAMOND MUKUT",
-            "image": "/idol.png"
+            "image": "/images/idol.webp"
           },
           {
             "name": "GOLDEN MUKUT",
-            "image": "/images/poshak-1.jpg"
+            "image": "/images/poshak-1.webp"
           },
           {
             "name": "SILVER MUKUT",
-            "image": "/images/poshak-2.jpg"
+            "image": "/images/poshak-1.webp"
           },
           {
             "name": "MINA MUKUT",
-            "image": "/images/heavy_dress_1.jpg"
+            "image": "/images/heavy_dress_1.webp"
           },
           {
             "name": "JARDOSHI MUKUT",
-            "image": "/images/western_dress_1.jpg"
+            "image": "/images/western_dress_1.webp"
           }
         ]
       },
       {
         "id": "bansuri",
         "name": "BANSURI",
-        "image": "/images/winter_dress_1.jpg",
+        "image": "/images/winter_dress_1.webp",
         "sections": []
       },
       {
         "id": "tilak",
         "name": "TILAK",
-        "image": "/images/pagdi_1.jpg",
+        "image": "/images/pagdi_1.webp",
         "sections": []
       },
       {
         "id": "kundal",
         "name": "KUNDAL",
-        "image": "/images/jewellery-1.jpg",
+        "image": "/images/jewellery-1.webp",
         "sections": []
       },
       {
         "id": "kalagi",
         "name": "KALAGI",
-        "image": "/images/jewellery_set_1.jpg",
+        "image": "/images/jewellery_set_1.webp",
         "sections": []
       },
       {
         "id": "nathani",
         "name": "NATHANI",
-        "image": "/images/singhasan_1.jpg",
+        "image": "/images/singhasan_1.webp",
         "sections": []
       },
       {
         "id": "tiko",
         "name": "TIKO",
-        "image": "/images/furniture-1.jpg",
+        "image": "/images/furniture-1.webp",
         "sections": []
       },
       {
         "id": "kamar-bandh",
         "name": "KAMAR BANDH",
-        "image": "/images/hero_1.jpg",
+        "image": "/images/hero_1.webp",
         "sections": []
       },
       {
         "id": "payal-zanzar",
         "name": "PAYAL & ZANZAR",
-        "image": "/images/hero_2.jpg",
+        "image": "/images/hero_2.webp",
         "sections": []
       },
       {
         "id": "trishul",
         "name": "TRISHUL",
-        "image": "/images/hero_3.jpg",
+        "image": "/images/hero_3.webp",
         "sections": []
       },
       {
         "id": "alka-vali",
         "name": "ALKA VALI",
-        "image": "/hero.png",
+        "image": "/images/hero.webp",
         "sections": []
       },
       {
         "id": "mojadi",
         "name": "MOJADI",
-        "image": "/shringar.png",
+        "image": "/images/shringar.webp",
         "sections": []
       },
       {
         "id": "topi",
         "name": "TOPI",
-        "image": "/furniture.png",
+        "image": "/images/furniture.webp",
         "sections": []
       },
       {
         "id": "pushtimarg",
         "name": "PUSHTIMARG",
-        "image": "/aasan.png",
+        "image": "/images/aasan.webp",
         "sections": []
       },
       {
         "id": "necklace",
         "name": "NECKLACE",
-        "image": "/accessories.png",
+        "image": "/images/accessories.webp",
         "sections": []
       }
     ]
@@ -517,48 +517,48 @@
   {
     "id": "furniture",
     "name": "FURNITURE",
-    "image": "/furniture.png",
+    "image": "/images/furniture.webp",
     "subCategories": [
       {
         "id": "bed",
         "name": "BED",
-        "image": "/images/singhasan_1.jpg",
+        "image": "/images/singhasan_1.webp",
         "sections": []
       },
       {
         "id": "sihasan",
         "name": "SIHASAN",
-        "image": "/images/singhasan_1.jpg",
+        "image": "/images/singhasan_1.webp",
         "sections": []
       },
       {
         "id": "zula",
         "name": "ZULA",
-        "image": "/images/singhasan_1.jpg",
+        "image": "/images/singhasan_1.webp",
         "sections": []
       },
       {
         "id": "khatla",
         "name": "KHATLA",
-        "image": "/idol.png",
+        "image": "/images/idol.webp",
         "sections": []
       },
       {
         "id": "parna",
         "name": "PARNA",
-        "image": "/images/poshak-1.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": []
       },
       {
         "id": "bajot",
         "name": "BAJOT",
-        "image": "/images/poshak-2.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": []
       },
       {
         "id": "sofa",
         "name": "SOFA",
-        "image": "/images/heavy_dress_1.jpg",
+        "image": "/images/heavy_dress_1.webp",
         "sections": []
       }
     ]
@@ -566,18 +566,18 @@
   {
     "id": "aasan-chunari",
     "name": "AASAN & CHUNNARI",
-    "image": "/aasan.png",
+    "image": "/images/aasan.webp",
     "subCategories": [
       {
         "id": "aasan",
         "name": "AASAN",
-        "image": "/images/western_dress_1.jpg",
+        "image": "/images/western_dress_1.webp",
         "sections": []
       },
       {
         "id": "chunnari",
         "name": "CHUNNARI",
-        "image": "/images/winter_dress_1.jpg",
+        "image": "/images/winter_dress_1.webp",
         "sections": []
       }
     ]
@@ -585,162 +585,162 @@
   {
     "id": "accessories",
     "name": "ACCESSORIES",
-    "image": "/accessories.png",
+    "image": "/images/accessories.webp",
     "subCategories": [
       {
         "id": "khilona",
         "name": "KHILONA",
-        "image": "/images/pagdi_1.jpg",
+        "image": "/images/pagdi_1.webp",
         "sections": []
       },
       {
         "id": "gadi-takiya",
         "name": "GADI TAKIYA",
-        "image": "/images/jewellery-1.jpg",
+        "image": "/images/jewellery-1.webp",
         "sections": []
       },
       {
         "id": "hair",
         "name": "HAIR",
-        "image": "/images/jewellery_set_1.jpg",
+        "image": "/images/jewellery_set_1.webp",
         "sections": []
       },
       {
         "id": "eyes",
         "name": "EYES",
-        "image": "/images/singhasan_1.jpg",
+        "image": "/images/singhasan_1.webp",
         "sections": []
       },
       {
         "id": "attar",
         "name": "ATTAR & FRAGRANCE",
-        "image": "/images/furniture-1.jpg",
+        "image": "/images/furniture-1.webp",
         "sections": []
       },
       {
         "id": "min",
         "name": "MIN",
-        "image": "/images/hero_1.jpg",
+        "image": "/images/hero_1.webp",
         "sections": []
       },
       {
         "id": "abhyan",
         "name": "ABHYAN",
-        "image": "/images/hero_2.jpg",
+        "image": "/images/hero_2.webp",
         "sections": []
       },
       {
         "id": "kanka-vati",
         "name": "KANKA VATI",
-        "image": "/images/hero_3.jpg",
+        "image": "/images/hero_3.webp",
         "sections": []
       },
       {
         "id": "pooja-thali",
         "name": "POOJA THALI",
-        "image": "/hero.png",
+        "image": "/images/hero.webp",
         "sections": []
       },
       {
         "id": "asht-sakha",
         "name": "ASHT SAKHA",
-        "image": "/shringar.png",
+        "image": "/images/shringar.webp",
         "sections": []
       },
       {
         "id": "gopi-set",
         "name": "GOPI SET",
-        "image": "/furniture.png",
+        "image": "/images/furniture.webp",
         "sections": []
       },
       {
         "id": "ramapir-paghadi",
         "name": "RAMAPIR PAGHADI",
-        "image": "/aasan.png",
+        "image": "/images/aasan.webp",
         "sections": []
       },
       {
         "id": "tokri",
         "name": "TOKRI",
-        "image": "/accessories.png",
+        "image": "/images/accessories.webp",
         "sections": []
       },
       {
         "id": "mataki",
         "name": "MATAKI",
-        "image": "/idol.png",
+        "image": "/images/idol.webp",
         "sections": []
       },
       {
         "id": "vinjana",
         "name": "VINJANA",
-        "image": "/images/poshak-1.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": []
       },
       {
         "id": "ridhhi-sidhdhi",
         "name": "RIDHHI-SIDHDHI",
-        "image": "/images/poshak-2.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": []
       },
       {
         "id": "kapoor",
         "name": "KAPOOR",
-        "image": "/images/heavy_dress_1.jpg",
+        "image": "/images/heavy_dress_1.webp",
         "sections": []
       },
       {
         "id": "mor-pankh",
         "name": "MOR PANKH",
-        "image": "/images/western_dress_1.jpg",
+        "image": "/images/western_dress_1.webp",
         "sections": []
       },
       {
         "id": "mor-pankh-zadu",
         "name": "MOR PANKH ZADU",
-        "image": "/images/winter_dress_1.jpg",
+        "image": "/images/winter_dress_1.webp",
         "sections": []
       },
       {
         "id": "bungla-ji",
         "name": "BUNGLA JI",
-        "image": "/images/pagdi_1.jpg",
+        "image": "/images/pagdi_1.webp",
         "sections": []
       },
       {
         "id": "ghatadi",
         "name": "GHATADI",
-        "image": "/images/jewellery-1.jpg",
+        "image": "/images/jewellery-1.webp",
         "sections": []
       },
       {
         "id": "nana-chhadi",
         "name": "NANA CHHADI",
-        "image": "/images/jewellery_set_1.jpg",
+        "image": "/images/jewellery_set_1.webp",
         "sections": []
       },
       {
         "id": "har-mala",
         "name": "HAR MALA",
-        "image": "/images/singhasan_1.jpg",
+        "image": "/images/singhasan_1.webp",
         "sections": []
       },
       {
         "id": "book-stand",
         "name": "BOOK STAND",
-        "image": "/images/furniture-1.jpg",
+        "image": "/images/furniture-1.webp",
         "sections": []
       },
       {
         "id": "mataji-face",
         "name": "MATAJI FACE",
-        "image": "/images/hero_1.jpg",
+        "image": "/images/hero_1.webp",
         "sections": []
       },
       {
         "id": "chattar",
         "name": "CHATTAR",
-        "image": "/images/hero_2.jpg",
+        "image": "/images/hero_2.webp",
         "sections": []
       }
     ]
@@ -748,78 +748,78 @@
   {
     "id": "idol",
     "name": "IDOL",
-    "image": "/idol.png",
+    "image": "/images/idol.webp",
     "subCategories": [
       {
         "id": "laddu-gopal",
         "name": "LADDU GOPAL",
-        "image": "/images/hero_3.jpg",
+        "image": "/images/hero_3.webp",
         "sections": []
       },
       {
         "id": "radha-krishna",
         "name": "RADHA KRISHNA",
-        "image": "/hero.png",
+        "image": "/images/hero.webp",
         "sections": []
       },
       {
         "id": "mataji-idol",
         "name": "MATAJI",
-        "image": "/shringar.png",
+        "image": "/images/shringar.webp",
         "sections": []
       },
       {
         "id": "ganpati-idol",
         "name": "GANPATI",
-        "image": "/furniture.png",
+        "image": "/images/furniture.webp",
         "sections": []
       },
       {
         "id": "shankar-idol",
         "name": "SHANKAR",
-        "image": "/aasan.png",
+        "image": "/images/aasan.webp",
         "sections": []
       },
       {
         "id": "nandi",
         "name": "NANDI",
-        "image": "/accessories.png",
+        "image": "/images/accessories.webp",
         "sections": []
       },
       {
         "id": "hanumanji-idol",
         "name": "HANUMANJI",
-        "image": "/idol.png",
+        "image": "/images/idol.webp",
         "sections": []
       },
       {
         "id": "radha-rani",
         "name": "RADHA RANI",
-        "image": "/images/poshak-1.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": []
       },
       {
         "id": "gaiya",
         "name": "GAIYA",
-        "image": "/images/poshak-2.jpg",
+        "image": "/images/poshak-1.webp",
         "sections": []
       },
       {
         "id": "kachabo",
         "name": "KACHABO",
-        "image": "/images/heavy_dress_1.jpg",
+        "image": "/images/heavy_dress_1.webp",
         "sections": []
       },
       {
         "id": "nav-grah-idol",
         "name": "NAV GRAH IDOL",
-        "image": "/images/western_dress_1.jpg",
+        "image": "/images/western_dress_1.webp",
         "sections": []
       },
       {
         "id": "ram-darbar-idol",
         "name": "RAM DARBAR",
-        "image": "/images/winter_dress_1.jpg",
+        "image": "/images/winter_dress_1.webp",
         "sections": []
       }
     ]
@@ -827,66 +827,66 @@
   {
     "id": "festival-special",
     "name": "FESTIVAL SPECIAL",
-    "image": "/images/pagdi_1.jpg",
+    "image": "/images/pagdi_1.webp",
     "subCategories": [
       {
         "id": "makarshankranti",
         "name": "MAKARSHANKRANTI",
-        "image": "/images/jewellery-1.jpg",
+        "image": "/images/jewellery-1.webp",
         "sections": []
       },
       {
         "id": "shivratri",
         "name": "SHIVRATRI",
-        "image": "/images/jewellery_set_1.jpg",
+        "image": "/images/jewellery_set_1.webp",
         "sections": []
       },
       {
         "id": "holi",
         "name": "HOLI",
-        "image": "/images/singhasan_1.jpg",
+        "image": "/images/singhasan_1.webp",
         "sections": []
       },
       {
         "id": "vasant-punchami",
         "name": "VASANT PUNCHAMI",
-        "image": "/images/furniture-1.jpg",
+        "image": "/images/furniture-1.webp",
         "sections": []
       },
       {
         "id": "chaitra-navratri",
         "name": "CHAITRA NAVRATRI",
-        "image": "/images/hero_1.jpg",
+        "image": "/images/hero_1.webp",
         "sections": []
       },
       {
         "id": "janmashtami",
         "name": "JANMASHTAMI",
-        "image": "/images/hero_2.jpg",
+        "image": "/images/hero_2.webp",
         "sections": []
       },
       {
         "id": "ganesh-chaturthi",
         "name": "GANESH CHATURTHI",
-        "image": "/images/hero_3.jpg",
+        "image": "/images/hero_3.webp",
         "sections": []
       },
       {
         "id": "navratri",
         "name": "NAVRATRI",
-        "image": "/hero.png",
+        "image": "/images/hero.webp",
         "sections": []
       },
       {
         "id": "sharad-poonam",
         "name": "SHARAD POONAM",
-        "image": "/shringar.png",
+        "image": "/images/shringar.webp",
         "sections": []
       },
       {
         "id": "diwali",
         "name": "DIWALI",
-        "image": "/furniture.png",
+        "image": "/images/furniture.webp",
         "sections": []
       }
     ]

@@ -16,7 +16,7 @@ export default function Footer() {
     <footer className="pt-10 pb-10 bg-brand-primary text-white overflow-hidden relative">
       <div className="absolute inset-0 opacity-5 mix-blend-overlay pointer-events-none">
         <Image
-          src="/images/hero_2.jpg"
+          src="/images/hero_2.webp"
           alt="Shree Shyam Darshan Background"
           fill
           sizes="100vw"
@@ -123,8 +123,8 @@ export default function Footer() {
             © 2026 Shree Shyam Darshan • Crafted for Devotion
           </p>
           <div className="flex gap-8 text-[8px] lg:text-[10px] font-bold tracking-widest text-white/20 uppercase">
-            <Link href="#" className="hover:text-white transition-all">Privacy</Link>
-            <Link href="#" className="hover:text-white transition-all">Terms</Link>
+            <Link href="/privacy-policy" className="hover:text-white transition-all">Privacy</Link>
+            <Link href="/terms-and-conditions" className="hover:text-white transition-all">Terms</Link>
           </div>
         </div>
       </div>

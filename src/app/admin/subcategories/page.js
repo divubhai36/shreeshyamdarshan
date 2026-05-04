@@ -5,15 +5,22 @@ import { getSubCategories, createSubCategory, updateSubCategory, deleteSubCatego
 import CustomSelect from "@/components/CustomSelect";
 import toast from "react-hot-toast";
 
+import { useCloudinary } from "@/hooks/useCloudinary";
+import { compressAndResizeImage } from "@/lib/imageProcessor";
 
 export default function SubcategoryPage() {
+  const { uploadToAllAccounts, uploading: isCloudSyncing } = useCloudinary();
   const [data, setData] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ name: "", slug: "", imageUrl: "", categoryId: "" });
-  const [uploading, setUploading] = useState(false);
+
+  // Local states for "Upload on Submit"
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => { loadData(); }, []);
@@ -28,19 +35,15 @@ export default function SubcategoryPage() {
   const handleUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    try {
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const upData = await res.json();
-      if(upData.url) {
-        setForm({ ...form, imageUrl: upData.url });
-        toast.success("Asset Ready");
-      }
-    } catch(err) { toast.error("Upload failed"); }
 
-    setUploading(false);
+    try {
+      const processed = await compressAndResizeImage(file, 'category'); // Using 'category' size for subcats
+      setSelectedFile(processed.file);
+      setImagePreview(processed.preview);
+      // toast.success(`Image Optimized (${processed.reduction} smaller)`);
+    } catch (err) {
+      toast.error("Image processing failed");
+    }
   };
 
   const slugify = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
@@ -52,7 +55,7 @@ export default function SubcategoryPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.imageUrl) {
+    if (!form.imageUrl && !selectedFile) {
       toast.error("Image is mandatory");
       return;
     }
@@ -61,23 +64,34 @@ export default function SubcategoryPage() {
       return;
     }
 
+    let currentForm = { ...form };
+
     try {
-      if(editingId) {
-        await updateSubCategory(editingId, form);
-        toast.success("Sub-category Refined");
+      if (selectedFile) {
+        toast.loading("Uploading...", { id: 'sync' });
+        const uploaded = await uploadToAllAccounts(selectedFile);
+        currentForm.imageUrl = uploaded.public_id;
+      }
+
+      toast.loading("Recording Registry...", { id: 'sync' });
+      if (editingId) {
+        await updateSubCategory(editingId, currentForm);
+        toast.success("Sub-category Refined", { id: 'sync' });
       } else {
-        await createSubCategory(form);
-        toast.success("Sub-category Created");
+        await createSubCategory(currentForm);
+        toast.success("Sub-category Created", { id: 'sync' });
       }
       setIsOpen(false);
+      setSelectedFile(null);
+      setImagePreview("");
       loadData();
     } catch (err) {
-      toast.error("Operation failed. System check required.");
+      toast.error("Operation failed. Sync interrupted.", { id: 'sync' });
     }
   };
 
   const handleDelete = async (id) => {
-    if(confirm("Confirm removal? This may affect product visibility for entries in this registry.")) {
+    if (confirm("Confirm removal? This may affect product visibility for entries in this registry.")) {
       await deleteSubCategory(id);
       toast.success("Registry Record Removed");
       loadData();
@@ -123,14 +137,14 @@ export default function SubcategoryPage() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32 gap-4">
           <Icon icon="line-md:loading-loop" className="w-12 h-12 text-brand-secondary" />
-          <p className="text-[10px] uppercase font-black tracking-[0.3em] text-brand-primary/30">Syncing Registry...</p>
+          <p className="text-[10px] uppercase font-black tracking-[0.3em] text-brand-primary/30">Loading Sub-Categories...</p>
         </div>
       ) : (
         <div className="space-y-16">
           {groupedData.length === 0 ? (
             <div className="text-center py-32 opacity-20">
               <Icon icon="solar:layers-broken" className="w-20 h-20 mx-auto mb-4" />
-              <p className="text-sm font-black uppercase tracking-widest">No matching sub-categories found</p>
+              <p className="text-sm font-black uppercase tracking-widest">No Sub-Categories Added</p>
             </div>
           ) : groupedData.map((group) => (
             <div key={group.id} className="space-y-6">
@@ -149,7 +163,7 @@ export default function SubcategoryPage() {
                   <div key={sub.id} className="group relative bg-white p-6 rounded-[32px] border border-brand-primary/5 hover:border-brand-secondary/20 transition-all duration-500 hover:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.08)]">
                     <div className="aspect-square w-full bg-brand-accent/30 rounded-2xl overflow-hidden mb-5 relative group-hover:scale-[1.02] transition-transform duration-500">
                       {sub.imageUrl ? (
-                        <img src={sub.imageUrl} className="w-full h-full object-cover" />
+                        <img src={sub.imageUrl.startsWith('shree') ? `https://res.cloudinary.com/dumbddcvh/image/upload/${sub.imageUrl}` : sub.imageUrl} className="w-full h-full object-cover" />
                       ) : (
                         <div className="flex items-center justify-center h-full text-brand-primary/10">
                           <Icon icon="solar:image-broken-bold" className="w-10 h-10" />
@@ -164,7 +178,7 @@ export default function SubcategoryPage() {
                     </div>
 
                     <div className="absolute top-8 right-8 flex gap-2 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                      <button onClick={() => { setEditingId(sub.id); setForm({name: sub.name, slug: sub.slug, imageUrl: sub.imageUrl, categoryId: sub.categoryId}); setIsOpen(true); }} className="w-9 h-9 bg-white/90 backdrop-blur-md text-blue-500 hover:bg-blue-500 hover:text-white rounded-xl shadow-lg flex items-center justify-center transition-all">
+                      <button onClick={() => { setEditingId(sub.id); setForm({ name: sub.name, slug: sub.slug, imageUrl: sub.imageUrl, categoryId: sub.categoryId }); setIsOpen(true); }} className="w-9 h-9 bg-white/90 backdrop-blur-md text-blue-500 hover:bg-blue-500 hover:text-white rounded-xl shadow-lg flex items-center justify-center transition-all">
                         <Icon icon="solar:pen-new-square-bold-duotone" className="w-5 h-5" />
                       </button>
                       <button onClick={() => handleDelete(sub.id)} className="w-9 h-9 bg-white/90 backdrop-blur-md text-red-500 hover:bg-red-500 hover:text-white rounded-xl shadow-lg flex items-center justify-center transition-all">
@@ -217,15 +231,15 @@ export default function SubcategoryPage() {
                   />
                 </div>
 
-                <div className="p-8 rounded-[32px] border-2 border-dashed border-brand-primary/5 group hover:border-brand-secondary/20 transition-all bg-brand-primary/[0.01]">
-                  <label className="text-[10px] uppercase font-black tracking-[0.2em] mb-4 block text-center text-brand-primary/30">Asset Payload</label>
+                <div className="p-4 rounded-[32px] border-2 border-dashed border-brand-primary/5 group hover:border-brand-secondary/20 transition-all bg-brand-primary/[0.01]">
+                  <label className="text-[10px] uppercase font-black tracking-[0.2em] mb-4 block text-center text-brand-primary/30">Image Preview</label>
                   <div className="flex flex-col items-center gap-6">
-                    {form.imageUrl ? (
+                    {imagePreview || form.imageUrl ? (
                       <div className="relative group/img aspect-video w-full rounded-2xl overflow-hidden shadow-xl">
-                        <img src={form.imageUrl} className="w-full h-full object-cover" />
+                        <img src={imagePreview || (form.imageUrl.startsWith('shree') ? `https://res.cloudinary.com/dumbddcvh/image/upload/${form.imageUrl}` : form.imageUrl)} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
-                          <button type="button" onClick={() => setForm({...form, imageUrl: ""})} className="bg-white/90 p-3 rounded-2xl text-red-500 font-bold text-xs flex items-center gap-2">
-                             <Icon icon="solar:refresh-linear" /> Replace Entry
+                          <button type="button" onClick={() => { setForm({ ...form, imageUrl: "" }); setSelectedFile(null); setImagePreview(""); }} className="bg-white/90 p-3 rounded-2xl text-red-500 font-bold text-xs flex items-center gap-2">
+                            <Icon icon="solar:refresh-linear" /> Replace Entry
                           </button>
                         </div>
                       </div>
@@ -234,14 +248,14 @@ export default function SubcategoryPage() {
                         <div className="w-12 h-12 bg-brand-primary/5 rounded-2xl flex items-center justify-center text-brand-primary/40 group-hover:scale-110 transition-transform">
                           <Icon icon="solar:cloud-upload-bold-duotone" className="w-6 h-6" />
                         </div>
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-primary/40">Inject Aesthetic (IMG)</span>
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-primary/40">Select Aesthetic Image</span>
                         <input type="file" onChange={handleUpload} className="hidden" accept="image/*" />
                       </label>
                     )}
-                    {uploading && (
+                    {isCloudSyncing && (
                       <div className="flex items-center gap-2 text-blue-500 animate-pulse">
                         <Icon icon="line-md:loading-loop" className="w-4 h-4" />
-                        <span className="text-[9px] font-bold uppercase tracking-widest">Streaming to Cloud...</span>
+                        <span className="text-[9px] font-bold uppercase tracking-widest">Uploading...</span>
                       </div>
                     )}
                   </div>
@@ -249,8 +263,11 @@ export default function SubcategoryPage() {
               </div>
 
               <div className="flex gap-4 pt-4">
-                <button type="button" onClick={()=>setIsOpen(false)} className="flex-1 h-16 rounded-[24px] font-black text-[10px] uppercase tracking-widest text-brand-primary/40 hover:bg-gray-50 transition-all">Cancel</button>
-                <button type="submit" disabled={uploading} className="flex-1 h-16 bg-brand-primary text-white rounded-[24px] font-black text-[10px] uppercase tracking-widest shadow-xl shadow-brand-primary/20 hover:bg-brand-secondary hover:shadow-2xl transition-all disabled:opacity-50">Confirm Registry</button>
+                <button type="button" onClick={() => setIsOpen(false)} className="flex-1 h-16 rounded-[24px] font-black text-[10px] uppercase tracking-widest text-brand-primary/40 hover:bg-gray-50 transition-all">Cancel</button>
+                <button type="submit" disabled={isCloudSyncing} className="flex-1 h-16 bg-brand-primary text-white rounded-[24px] font-black text-[10px] uppercase tracking-widest shadow-xl shadow-brand-primary/20 hover:bg-brand-secondary hover:shadow-2xl transition-all disabled:opacity-50 flex items-center justify-center gap-3">
+                  {isCloudSyncing && <Icon icon="line-md:loading-loop" className="w-5 h-5" />}
+                  Confirm Registry
+                </button>
               </div>
             </form>
           </div>

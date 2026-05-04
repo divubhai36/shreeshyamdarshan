@@ -91,7 +91,7 @@ export default function LeadPopup() {
                >
                   {/* Slim Header - No Scroll Layout */}
                   <div className="shrink-0 bg-brand-primary p-4 md:p-8 relative overflow-hidden flex items-center justify-between border-b border-brand-secondary/20">
-                     <div className="absolute inset-0 bg-[url('/images/hero_2.jpg')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
+                     <div className="absolute inset-0 bg-[url('/images/hero_2.webp')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
                      <div className="absolute inset-0 bg-gradient-to-r from-brand-primary via-brand-primary/80 to-transparent"></div>
 
                      <div className="relative z-10 flex items-center gap-3">

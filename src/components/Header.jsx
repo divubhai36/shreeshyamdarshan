@@ -14,10 +14,10 @@ import { useCart } from '@/context/CartContext';
 export default function Header() {
   const pathname = usePathname();
    const { cartCount, saved = [], isAuthenticated } = useCart();
- 
+
    // Hide on Admin, Login and Dashboard pages to prevent layout conflicts
    const isExcluded = pathname.startsWith('/admin') || pathname === '/login'
- 
+
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
    const [activeCategory, setActiveCategory] = useState(null);
    const [expandedMobileCat, setExpandedMobileCat] = useState(null);
@@ -25,7 +25,7 @@ export default function Header() {
    const [isAdmin, setIsAdmin] = useState(false);
    const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
    const accountRef = useRef(null);
- 
+
    // Close account menu on outside click
    useEffect(() => {
      const handleClickOutside = (event) => {
@@ -38,15 +38,15 @@ export default function Header() {
      }
      return () => document.removeEventListener('mousedown', handleClickOutside);
    }, [isAccountMenuOpen]);
- 
+
    useEffect(() => {
      setIsMobileMenuOpen(false);
      setIsAccountMenuOpen(false);
      setActiveCategory(null);
- 
+
      const cookies = document.cookie.split(';');
      const hasAdminSession = cookies.some((item) => item.trim().startsWith('admin_session='));
- 
+
      setIsAdmin(hasAdminSession);
      setIsLogged(isAuthenticated || hasAdminSession);
    }, [pathname, isAuthenticated]);
@@ -167,7 +167,7 @@ export default function Header() {
                           <div className="grid grid-cols-12 gap-10">
 
                             {/* Left: Category Info */}
-                            <div className="col-span-3 border-r border-brand-primary/5 pr-10">
+                            <div className="col-span-3 border-r border-brand-primary/5 pr-2">
                               <h3 className="text-2xl font-serif font-bold text-brand-primary mb-3 uppercase tracking-tight">
                                 {cat.name}
                               </h3>

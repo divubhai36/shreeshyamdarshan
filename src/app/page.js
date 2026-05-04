@@ -18,7 +18,7 @@ export default async function Home() {
 
    try {
       // 1. Fetch products & categories and videos in parallel for efficiency
-      const [dbProducts, dbCategories, dbReviewVideos] = await Promise.all([
+      const [dbProducts, dbCategories] = await Promise.all([
          prisma.product.findMany({
             where: { isVisible: true, isBestSeller: true },
             take: 12,
@@ -26,13 +26,17 @@ export default async function Home() {
             orderBy: { createdAt: 'desc' }
          }),
          prisma.category.findMany({ include: { subCategories: true } }),
-         prisma.reviewVideo.findMany({
-            where: { isActive: true },
-            orderBy: { createdAt: 'desc' }
-         }).catch(() => [])
+         // prisma.reviewVideo.findMany({
+         //    where: { isActive: true },
+         //    orderBy: { createdAt: 'desc' }
+         // }).catch(() => [])
       ]);
 
-      reviewVideos = dbReviewVideos;
+      // Happy Customer: User Review Videos
+      reviewVideos = [
+         { id: '1', url: 'https://ssd-video-server.vercel.app/customer-review-1.mp4', title: 'from Delhi' },
+         { id: '2', url: 'https://ssd-video-server.vercel.app/customer-review-2.mp4', title: 'from Ahmedabad' }
+      ];
 
       // 2. Map DB → front-end schema
       products = dbProducts.map(p => ({
@@ -45,7 +49,7 @@ export default async function Home() {
          mrp: p.mrp,
          description: p.description,
          images: p.images,
-         image: p.images[0] || "/hero.png",
+         image: p.images[0] || "/images/hero.webp",
          isBestSeller: p.isBestSeller
       }));
 
@@ -78,12 +82,24 @@ export default async function Home() {
    } catch (dbErr) {
       console.error("[Home] DB unreachable, falling back to static data:", dbErr?.message);
       // Fallback: use local JSON so the page still renders
-      products = productData
+      products = (productData.products || [])
          .filter(p => p.isBestSeller)
          .slice(0, 12)
-         .map(p => ({ ...p, image: p.images?.[0] || p.image || "/hero.png" }));
+         .map(p => ({
+            ...p,
+            image: p.images?.[0] || p.image || "/images/hero.webp",
+            images: p.images || [p.image || "/images/hero.webp"]
+         }));
+
+      categories = (productData.categories || []).map(c => ({
+         id: c.id,
+         name: c.label,
+         label: c.label,
+         image: c.image,
+         subCategories: c.subCategories || []
+      }));
    }
-    
+
      // SEO Structured Data
      const jsonLd = {
        "@context": "https://schema.org",
@@ -106,10 +122,10 @@ export default async function Home() {
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
-          <HomeClient 
-             products={products} 
-             categories={categories} 
-             reviews={reviews} 
+          <HomeClient
+             products={products}
+             categories={categories}
+             reviews={reviews}
              reviewVideos={reviewVideos}
           />
         </>

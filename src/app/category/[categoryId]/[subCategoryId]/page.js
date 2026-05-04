@@ -79,7 +79,7 @@ export default async function SubCategoryPage({ params }) {
              price: p.price,
              description: p.description,
              images: p.images,
-             image: p.images[0] || "/hero.png",
+             image: p.images[0] || "/images/hero.webp",
              isBestSeller: p.isBestSeller,
              isOfferProduct: p.isOfferProduct,
              offerPrice: p.offerPrice,
