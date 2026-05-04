@@ -135,7 +135,7 @@ export default function Categories() {
           // Split deletion by type
           const imagesToDelete = itemsToDelete.filter(m => m.type === 'image').map(m => m.id);
           const videosToDelete = itemsToDelete.filter(m => m.type === 'video').map(m => m.id);
-          
+
           if (imagesToDelete.length > 0) await deleteFromAllAccounts(imagesToDelete, 'image');
           if (videosToDelete.length > 0) await deleteFromAllAccounts(videosToDelete, 'video');
         }
@@ -345,12 +345,12 @@ export default function Categories() {
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between items-center mb-1.5">
-                      <label className="text-10px uppercase font-black tracking-0.15em text-brand-primary flex items-center gap-2">
+                      <label className="text-[10px] uppercase font-black tracking-0.15em text-brand-primary flex items-center gap-2">
                          Cinema Reels (Portrait) <span className="text-red-500 font-medium">- Max 5MB</span>
                       </label>
 
                       <div className="flex items-center gap-2">
-                        {form.videos.length < 3 && <span className="text-[10px] font-bold text-amber-600 animate-pulse">Min. 3 required for Cinema mode</span>}
+                        {/* {form.videos.length < 3 && <span className="text-[10px] font-bold text-amber-600 animate-pulse">Min. 3 required for Cinema mode</span>} */}
                         <span className="text-[10px] font-bold text-brand-secondary bg-brand-secondary/10 px-2 py-0.5 rounded-md leading-none">{form.videos.length} Active</span>
                       </div>
                     </div>
