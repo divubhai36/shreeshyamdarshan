@@ -45,13 +45,13 @@ export default function AdminSettings() {
             <Icon icon="solar:shield-keyhole-bold-duotone" className="w-4 h-4" />
             Security Protocol
         </div>
-        <h1 className="text-4xl lg:text-5xl font-serif font-bold text-brand-primary mb-3">Administrative Access</h1>
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-brand-primary mb-3">Administrative Access</h1>
         <p className="text-sm text-brand-primary/40 font-medium tracking-wide">Manage your secure credentials and site-wide permissions</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
-        <div className="lg:col-span-3">
-          <div className="bg-white p-8 lg:p-12 rounded-[48px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-black/5 text-left relative overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-start">
+        <div className="lg:col-span-3 w-full">
+          <div className="bg-white p-6 md:p-8 lg:p-12 rounded-[32px] md:rounded-[48px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-black/5 text-left relative overflow-hidden">
             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
                 <Icon icon="solar:lock-keyhole-minimalistic-bold-duotone" className="w-32 h-32 text-brand-primary" />
             </div>
@@ -120,8 +120,8 @@ export default function AdminSettings() {
           </div>
         </div>
 
-        <div className="lg:col-span-2 space-y-6">
-            <div className="bg-brand-primary p-8 rounded-[40px] text-white relative overflow-hidden shadow-xl border border-white/5">
+        <div className="lg:col-span-2 w-full space-y-6">
+            <div className="bg-brand-primary p-6 md:p-8 rounded-[32px] md:rounded-[40px] text-white relative overflow-hidden shadow-xl border border-white/5">
                 <div className="absolute top-0 right-0 p-8 opacity-20 rotate-12 pointer-events-none">
                     <Icon icon="solar:info-circle-bold-duotone" className="w-24 h-24" />
                 </div>
@@ -133,7 +133,7 @@ export default function AdminSettings() {
                 </ul>
             </div>
 
-            <div className="p-8 rounded-[40px] border border-dashed border-brand-primary/20 bg-brand-primary/2">
+            <div className="p-6 md:p-8 rounded-[32px] md:rounded-[40px] border border-dashed border-brand-primary/20 bg-brand-primary/2">
                 <h4 className="text-xs font-bold text-brand-primary uppercase tracking-widest mb-2">Last Update</h4>
                 <p className="text-[10px] text-brand-primary/40 font-bold uppercase tracking-widest">Automatic sync with master database enabled</p>
             </div>

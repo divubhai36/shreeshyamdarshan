@@ -53,7 +53,7 @@ export default function InquiriesPage() {
       </div>
 
       <div className="bg-white rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-brand-primary/5 overflow-x-auto custom-scrollbar">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-left text-sm min-w-[800px]">
           <thead className="bg-brand-primary/5 text-[10px] uppercase font-bold text-brand-primary/60 tracking-widest border-b border-brand-primary/5">
             <tr>
               <th className="p-6">User Details</th>

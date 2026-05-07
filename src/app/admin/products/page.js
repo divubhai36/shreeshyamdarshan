@@ -282,8 +282,8 @@ export default function ProductsPage() {
             </div>
 
             {loading ? <div className="text-center py-20"><Icon icon="line-md:loading-loop" className="w-10 h-10 text-brand-secondary mx-auto" /></div> : (
-                <div className="bg-white rounded-[32px] shadow-sm border border-brand-primary/5">
-                    <table className="w-full text-left text-sm">
+                <div className="bg-white rounded-[32px] shadow-sm border border-brand-primary/5 overflow-x-auto custom-scrollbar">
+                    <table className="w-full text-left text-sm min-w-[1000px]">
                         <thead className="bg-brand-primary/5 text-[10px] uppercase font-bold text-brand-primary/60 tracking-widest">
                             <tr>
                                 <th className="p-5 w-16 rounded-tl-[32px]">Media</th>

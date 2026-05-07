@@ -3,10 +3,16 @@ import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { usePathname } from "next/navigation";
 
-export default function AdminSidebar() {
+import { useEffect } from "react";
+
+export default function AdminSidebar({ isOpen, setIsOpen }) {
   const pathname = usePathname();
 
   if (pathname === "/admin/login") return null;
+
+  useEffect(() => {
+    if (setIsOpen) setIsOpen(false);
+  }, [pathname, setIsOpen]);
 
   const links = [
     { name: "Dashboard", path: "/admin", icon: "solar:widget-add-bold-duotone" },
@@ -26,13 +32,21 @@ export default function AdminSidebar() {
   ];
 
   return (
-    <div className="w-72 bg-brand-primary text-white h-screen fixed top-0 left-0 p-6 flex flex-col z-50 border-r border-white/5 shadow-2xl">
-      <div className="px-4 py-8 mb-4">
+    <div className={`w-72 bg-brand-primary text-white h-screen fixed top-0 left-0 p-6 flex flex-col z-50 border-r border-white/5 shadow-2xl transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}>
+      <div className="px-4 py-8 mb-4 relative">
         <h1 className="text-2xl font-serif font-bold text-white tracking-widest leading-tight uppercase">
             <span className="text-brand-secondary">Shree</span> Shyam <br/>
             Darshan
         </h1>
         <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/40 mt-2">Administrative Portal</p>
+        
+        {/* Mobile Close Button */}
+        <button 
+          onClick={() => setIsOpen(false)}
+          className="lg:hidden absolute top-8 right-0 p-2 text-white/50 hover:text-white bg-white/5 rounded-lg"
+        >
+          <Icon icon="solar:close-circle-bold-duotone" className="w-6 h-6" />
+        </button>
       </div>
 
       <div className="flex-1 space-y-1 overflow-y-auto pr-2 sidebar-scrollbar">

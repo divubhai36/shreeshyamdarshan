@@ -111,8 +111,8 @@ export default function ReviewsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-brand-primary/5">
-        <table className="w-full text-left text-sm">
+      <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-brand-primary/5 overflow-x-auto custom-scrollbar">
+        <table className="w-full text-left text-sm min-w-[900px]">
           <thead className="bg-brand-primary/5 text-[10px] uppercase font-bold text-brand-primary/60 tracking-widest border-b border-brand-primary/5">
             <tr>
               <th className="p-6 rounded-tl-3xl">Wholesaler</th>
@@ -199,8 +199,8 @@ export default function ReviewsPage() {
 
       {/* Add Review Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-brand-primary/60 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-lg rounded-[32px] p-8 shadow-2xl relative overflow-hidden">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-primary/60 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-lg max-h-[90vh] rounded-[32px] p-8 shadow-2xl relative overflow-y-auto custom-scrollbar">
             <button onClick={() => setShowAddModal(false)} className="absolute top-6 right-6 text-brand-primary/20 hover:text-brand-primary transition-colors z-10">
               <Icon icon="lucide:x" className="w-6 h-6" />
             </button>

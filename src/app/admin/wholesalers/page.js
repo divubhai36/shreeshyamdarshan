@@ -75,8 +75,8 @@ export default function WholesalersPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-brand-primary/5 overflow-hidden">
-        <table className="w-full text-left text-sm">
+      <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-brand-primary/5 overflow-x-auto custom-scrollbar">
+        <table className="w-full text-left text-sm min-w-[900px]">
           <thead className="bg-brand-primary/5 text-[10px] uppercase font-bold text-brand-primary/60 tracking-widest border-b border-brand-primary/5">
             <tr>
               <th className="p-6">Client Identity</th>

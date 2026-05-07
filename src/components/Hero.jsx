@@ -43,7 +43,7 @@ export default function Hero() {
               <motion.div
                 key={index}
                 initial={false}
-                animate={{ 
+                animate={{
                   opacity: index === current ? 1 : 0,
                   scale: index === current ? 1 : 1.1,
                   zIndex: index === current ? 20 : 10
@@ -62,9 +62,9 @@ export default function Hero() {
 
                 <div className="absolute inset-0 z-20 flex flex-col justify-center px-8 lg:px-24 max-w-md lg:max-w-3xl text-white">
                   <motion.div
-                    animate={{ 
-                      x: index === current ? 0 : -30, 
-                      opacity: index === current ? 1 : 0 
+                    animate={{
+                      x: index === current ? 0 : -30,
+                      opacity: index === current ? 1 : 0
                     }}
                     transition={{ delay: 0.3, duration: 0.8 }}
                   >
@@ -74,8 +74,8 @@ export default function Hero() {
                   </motion.div>
 
                   <motion.h2
-                    animate={{ 
-                      y: index === current ? 0 : 80, 
+                    animate={{
+                      y: index === current ? 0 : 80,
                       opacity: index === current ? 1 : 0,
                       skewY: index === current ? 0 : 5
                     }}
@@ -92,15 +92,15 @@ export default function Hero() {
                   </motion.h2>
 
                   <motion.div
-                    animate={{ 
-                      y: index === current ? 0 : 30, 
-                      opacity: index === current ? 1 : 0 
+                    animate={{
+                      y: index === current ? 0 : 30,
+                      opacity: index === current ? 1 : 0
                     }}
                     transition={{ delay: 0.7, duration: 0.8 }}
                   >
-                    <button 
+                    <button
                       onClick={scrollToCollections}
-                      className="group relative px-8 py-4 lg:px-12 lg:py-5 bg-white text-brand-primary font-bold rounded-full text-[10px] lg:text-sm uppercase tracking-widest flex items-center gap-3 overflow-hidden transition-all hover:pr-14 hover:bg-brand-secondary hover:text-white shadow-2xl"
+                      className="group relative px-4 py-2 sm:px-6 sm:py-3 lg:px-12 lg:py-5 bg-white text-brand-primary font-bold rounded-full text-[9px] sm:text-[10px] lg:text-sm uppercase tracking-widest flex items-center gap-3 overflow-hidden transition-all hover:pr-14 hover:bg-brand-secondary hover:text-white shadow-2xl"
                     >
                       <span className="relative z-10">Explore Collection</span>
                       <Icon icon="lucide:arrow-right" className="relative z-10 transition-transform duration-500 group-hover:translate-x-2 w-5 h-5" />
@@ -138,7 +138,7 @@ export default function Hero() {
               />
             ))}
           </div>
-          
+
         </div>
       </div>
     </section>

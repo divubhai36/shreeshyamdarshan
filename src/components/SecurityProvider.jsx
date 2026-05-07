@@ -4,27 +4,27 @@ import toast from 'react-hot-toast';
 
 export default function SecurityProvider() {
   useEffect(() => {
-    const showAlert = () => {
-      toast.error("Security Alert: SSD Inspection is strictly prohibited", {
-        id: 'security-alert', // Prevents toast flooding
-        style: {
-          background: '#1a4332',
-          color: '#fff',
-          fontWeight: 'bold',
-          fontSize: '12px',
-          border: '1px solid #c5a059'
-        },
-        iconTheme: {
-            primary: '#c5a059',
-            secondary: '#fff',
-        },
-      });
-    };
+    // const showAlert = () => {
+    //   toast.error("Security Alert: SSD Inspection is strictly prohibited", {
+    //     id: 'security-alert', // Prevents toast flooding
+    //     style: {
+    //       background: '#1a4332',
+    //       color: '#fff',
+    //       fontWeight: 'bold',
+    //       fontSize: '12px',
+    //       border: '1px solid #c5a059'
+    //     },
+    //     iconTheme: {
+    //         primary: '#c5a059',
+    //         secondary: '#fff',
+    //     },
+    //   });
+    // };
 
     // 1. Disable Right Click
     const handleContextMenu = (e) => {
       e.preventDefault();
-      showAlert();
+      // showAlert();
     };
 
     // 2. Disable Specific Key Combinations
@@ -42,7 +42,7 @@ export default function SecurityProvider() {
         showAlert();
         return false;
       }
-      
+
       if (e.ctrlKey && e.keyCode === 85) {
         e.preventDefault();
         showAlert();
