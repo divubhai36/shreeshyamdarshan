@@ -55,7 +55,7 @@ export default function StorageSettings() {
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white max-w-md w-full rounded-[48px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] border border-brand-primary/5 p-12 text-center relative overflow-hidden"
+                    className="bg-white max-w-md w-full rounded-[32px] md:rounded-[48px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] border border-brand-primary/5 p-6 md:p-12 text-center relative overflow-hidden"
                 >
                     <div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-brand-secondary via-brand-primary to-brand-secondary" />
                     
@@ -74,7 +74,7 @@ export default function StorageSettings() {
                                 value={passInput}
                                 onChange={(e) => setPassInput(e.target.value)}
                                 placeholder="ENTER PIN"
-                                className="w-full bg-brand-primary/5 border-2 border-transparent focus:border-brand-secondary focus:bg-white rounded-[24px] py-5 px-6 text-center text-3xl font-serif font-black tracking-[0.8em] outline-none transition-all placeholder:text-[10px] placeholder:tracking-[0.3em] placeholder:font-black placeholder:uppercase placeholder:text-brand-primary/20 shadow-inner"
+                                className="w-full bg-brand-primary/5 border-2 border-transparent focus:border-brand-secondary focus:bg-white rounded-[24px] py-4 md:py-5 px-4 md:px-6 text-center text-2xl md:text-3xl font-serif font-black tracking-[0.4em] md:tracking-[0.8em] outline-none transition-all placeholder:text-[10px] placeholder:tracking-[0.2em] md:placeholder:tracking-[0.3em] placeholder:font-black placeholder:uppercase placeholder:text-brand-primary/20 shadow-inner"
                                 autoFocus
                             />
                         </div>
@@ -126,16 +126,16 @@ export default function StorageSettings() {
     );
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-end mb-12">
+        <div className="max-w-4xl mx-auto px-2">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-8 md:mb-12">
                 <div>
-                    <h1 className="text-4xl font-serif font-bold text-brand-primary">Storage Hub</h1>
-                    <p className="text-[10px] font-black text-brand-secondary tracking-[0.4em] uppercase mt-2 opacity-60">Cloudinary Multi-Account Management</p>
+                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-brand-primary">Storage Hub</h1>
+                    <p className="text-[10px] font-black text-brand-secondary tracking-[0.2em] md:tracking-[0.4em] uppercase mt-2 opacity-60">Cloudinary Multi-Account Management</p>
                 </div>
                 <button
                     onClick={loadData}
                     disabled={refreshing}
-                    className="p-3 bg-white border border-brand-primary/5 rounded-xl text-brand-primary hover:bg-brand-primary/5 transition-all shadow-sm"
+                    className="p-3 bg-white border border-brand-primary/5 rounded-xl text-brand-primary hover:bg-brand-primary/5 transition-all shadow-sm w-full sm:w-auto flex justify-center"
                 >
                     <Icon icon="solar:restart-bold-duotone" className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
                 </button>
@@ -156,7 +156,7 @@ export default function StorageSettings() {
                 )}
 
                 {/* System Status Card */}
-                <div className="bg-white rounded-[32px] p-8 border border-brand-primary/5 shadow-sm overflow-hidden relative group">
+                <div className="bg-white rounded-[24px] md:rounded-[32px] p-6 md:p-8 border border-brand-primary/5 shadow-sm overflow-hidden relative group">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-brand-secondary/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-brand-secondary/10 transition-colors" />
 
                     <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -171,7 +171,7 @@ export default function StorageSettings() {
                         </div>
                         <button
                             onClick={toggleAutoSwitch}
-                            className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg ${config?.isAutoSwitchEnabled
+                            className={`px-8 py-4 w-full md:w-auto rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg ${config?.isAutoSwitchEnabled
                                     ? 'bg-brand-primary text-white hover:bg-brand-secondary'
                                     : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                                 }`}
@@ -214,15 +214,15 @@ function AccountCard({ acc, idx, isActive, handleSwitchAccount }) {
 
     return (
         <div
-            className={`bg-white rounded-[32px] p-8 border transition-all duration-500 ${isCritical
+            className={`bg-white rounded-[24px] md:rounded-[32px] p-6 md:p-8 border transition-all duration-500 ${isCritical
                     ? 'border-rose-200 bg-rose-50/30 shadow-xl shadow-rose-100'
                     : isActive
                         ? 'border-brand-secondary shadow-xl shadow-brand-secondary/5'
                         : 'border-brand-primary/5 hover:border-brand-primary/10'
                 }`}
         >
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
-                <div className="flex items-center gap-6">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 md:gap-8">
+                <div className="flex items-center gap-4 md:gap-6 w-full lg:w-auto">
                     <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-colors ${isCritical ? 'bg-rose-500 text-white shadow-lg shadow-rose-200' :
                             isActive ? 'bg-brand-secondary/10 text-brand-secondary' :
                                 'bg-brand-primary/5 text-brand-primary/20'
@@ -231,12 +231,12 @@ function AccountCard({ acc, idx, isActive, handleSwitchAccount }) {
                     </div>
                     <div>
                         <div className="flex items-center gap-3">
-                            <h4 className={`text-lg font-bold ${isCritical ? 'text-rose-900' : 'text-brand-primary'}`}>{acc.name}</h4>
+                            <h4 className={`text-base md:text-lg font-bold ${isCritical ? 'text-rose-900' : 'text-brand-primary'}`}>{acc.name}</h4>
                             {acc.type === 'video' && (
-                                <span className="bg-brand-primary text-white text-[8px] font-black uppercase px-3 py-1 rounded-full tracking-widest shadow-md">Dedicated Video</span>
+                                <span className="bg-brand-primary text-white text-[8px] font-black uppercase px-2 py-1 md:px-3 md:py-1 rounded-full tracking-widest shadow-md">Dedicated Video</span>
                             )}
                             {isCritical && (
-                                <span className="bg-rose-100 text-rose-600 text-[8px] font-black uppercase px-3 py-1 rounded-full tracking-widest border border-rose-200">Exhausted</span>
+                                <span className="bg-rose-100 text-rose-600 text-[8px] font-black uppercase px-2 py-1 md:px-3 md:py-1 rounded-full tracking-widest border border-rose-200">Exhausted</span>
                             )}
                         </div>
                         <p className={`text-[10px] font-bold mt-1 uppercase tracking-tighter ${isCritical ? 'text-rose-400' : 'text-brand-primary/40'}`}>
@@ -250,7 +250,7 @@ function AccountCard({ acc, idx, isActive, handleSwitchAccount }) {
                     </div>
                 </div>
 
-                <div className="flex-1 max-w-sm w-full space-y-3">
+                <div className="flex-1 max-w-full lg:max-w-sm w-full space-y-3">
                     <div className="flex justify-between items-end">
                         <span className={`text-[9px] font-black uppercase tracking-widest ${isCritical ? 'text-rose-400' : 'text-brand-primary/30'}`}>Credit Usage</span>
                         <span className={`text-xs font-bold ${isCritical ? 'text-rose-600' : 'text-brand-primary'}`}>
@@ -272,7 +272,7 @@ function AccountCard({ acc, idx, isActive, handleSwitchAccount }) {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between lg:justify-end gap-4 w-full lg:w-auto">
                     {isCritical ? (
                         <div className="flex items-center gap-2 px-4 py-2 bg-rose-100 rounded-full text-rose-600 text-[10px] font-black uppercase tracking-widest">
                             <Icon icon="solar:lock-bold" className="w-4 h-4" />
@@ -305,7 +305,7 @@ function AccountCard({ acc, idx, isActive, handleSwitchAccount }) {
                 </div>
             </div>
 
-            <div className={`mt-12 pt-12 border-t grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 ${isCritical ? 'border-rose-100' : 'border-brand-primary/5'}`}>
+            <div className={`mt-8 md:mt-12 pt-8 md:pt-12 border-t grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 ${isCritical ? 'border-rose-100' : 'border-brand-primary/5'}`}>
                 <div className="space-y-2">
                     <div className={`flex items-center gap-2 mb-3 ${isCritical ? 'text-rose-400' : 'text-brand-primary/40'}`}>
                         <Icon icon="solar:globus-bold-duotone" className="w-4 h-4" />

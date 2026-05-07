@@ -147,8 +147,8 @@ export default function ShowcaseVideosPage() {
 
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-primary/50 backdrop-blur-md p-4">
-          <div className="bg-white max-w-md w-full rounded-3xl shadow-2xl overflow-hidden flex flex-col">
-            <div className="flex justify-between items-center px-6 py-4 border-b border-brand-primary/5">
+          <div className="bg-white max-w-md w-full max-h-[90vh] rounded-3xl shadow-2xl overflow-y-auto custom-scrollbar flex flex-col">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-brand-primary/5 shrink-0">
               <div>
                 <h2 className="text-xl font-bold text-brand-primary font-serif">Add New Reel</h2>
                 <p className="text-[9px] text-brand-secondary font-bold uppercase tracking-widest">Cinematic Showcase</p>

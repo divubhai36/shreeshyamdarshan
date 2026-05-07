@@ -260,10 +260,10 @@ export default function Categories() {
       )}
 
       {isOpen && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center bg-brand-primary/50 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-primary/50 backdrop-blur-md p-4">
 
-          <div className="bg-white max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden flex flex-col">
-            <div className="flex justify-between items-center px-6 py-4 border-b border-brand-primary/5">
+          <div className="bg-white max-w-4xl w-full max-h-[90vh] rounded-3xl shadow-2xl flex flex-col">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-brand-primary/5 shrink-0">
               <div>
                 <h2 className="text-xl font-bold text-brand-primary font-serif">{editingId ? 'Edit Category' : 'Add Category'}</h2>
                 <p className="text-[9px] text-brand-secondary font-bold uppercase tracking-widest">Configure layout and media</p>
@@ -271,7 +271,7 @@ export default function Categories() {
               <button onClick={() => setIsOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-brand-primary/5 text-brand-primary/40 hover:text-red-500 hover:bg-red-50 transition-colors"><Icon icon="lucide:x" className="w-5 h-5" /></button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6">
+            <form onSubmit={handleSubmit} className="p-6 overflow-y-auto custom-scrollbar flex-1">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Left Column: Basic Info & Image */}
                 <div className="space-y-4">
