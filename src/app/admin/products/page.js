@@ -39,6 +39,38 @@ export default function ProductsPage() {
 
     const [searchTerm, setSearchTerm] = useState("");
 
+    // Collapsible states (Category default open/expanded -> track collapsed; Subcategory & Inner Subcategory default closed/collapsed -> track expanded)
+    const [collapsedCategories, setCollapsedCategories] = useState(new Set());
+    const [expandedSubCategories, setExpandedSubCategories] = useState(new Set());
+    const [expandedInnerCategories, setExpandedInnerCategories] = useState(new Set());
+
+    const toggleCategory = (id) => {
+        setCollapsedCategories(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const toggleSubCategory = (id) => {
+        setExpandedSubCategories(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const toggleInnerCategory = (id) => {
+        setExpandedInnerCategories(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
     useEffect(() => { loadData(); }, []);
 
     const loadData = async () => {
@@ -362,7 +394,7 @@ export default function ProductsPage() {
                             <div key={p.id} className="group relative bg-white p-4 rounded-2xl border border-brand-primary/10 hover:border-brand-secondary/30 transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-between gap-4 overflow-hidden w-full">
                                 {/* Left Side: Media, Name, SKU */}
                                 <div className="flex items-center gap-4 min-w-0 flex-1">
-                                    <div className="w-12 h-14 bg-brand-primary/5 rounded-xl overflow-hidden shrink-0 border border-brand-primary/5">
+                                    <div className="w-14 h-14 bg-brand-primary/5 rounded-xl overflow-hidden shrink-0 border border-brand-primary/5">
                                         {p.images[0] ? (
                                             <img src={p.images[0].startsWith('shree') ? `https://res.cloudinary.com/dumbddcvh/image/upload/${p.images[0]}` : p.images[0]} className="w-full h-full object-cover brightness-95 group-hover:brightness-100 transition-all" />
                                         ) : (
@@ -435,54 +467,100 @@ export default function ProductsPage() {
                             </div>
                         );
 
-                        return groupedData.map(cat => (
-                            <div key={cat.id} className="space-y-8 bg-white/40 p-6 lg:p-8 rounded-[40px] border border-brand-primary/5 shadow-sm">
-                                <div className="flex items-center gap-4 border-b border-brand-primary/10 pb-4">
-                                    <div className="w-2 h-8 bg-brand-primary rounded-full" />
-                                    <h2 className="text-2xl lg:text-3xl font-serif font-black text-brand-primary">
-                                        {cat.name}
-                                    </h2>
-                                </div>
-
-                                <div className="space-y-12 pl-2 md:pl-6">
-                                    {cat.subCategories.map(sub => (
-                                        <div key={sub.id} className="space-y-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-1.5 h-6 bg-brand-secondary rounded-full" />
-                                                <h3 className="text-xl lg:text-2xl font-serif font-black text-brand-primary/90">
-                                                    {sub.name}
-                                                </h3>
-                                            </div>
-
-                                            {sub.directProducts.length > 0 && (
-                                                <div className="flex flex-col gap-3 pl-2 md:pl-6">
-                                                    {sub.directProducts.map(renderProduct)}
-                                                </div>
-                                            )}
-
-                                            <div className="space-y-8 pl-4 md:pl-8 border-l-2 border-brand-primary/5">
-                                                {sub.innerSubCategories.map(inner => (
-                                                    <div key={inner.id} className="space-y-4">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-1.5 h-5 bg-brand-primary/30 rounded-full" />
-                                                            <h4 className="text-lg font-serif font-black text-brand-primary/70">
-                                                                {inner.name}
-                                                            </h4>
-                                                            <span className="text-[9px] font-sans font-black bg-brand-primary/5 text-brand-primary/60 px-3 py-1.5 rounded-full uppercase tracking-widest ml-2">
-                                                                {inner.products.length} Units
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex flex-col gap-3 pl-2">
-                                                            {inner.products.map(renderProduct)}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
+                        return groupedData.map(cat => {
+                            const isCatExpanded = !collapsedCategories.has(cat.id);
+                            return (
+                                <div key={cat.id} className="space-y-8 bg-white/40 p-6 lg:p-8 rounded-[40px] border border-brand-primary/5 shadow-sm">
+                                    <div 
+                                        onClick={() => toggleCategory(cat.id)}
+                                        className="flex items-center justify-between border-b border-brand-primary/10 pb-4 cursor-pointer select-none group/cat"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-2 h-8 bg-brand-primary rounded-full" />
+                                            <h2 className="text-2xl lg:text-3xl font-serif font-black text-brand-primary">
+                                                {cat.name}
+                                            </h2>
                                         </div>
-                                    ))}
+                                        <Icon 
+                                            icon="solar:alt-arrow-down-bold-duotone" 
+                                            className={`w-6 h-6 text-brand-primary/45 group-hover/cat:text-brand-primary transition-all duration-300 ${isCatExpanded ? 'rotate-180 text-brand-primary' : ''}`} 
+                                        />
+                                    </div>
+
+                                    {isCatExpanded && (
+                                        <div className="space-y-12 pl-2 md:pl-6">
+                                            {cat.subCategories.map(sub => {
+                                                const isSubExpanded = expandedSubCategories.has(sub.id);
+                                                return (
+                                                    <div key={sub.id} className="space-y-6">
+                                                        <div 
+                                                            onClick={() => toggleSubCategory(sub.id)}
+                                                            className="flex items-center justify-between cursor-pointer select-none group/sub py-1"
+                                                        >
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-1.5 h-6 bg-brand-secondary rounded-full" />
+                                                                <h3 className="text-xl lg:text-2xl font-serif font-black text-brand-primary/90">
+                                                                    {sub.name}
+                                                                </h3>
+                                                            </div>
+                                                            <Icon 
+                                                                icon="solar:alt-arrow-down-bold-duotone" 
+                                                                className={`w-5 h-5 text-brand-primary/30 group-hover/sub:text-brand-primary/60 transition-all duration-300 ${isSubExpanded ? 'rotate-180 text-brand-secondary' : ''}`} 
+                                                            />
+                                                        </div>
+
+                                                        {isSubExpanded && (
+                                                            <>
+                                                                {sub.directProducts.length > 0 && (
+                                                                    <div className="flex flex-col gap-3 pl-2 md:pl-6">
+                                                                        {sub.directProducts.map(renderProduct)}
+                                                                    </div>
+                                                                )}
+
+                                                                {sub.innerSubCategories.length > 0 && (
+                                                                    <div className="space-y-8 pl-4 md:pl-8 border-l-2 border-brand-primary/5">
+                                                                        {sub.innerSubCategories.map(inner => {
+                                                                            const isInnerExpanded = expandedInnerCategories.has(inner.id);
+                                                                            return (
+                                                                                <div key={inner.id} className="space-y-4">
+                                                                                    <div 
+                                                                                        onClick={() => toggleInnerCategory(inner.id)}
+                                                                                        className="flex items-center justify-between cursor-pointer select-none group/inner py-1"
+                                                                                    >
+                                                                                        <div className="flex items-center gap-3">
+                                                                                            <div className="w-1.5 h-5 bg-brand-primary/30 rounded-full" />
+                                                                                            <h4 className="text-lg font-serif font-black text-brand-primary/70">
+                                                                                                {inner.name}
+                                                                                            </h4>
+                                                                                            <span className="text-[9px] font-sans font-black bg-brand-primary/5 text-brand-primary/60 px-3 py-1.5 rounded-full uppercase tracking-widest ml-2">
+                                                                                                {inner.products.length} Units
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        <Icon 
+                                                                                            icon="solar:alt-arrow-down-bold-duotone" 
+                                                                                            className={`w-4 h-4 text-brand-primary/20 group-hover/inner:text-brand-primary/45 transition-all duration-300 ${isInnerExpanded ? 'rotate-180 text-brand-primary/70' : ''}`} 
+                                                                                        />
+                                                                                    </div>
+                                                                                    {isInnerExpanded && (
+                                                                                        <div className="flex flex-col gap-3 pl-2">
+                                                                                            {inner.products.map(renderProduct)}
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        ));
+                            );
+                        });
                     })()}
                 </div>
             )}

@@ -15,7 +15,8 @@ const getSubCategoryData = cache(async (subCategoryId) => {
          innerSubCategories: true,
          products: {
             where: { isVisible: true },
-            include: { category: true }
+            include: { category: true },
+            orderBy: { createdAt: 'asc' }
          }
       }
     });
