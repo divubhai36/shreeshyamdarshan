@@ -6,6 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 
 export default function SubCategoryClient({ category, subCategory, products, categoryId, subCategoryId }) {
+  const sections = (subCategory.sections || []).filter(section =>
+    products.some(p => p.innerSubId === section.dbId)
+  );
+
   const sectionRefs = useRef({});
   const sliderRef = useRef(null);
   const stickySliderRef = useRef(null);
@@ -96,10 +100,10 @@ export default function SubCategoryClient({ category, subCategory, products, cat
   }, [products]);
 
   useEffect(() => {
-    if (subCategory?.sections?.length > 0 && !activeSection) {
-      setActiveSection(subCategory.sections[0].name);
+    if (sections.length > 0 && !activeSection) {
+      setActiveSection(sections[0].name);
     }
-  }, [subCategory, activeSection]);
+  }, [sections, activeSection]);
 
   const scrollToSection = (sectionName) => {
     const element = sectionRefs.current[sectionName];
@@ -111,7 +115,7 @@ export default function SubCategoryClient({ category, subCategory, products, cat
     }
   };
 
-  const sections = subCategory.sections || [];
+  // sections are already filtered and defined at the top
 
   const renderSectionSlider = (isStickySlider = false) => {
     const ref = isStickySlider ? stickySliderRef : sliderRef;
@@ -120,7 +124,7 @@ export default function SubCategoryClient({ category, subCategory, products, cat
       <div className={`relative group/slider ${isStickySlider ? "bg-white/80 backdrop-blur-xl shadow-2xl py-3 px-2 rounded-[32px] border border-white/20" : "mb-4 lg:mb-8"}`}>
         <div
           ref={ref}
-          className="flex gap-4 lg:gap-10 overflow-x-auto py-2 snap-x no-scrollbar scroll-smooth px-4 lg:px-6"
+          className="flex gap-4 lg:gap-10 overflow-x-auto py-2 snap-x no-scrollbar scroll-smooth px-4 lg:px-6 scroll-px-4 lg:scroll-px-6"
         >
           {sections.map((section, idx) => {
             const isActive = activeSection === section.name;
@@ -131,13 +135,13 @@ export default function SubCategoryClient({ category, subCategory, products, cat
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.05 }}
                 onClick={() => { scrollToSection(section.name); setActiveSection(section.name); }}
-                className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer snap-start group"
+                className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer snap-start group scroll-ml-4 lg:scroll-ml-6"
               >
-                <div className={`relative transition-all duration-500 rounded-full overflow-hidden flex items-center justify-center ${isActive ? "scale-110 shadow-xl" : "scale-100 shadow-sm group-hover:scale-105"} ${isStickySlider ? "w-12 h-12 lg:w-16 lg:h-16" : "w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24"}`}>
-                  <div className={`w-full h-full flex items-center justify-center font-serif font-bold text-brand-primary/40 bg-brand-primary/[0.03] ${isStickySlider ? "text-xl" : "text-2xl lg:text-3xl"}`}>
-                    {section.name.split(' ').map(w => w[0]).join('').toUpperCase()}
+                <div className={`relative transition-all duration-500 rounded-full flex items-center justify-center ${isActive ? "scale-110 shadow-xl" : "scale-100 shadow-sm group-hover:scale-105"} ${isStickySlider ? "w-12 h-12 lg:w-16 lg:h-16" : "w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24"}`}>
+                  <div className={`w-full h-full flex items-center justify-center font-serif font-bold rounded-full text-brand-primary/40 bg-brand-primary/[0.03] ${isStickySlider ? "text-xl" : "text-2xl lg:text-3xl"}`}>
+                    {section.name.trim().charAt(0).toUpperCase()}
                   </div>
-                  <div className={`absolute inset-0 transition-opacity duration-500 ${isActive ? "bg-brand-primary/5" : "bg-black/[0.02] group-hover:bg-transparent"}`} />
+                  <div className={`absolute inset-0 transition-opacity duration-500 rounded-full ${isActive ? "bg-brand-primary/5" : "bg-black/[0.02] group-hover:bg-transparent"}`} />
                   {isActive && (
                     <motion.div
                       layoutId={isStickySlider ? "active-ring-sticky" : "active-ring"}

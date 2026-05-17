@@ -1,7 +1,7 @@
 [
   {
-    "id": "dresses",
-    "name": "DRESSES",
+    "id": "dress",
+    "name": "DRESS",
     "image": "/images/hero.webp",
     "subCategories": [
       {
@@ -227,7 +227,7 @@
         ]
       },
       {
-        "id": "mukut-dresses",
+        "id": "mukut-dress",
         "name": "MUKUT",
         "image": "/images/pagdi_1.webp",
         "sections": [

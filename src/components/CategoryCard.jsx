@@ -14,12 +14,18 @@ const CategoryCard = React.memo(({ label, image, href, count, index, priority = 
         transition={{ delay: index * 0, duration: 0.6 }}
         className="group relative overflow-hidden rounded-[24px] lg:rounded-[40px] aspect-[3/4] shadow-lg bg-white border border-brand-primary/5 h-full"
       >
-        <SmartImage
-          id={image || 'shree_placeholder'}
-          alt={label}
-          priority={priority}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms] brightness-90 group-hover:brightness-100"
-        />
+        {image ? (
+          <SmartImage
+            id={image}
+            alt={label}
+            priority={priority}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms] brightness-90 group-hover:brightness-100"
+          />
+        ) : (
+          <div className="w-full h-full bg-brand-primary/5 flex items-center justify-center group-hover:bg-brand-primary/10 transition-colors duration-500">
+            <span className="font-serif font-black text-6xl text-brand-primary/20 tracking-tighter italic">SSD</span>
+          </div>
+        )}
         <div className="absolute inset-x-0 bottom-0 p-4 lg:p-8 bg-gradient-to-t from-brand-primary/95 via-brand-primary/40 to-transparent flex flex-col items-center justify-end text-center z-10 h-1/2">
           <h3 className="text-lg lg:text-2xl font-serif font-bold text-white mb-2 lg:mb-3 transition-transform group-hover:-translate-y-1 uppercase tracking-wider">{label}</h3>
 

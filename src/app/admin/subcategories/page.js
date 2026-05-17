@@ -55,10 +55,7 @@ export default function SubcategoryPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.imageUrl && !selectedFile) {
-      toast.error("Image is mandatory");
-      return;
-    }
+
     if (!form.categoryId) {
       toast.error("Please assign a parent category");
       return;
@@ -165,8 +162,8 @@ export default function SubcategoryPage() {
                       {sub.imageUrl ? (
                         <img src={sub.imageUrl.startsWith('shree') ? `https://res.cloudinary.com/dumbddcvh/image/upload/${sub.imageUrl}` : sub.imageUrl} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="flex items-center justify-center h-full text-brand-primary/10">
-                          <Icon icon="solar:image-broken-bold" className="w-10 h-10" />
+                        <div className="flex items-center justify-center h-full bg-brand-primary/5">
+                          <span className="font-serif font-black text-4xl text-brand-primary/20 tracking-tighter italic">SSD</span>
                         </div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
