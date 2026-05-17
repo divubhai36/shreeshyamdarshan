@@ -7,7 +7,7 @@ import { deleteFromAllAccounts } from "@/lib/cloudinary";
 
 // Category Actions
 export async function getCategories() { return await prisma.category.findMany({ orderBy: { createdAt: 'asc' } }); }
-export async function createCategory(data) { await prisma.category.create({ data }); revalidatePath('/admin/categories'); }
+export async function createCategory(data) { await prisma.category.create({ data }); revalidatePath('/admin/categories'); revalidatePath('/', 'layout'); }
 export async function updateCategory(id, data) { 
   const oldItem = await prisma.category.findUnique({ where: { id } });
   if (oldItem?.imageUrl && data.imageUrl && oldItem.imageUrl !== data.imageUrl) {
@@ -19,6 +19,7 @@ export async function updateCategory(id, data) {
   }
   await prisma.category.update({ where: { id }, data }); 
   revalidatePath('/admin/categories'); 
+  revalidatePath('/', 'layout');
 }
 export async function deleteCategory(id) { 
   const item = await prisma.category.findUnique({ where: { id } });
@@ -26,6 +27,7 @@ export async function deleteCategory(id) {
   if (item?.videos?.length > 0) await deleteFromAllAccounts(item.videos, 'video');
   await prisma.category.delete({ where: { id } }); 
   revalidatePath('/admin/categories'); 
+  revalidatePath('/', 'layout');
 }
 export async function swapCategoryOrder(id1, id2) {
   const cat1 = await prisma.category.findUnique({ where: { id: id1 } });
@@ -37,13 +39,13 @@ export async function swapCategoryOrder(id1, id2) {
       prisma.category.update({ where: { id: id2 }, data: { createdAt: temp } }),
     ]);
     revalidatePath('/admin/categories');
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
   }
 }
 
 // Subcategory Actions
 export async function getSubCategories() { return await prisma.subCategory.findMany({ include: { category: true }, orderBy: { id: 'asc' } }); }
-export async function createSubCategory(data) { await prisma.subCategory.create({ data }); revalidatePath('/admin/subcategories'); }
+export async function createSubCategory(data) { await prisma.subCategory.create({ data }); revalidatePath('/admin/subcategories'); revalidatePath('/', 'layout'); }
 export async function updateSubCategory(id, data) { 
   const oldItem = await prisma.subCategory.findUnique({ where: { id } });
   if (oldItem?.imageUrl && data.imageUrl && oldItem.imageUrl !== data.imageUrl) {
@@ -51,17 +53,19 @@ export async function updateSubCategory(id, data) {
   }
   await prisma.subCategory.update({ where: { id }, data }); 
   revalidatePath('/admin/subcategories'); 
+  revalidatePath('/', 'layout');
 }
 export async function deleteSubCategory(id) { 
   const item = await prisma.subCategory.findUnique({ where: { id } });
   if (item?.imageUrl) await deleteFromAllAccounts(item.imageUrl, 'image');
   await prisma.subCategory.delete({ where: { id } }); 
   revalidatePath('/admin/subcategories'); 
+  revalidatePath('/', 'layout');
 }
 
 // InnerSubcategory Actions
 export async function getInnerSubCategories() { return await prisma.innerSubCategory.findMany({ include: { subCategory: { include: { category: true } } }, orderBy: { id: 'asc' } }); }
-export async function createInnerSubCategory(data) { await prisma.innerSubCategory.create({ data }); revalidatePath('/admin/inner-subcategories'); }
+export async function createInnerSubCategory(data) { await prisma.innerSubCategory.create({ data }); revalidatePath('/admin/inner-subcategories'); revalidatePath('/', 'layout'); }
 export async function updateInnerSubCategory(id, data) { 
   const oldItem = await prisma.innerSubCategory.findUnique({ where: { id } });
   if (oldItem?.imageUrl && data.imageUrl && oldItem.imageUrl !== data.imageUrl) {
@@ -69,12 +73,14 @@ export async function updateInnerSubCategory(id, data) {
   }
   await prisma.innerSubCategory.update({ where: { id }, data }); 
   revalidatePath('/admin/inner-subcategories'); 
+  revalidatePath('/', 'layout');
 }
 export async function deleteInnerSubCategory(id) { 
   const item = await prisma.innerSubCategory.findUnique({ where: { id } });
   if (item?.imageUrl) await deleteFromAllAccounts(item.imageUrl, 'image');
   await prisma.innerSubCategory.delete({ where: { id } }); 
   revalidatePath('/admin/inner-subcategories'); 
+  revalidatePath('/', 'layout');
 }
 
 // Wholesaler Actions
@@ -162,6 +168,7 @@ export async function createProduct(data) {
     throw error;
   } finally {
     revalidatePath('/admin/products'); 
+    revalidatePath('/', 'layout');
   }
 }
 
@@ -221,6 +228,7 @@ export async function updateProduct(id, data) {
     throw error;
   } finally {
     revalidatePath('/admin/products'); 
+    revalidatePath('/', 'layout');
   }
 }
 
@@ -230,6 +238,7 @@ export async function deleteProduct(id) {
   if (item?.videos?.length > 0) await deleteFromAllAccounts(item.videos, 'video');
   await prisma.product.delete({ where: { id } }); 
   revalidatePath('/admin/products'); 
+  revalidatePath('/', 'layout');
 }
 
 // Review Actions
