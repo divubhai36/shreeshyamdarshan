@@ -394,7 +394,7 @@ export default function HomeClient({ products, categories, reviews, reviewVideos
                      <p className="text-brand-secondary font-bold text-[10px] lg:text-xs tracking-widest uppercase mb-2 lg:mb-3 text-center md:text-left">Trending Now</p>
                      <h2 className="text-2xl lg:text-4xl font-serif font-bold text-brand-primary leading-tight uppercase text-center md:text-left">Handpicked <br className="hidden md:block" /> <span className="italic font-normal">Best Sellers</span></h2>
                   </div>
-                  <Link href="/collections/dresses" className="hidden md:flex btn-outline group text-xs py-2 px-5 rounded-full items-center gap-2">
+                  <Link href="/collections/dress" className="hidden md:flex btn-outline group text-xs py-2 px-5 rounded-full items-center gap-2">
                      View All
                      <Icon icon="lucide:arrow-right" className="group-hover:translate-x-1.5 transition-transform duration-300 w-4 h-4" />
                   </Link>

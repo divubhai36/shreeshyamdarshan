@@ -7,6 +7,7 @@ import CustomSelect from "@/components/CustomSelect";
 import toast from "react-hot-toast";
 import { roundToTwo } from "@/lib/utils";
 
+import Link from "next/link";
 import { useCloudinary } from "@/hooks/useCloudinary";
 import { compressAndResizeImage } from "@/lib/imageProcessor";
 import { deleteFromAllAccounts } from "@/lib/cloudinary";
@@ -149,7 +150,7 @@ export default function ProductsPage() {
 
         if (s === 4) {
             if (form.images.length === 0 && selectedImages.length === 0) {
-                newErrors.images = "At least one visual masterpiece (image) is required";
+                newErrors.images = "At least one image is required";
             }
         }
 
@@ -199,7 +200,7 @@ export default function ProductsPage() {
                 currentForm.videos = [...currentForm.videos, ...uploadedIds];
             }
 
-            toast.loading("Recording Masterpiece in DB...", { id: 'save' });
+            toast.loading("Recording Product in DB...", { id: 'save' });
 
             const payload = {
                 ...currentForm,
@@ -220,7 +221,7 @@ export default function ProductsPage() {
                 if (itemsToDelete.length > 0) {
                     const imagesToDelete = itemsToDelete.filter(item => item.type === 'image').map(item => item.id);
                     const videosToDelete = itemsToDelete.filter(item => item.type === 'video').map(item => item.id);
-                    
+
                     if (imagesToDelete.length > 0) await deleteFromAllAccounts(imagesToDelete, 'image');
                     if (videosToDelete.length > 0) await deleteFromAllAccounts(videosToDelete, 'video');
                 }
@@ -275,6 +276,9 @@ export default function ProductsPage() {
                             className="w-full bg-white border border-brand-primary/5 rounded-xl p-4 pl-11 text-[11px] font-bold text-brand-primary focus:ring-4 focus:ring-brand-secondary/5 transition-all outline-none shadow-sm placeholder:text-brand-primary/20 tracking-wider"
                         />
                     </div>
+                    <Link href="/admin/products/bulk" className="bg-white text-brand-primary border border-brand-primary/10 px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-brand-primary/5 transition-all shadow-sm whitespace-nowrap flex items-center gap-2">
+                        <Icon icon="solar:layers-minimalistic-bold-duotone" className="w-4 h-4" /> Bulk Upload
+                    </Link>
                     <button onClick={() => { setEditingId(null); setForm(initForm); setErrors({}); setIsOpen(true); setStep(1); setOfferType("price"); }} className="bg-brand-primary text-white px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:shadow-2xl transition-all shadow-xl whitespace-nowrap flex items-center gap-2">
                         <Icon icon="lucide:plus" className="w-4 h-4" /> Add Product
                     </button>
@@ -282,97 +286,204 @@ export default function ProductsPage() {
             </div>
 
             {loading ? <div className="text-center py-20"><Icon icon="line-md:loading-loop" className="w-10 h-10 text-brand-secondary mx-auto" /></div> : (
-                <div className="bg-white rounded-[32px] shadow-sm border border-brand-primary/5 overflow-x-auto custom-scrollbar">
-                    <table className="w-full text-left text-sm min-w-[1000px]">
-                        <thead className="bg-brand-primary/5 text-[10px] uppercase font-bold text-brand-primary/60 tracking-widest">
-                            <tr>
-                                <th className="p-5 w-16 rounded-tl-[32px]">Media</th>
-                                <th className="p-5">Name & Taxonomy</th>
-                                <th className="p-5">Pricing</th>
-                                <th className="p-5">Status</th>
-                                <th className="p-5 text-right rounded-tr-[32px]">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-brand-primary/5">
-                            {data.filter(p =>
-                                p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                (p.productId && p.productId.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                                p.category?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                p.subCategory?.name.toLowerCase().includes(searchTerm.toLowerCase())
-                            ).map(p => (
-                                <tr key={p.id} className="hover:bg-brand-primary/[0.02] transition-colors">
-                                    <td className="p-5">
-                                        <div className="w-12 h-14 bg-gray-100 rounded-lg overflow-hidden border border-black/5">
-                                            {p.images[0] ? (
-                                                <img src={p.images[0].startsWith('shree') ? `https://res.cloudinary.com/dumbddcvh/image/upload/${p.images[0]}` : p.images[0]} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="flex items-center justify-center h-full"><Icon icon="lucide:image" className="opacity-20" /></div>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="p-5">
-                                        <p className="font-bold text-brand-primary truncate max-w-[200px]">{p.name}</p>
-                                        <p className="text-[10px] text-brand-secondary tracking-widest uppercase font-bold mt-1">
-                                            <span className="bg-brand-primary/10 px-2 py-0.5 rounded text-brand-primary mr-2">{p.productId || 'NO-ID'}</span>
-                                            {p.category?.name} {p.subCategory ? `› ${p.subCategory.name}` : ''}
-                                        </p>
-                                    </td>
-                                    <td className="p-5">
-                                        {p.isOfferProduct && p.offerPrice ? (
-                                            <>
-                                                <p className="font-bold text-red-600 font-serif text-lg">₹{p.offerPrice}</p>
-                                                <p className="text-[10px] line-through text-gray-400">₹{p.price}</p>
-                                            </>
+                <div className="space-y-16">
+                    {(() => {
+                        const term = searchTerm.toLowerCase().trim();
+                        const filteredProducts = data.filter(p => {
+                            if (!term) return true;
+                            const nameMatch = p.name.toLowerCase().includes(term);
+                            const idMatch = p.productId && p.productId.toLowerCase().includes(term);
+                            const catMatch = p.category?.name.toLowerCase().includes(term);
+                            const subMatch = p.subCategory?.name.toLowerCase().includes(term);
+
+                            const isBestSellerSearch = 'best seller'.includes(term) || 'best'.includes(term);
+                            const isBestMatch = p.isBestSeller && isBestSellerSearch;
+
+                            const isOfferSearch = 'discount offer'.includes(term) || 'offer'.includes(term) || 'discount'.includes(term);
+                            const isOfferMatch = p.isOfferProduct && isOfferSearch;
+
+                            return nameMatch || idMatch || catMatch || subMatch || isBestMatch || isOfferMatch;
+                        });
+
+                        if (filteredProducts.length === 0) {
+                            return (
+                                <div className="text-center py-32 opacity-20">
+                                    <Icon icon="solar:box-minimalistic-broken" className="w-20 h-20 mx-auto mb-4" />
+                                    <p className="text-sm font-black uppercase tracking-widest">No Products Found</p>
+                                </div>
+                            );
+                        }
+
+                        const categoriesMap = new Map();
+
+                        filteredProducts.forEach(p => {
+                            if (!p.category) return;
+                            if (!categoriesMap.has(p.categoryId)) {
+                                categoriesMap.set(p.categoryId, {
+                                    ...p.category,
+                                    subCategoriesMap: new Map()
+                                });
+                            }
+                            const catGroup = categoriesMap.get(p.categoryId);
+
+                            if (p.subCategoryId && p.subCategory) {
+                                if (!catGroup.subCategoriesMap.has(p.subCategoryId)) {
+                                    catGroup.subCategoriesMap.set(p.subCategoryId, {
+                                        ...p.subCategory,
+                                        innerSubCategoriesMap: new Map(),
+                                        directProducts: []
+                                    });
+                                }
+                                const subGroup = catGroup.subCategoriesMap.get(p.subCategoryId);
+
+                                if (p.innerSubId && p.innerSubCategory) {
+                                    if (!subGroup.innerSubCategoriesMap.has(p.innerSubId)) {
+                                        subGroup.innerSubCategoriesMap.set(p.innerSubId, {
+                                            ...p.innerSubCategory,
+                                            products: []
+                                        });
+                                    }
+                                    subGroup.innerSubCategoriesMap.get(p.innerSubId).products.push(p);
+                                } else {
+                                    subGroup.directProducts.push(p);
+                                }
+                            }
+                        });
+
+                        const groupedData = Array.from(categoriesMap.values()).map(cat => ({
+                            ...cat,
+                            subCategories: Array.from(cat.subCategoriesMap.values()).map(sub => ({
+                                ...sub,
+                                innerSubCategories: Array.from(sub.innerSubCategoriesMap.values())
+                            }))
+                        }));
+
+                        const renderProduct = (p) => (
+                            <div key={p.id} className="group relative bg-white p-4 rounded-2xl border border-brand-primary/10 hover:border-brand-secondary/30 transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-between gap-4 overflow-hidden w-full">
+                                {/* Left Side: Media, Name, SKU */}
+                                <div className="flex items-center gap-4 min-w-0 flex-1">
+                                    <div className="w-12 h-14 bg-brand-primary/5 rounded-xl overflow-hidden shrink-0 border border-brand-primary/5">
+                                        {p.images[0] ? (
+                                            <img src={p.images[0].startsWith('shree') ? `https://res.cloudinary.com/dumbddcvh/image/upload/${p.images[0]}` : p.images[0]} className="w-full h-full object-cover brightness-95 group-hover:brightness-100 transition-all" />
                                         ) : (
-                                            <>
-                                                <p className="font-bold text-black font-serif">₹{p.price}</p>
-                                                {p.mrp > p.price && <p className="text-[10px] line-through text-gray-400">₹{p.mrp}</p>}
-                                            </>
+                                            <div className="flex items-center justify-center h-full"><Icon icon="lucide:image" className="opacity-20 w-6 h-6" /></div>
                                         )}
-                                    </td>
-                                    <td className="p-5">
-                                        <div className="flex gap-2">
-                                            {p.isBestSeller && <span className="bg-yellow-100 text-yellow-800 text-[8px] font-bold px-2 py-1 rounded uppercase tracking-widest">Best</span>}
-                                            {p.isOfferProduct && <span className="bg-red-100 text-red-800 text-[8px] font-bold px-2 py-1 rounded uppercase tracking-widest">Offer</span>}
+                                    </div>
+
+                                    <div className="min-w-0 flex-1">
+                                        <h4 className="font-bold text-brand-primary text-[15px] truncate">{p.name}</h4>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="text-[9px] font-black text-brand-secondary/50 uppercase tracking-[0.2em] italic bg-brand-primary/5 px-2 py-0.5 rounded text-brand-primary truncate max-w-fit">{p.productId || 'NO-ID'}</span>
+                                            {p.isBestSeller && <span className="bg-yellow-100 text-yellow-800 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest">Best Seller</span>}
+                                            {p.isOfferProduct && <span className="bg-red-100 text-red-800 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest">Discount Offer</span>}
                                         </div>
-                                    </td>
-                                    <td className="p-5 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button
-                                                onClick={() => handleToggleVisibility(p)}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none shadow-inner ${p.isVisible ? 'bg-emerald-500' : 'bg-gray-200'}`}
-                                                title={p.isVisible ? "Visible on Website" : "Hidden from Website"}
-                                            >
-                                                <span
-                                                    className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-sm ${p.isVisible ? 'translate-x-6' : 'translate-x-1'}`}
-                                                />
-                                            </button>
-                                            <button onClick={() => {
-                                                setEditingId(p.id);
-                                                setForm({
-                                                    ...p,
-                                                    innerSubId: p.innerSubId || "",
-                                                    details: Array.isArray(p.details) ? p.details : [],
-                                                    showWashCare: !!p.showWashCare,
-                                                    isReadyStock: !!p.isReadyStock,
-                                                    wholesalerDescription: p.wholesalerDescription || "",
-                                                    allowToBuy: p.allowToBuy !== undefined ? p.allowToBuy : true,
-                                                    variants: (Array.isArray(p.variants) ? p.variants : []).map(v => ({ ...v, id: v.id || Math.random().toString(36).substr(2, 9) })),
-                                                    unit: p.unit || "PIECE",
-                                                    isVisible: p.isVisible !== undefined ? p.isVisible : true
-                                                });
-                                                setOfferType(p.discountPercent > 0 ? "percentage" : "price");
-                                                setStep(1);
-                                                setErrors({});
-                                                setIsOpen(true);
-                                            }} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg mr-2"><Icon icon="lucide:edit-2" /></button>
-                                            <button onClick={() => { setItemToDelete(p); setIsDeleteModalOpen(true); }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Icon icon="lucide:trash-2" /></button>
+                                    </div>
+                                </div>
+
+                                {/* Middle: Pricing */}
+                                <div className="flex flex-col items-end shrink-0 w-28 pr-4">
+                                    {p.isOfferProduct && p.offerPrice ? (
+                                        <>
+                                            <span className="font-bold text-red-600 font-serif text-lg">₹{p.offerPrice}</span>
+                                            <span className="text-[10px] line-through text-gray-400">₹{p.price}</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="font-bold text-brand-primary font-serif text-lg">₹{p.price}</span>
+                                            {p.mrp > p.price && <span className="text-[10px] line-through text-gray-400">₹{p.mrp}</span>}
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Right Side: Visibility Toggle and Actions */}
+                                <div className="flex items-center gap-4 shrink-0">
+                                    <button
+                                        onClick={() => handleToggleVisibility(p)}
+                                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 shadow-inner border border-black/5 ${p.isVisible ? 'bg-emerald-500' : 'bg-gray-200'}`}
+                                        title={p.isVisible ? "Visible on Website" : "Hidden from Website"}
+                                    >
+                                        <span className={`inline-block w-3.5 h-3.5 transform bg-white rounded-full transition-transform duration-300 shadow-sm ${p.isVisible ? 'translate-x-5' : 'translate-x-1'}`} />
+                                    </button>
+
+                                    <div className="flex items-center gap-1.5">
+                                        <button onClick={() => {
+                                            setEditingId(p.id);
+                                            setForm({
+                                                ...p,
+                                                innerSubId: p.innerSubId || "",
+                                                details: Array.isArray(p.details) ? p.details : [],
+                                                showWashCare: !!p.showWashCare,
+                                                isReadyStock: !!p.isReadyStock,
+                                                wholesalerDescription: p.wholesalerDescription || "",
+                                                allowToBuy: p.allowToBuy !== undefined ? p.allowToBuy : true,
+                                                variants: (Array.isArray(p.variants) ? p.variants : []).map(v => ({ ...v, id: v.id || Math.random().toString(36).substr(2, 9) })),
+                                                unit: p.unit || "PIECE",
+                                                isVisible: p.isVisible !== undefined ? p.isVisible : true
+                                            });
+                                            setOfferType(p.discountPercent > 0 ? "percentage" : "price");
+                                            setStep(1);
+                                            setErrors({});
+                                            setIsOpen(true);
+                                        }} className="w-8 h-8 bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white rounded-xl flex items-center justify-center transition-all shadow-sm border border-blue-100">
+                                            <Icon icon="solar:pen-new-square-bold-duotone" className="w-4 h-4" />
+                                        </button>
+                                        <button onClick={() => { setItemToDelete(p); setIsDeleteModalOpen(true); }} className="w-8 h-8 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-xl flex items-center justify-center transition-all shadow-sm border border-red-100">
+                                            <Icon icon="solar:trash-bin-trash-bold-duotone" className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                        return groupedData.map(cat => (
+                            <div key={cat.id} className="space-y-8 bg-white/40 p-6 lg:p-8 rounded-[40px] border border-brand-primary/5 shadow-sm">
+                                <div className="flex items-center gap-4 border-b border-brand-primary/10 pb-4">
+                                    <div className="w-2 h-8 bg-brand-primary rounded-full" />
+                                    <h2 className="text-2xl lg:text-3xl font-serif font-black text-brand-primary">
+                                        {cat.name}
+                                    </h2>
+                                </div>
+
+                                <div className="space-y-12 pl-2 md:pl-6">
+                                    {cat.subCategories.map(sub => (
+                                        <div key={sub.id} className="space-y-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-1.5 h-6 bg-brand-secondary rounded-full" />
+                                                <h3 className="text-xl lg:text-2xl font-serif font-black text-brand-primary/90">
+                                                    {sub.name}
+                                                </h3>
+                                            </div>
+
+                                            {sub.directProducts.length > 0 && (
+                                                <div className="flex flex-col gap-3 pl-2 md:pl-6">
+                                                    {sub.directProducts.map(renderProduct)}
+                                                </div>
+                                            )}
+
+                                            <div className="space-y-8 pl-4 md:pl-8 border-l-2 border-brand-primary/5">
+                                                {sub.innerSubCategories.map(inner => (
+                                                    <div key={inner.id} className="space-y-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-1.5 h-5 bg-brand-primary/30 rounded-full" />
+                                                            <h4 className="text-lg font-serif font-black text-brand-primary/70">
+                                                                {inner.name}
+                                                            </h4>
+                                                            <span className="text-[9px] font-sans font-black bg-brand-primary/5 text-brand-primary/60 px-3 py-1.5 rounded-full uppercase tracking-widest ml-2">
+                                                                {inner.products.length} Units
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex flex-col gap-3 pl-2">
+                                                            {inner.products.map(renderProduct)}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                    ))}
+                                </div>
+                            </div>
+                        ));
+                    })()}
                 </div>
             )}
 
@@ -963,7 +1074,7 @@ export default function ProductsPage() {
                                             <div className="space-y-8">
                                                 <div className="group">
                                                     <label className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-primary/30 block mb-3 px-1 group-focus-within:text-brand-primary transition-colors">General Description</label>
-                                                    <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full p-6 border border-brand-primary/5 rounded-[32px] bg-white text-[13px] font-bold text-brand-primary h-40 resize-none focus:border-brand-primary/40 outline-none transition-all shadow-inner leading-relaxed" placeholder="Describe the soul of this masterpiece..." />
+                                                    <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full p-6 border border-brand-primary/5 rounded-[32px] bg-white text-[13px] font-bold text-brand-primary h-40 resize-none focus:border-brand-primary/40 outline-none transition-all shadow-inner leading-relaxed" placeholder="Describe the soul of this product..." />
                                                 </div>
                                                 <div className="group">
                                                     <label className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-secondary/40 block mb-3 px-1 group-focus-within:text-brand-secondary transition-colors">Wholesale Only Description</label>
@@ -1069,23 +1180,37 @@ export default function ProductsPage() {
 
                                 <div className="flex gap-4">
                                     {step > 1 && (
-                                        <button type="button" onClick={() => { setStep(s => s - 1); setErrors({}); }} className="px-8 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-gray-100 hover:bg-gray-200 transition-all text-[11px] flex items-center gap-3 text-brand-primary/60"> <Icon icon="lucide:arrow-left" className="w-5 h-5" /> {editingId ? 'Previous' : 'Previous Stage'}</button>
+                                        <button type="button" onClick={() => { setStep(s => s - 1); setErrors({}); }} className="px-8 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-gray-100 hover:bg-gray-200 transition-all text-[11px] flex items-center gap-3 text-brand-primary/60 cursor-pointer"> <Icon icon="lucide:arrow-left" className="w-5 h-5" /> {editingId ? 'Previous' : 'Previous Stage'}</button>
                                     )}
 
                                     {step < 4 ? (
-                                        <button type="button" onClick={editingId ? (() => setStep(s => s + 1)) : handleSubmit} className={`py-5 rounded-[24px] font-black uppercase tracking-[0.2em] transition-all text-[11px] flex items-center gap-3 ${editingId ? 'px-8 bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/20' : 'px-14 bg-brand-primary text-white hover:bg-brand-secondary shadow-lg shadow-brand-primary/20'}`}>
+                                        <button type="button" onClick={editingId ? (() => setStep(s => s + 1)) : handleSubmit} className={`py-5 rounded-[24px] font-black uppercase tracking-[0.2em] transition-all text-[11px] flex items-center gap-3 ${editingId ? 'px-8 bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/20' : 'px-14 bg-brand-primary text-white hover:bg-brand-secondary shadow-lg shadow-brand-primary/20'} cursor-pointer`}>
                                             {editingId ? 'Next Section' : 'Proceed'} <Icon icon="lucide:arrow-right" className="w-5 h-5" />
                                         </button>
                                     ) : (
                                         !editingId && (
-                                            <button type="button" onClick={handleSubmit} disabled={isCloudSyncing || isSaving} className="px-20 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/30 text-[11px] flex items-center gap-3">
+                                            <button type="button" onClick={handleSubmit} disabled={isCloudSyncing || isSaving} className="px-20 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-2xl shadow-brand-primary/30 text-[11px] flex items-center gap-3 cursor-pointer">
                                                 {isSaving || isCloudSyncing ? <Icon icon="line-md:loading-loop" className="w-5 h-5" /> : <Icon icon="lucide:save" className="w-5 h-5" />}
                                                 {isSaving || isCloudSyncing ? 'Uploading...' : 'Save Product'}
                                             </button>
                                         )
                                     )}
+
+                                    {editingId && step < 4 && (
+                                        <button
+                                            type="button"
+                                            onClick={handleSubmit}
+                                            disabled={isCloudSyncing || isSaving}
+                                            className="px-6 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-primary/90 transition-all shadow-lg text-[11px] flex items-center gap-2 cursor-pointer"
+                                            title="Direct Save"
+                                        >
+                                            {isSaving || isCloudSyncing ? <Icon icon="line-md:loading-loop" className="w-4 h-4" /> : <Icon icon="lucide:save" className="w-4 h-4" />}
+                                            Save
+                                        </button>
+                                    )}
+
                                     {editingId && step === 4 && (
-                                        <button type="button" onClick={handleSubmit} disabled={isCloudSyncing || isSaving} className="px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl shadow-brand-primary/10 text-[11px] flex items-center gap-3">
+                                        <button type="button" onClick={handleSubmit} disabled={isCloudSyncing || isSaving} className="px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] bg-brand-primary text-white hover:bg-brand-secondary transition-all shadow-xl shadow-brand-primary/10 text-[11px] flex items-center gap-3 cursor-pointer">
                                             {isSaving || isCloudSyncing ? <Icon icon="line-md:loading-loop" className="w-5 h-5" /> : <Icon icon="lucide:save" className="w-5 h-5" />}
                                             {isSaving || isCloudSyncing ? 'Uploading...' : 'Update Product'}
                                         </button>
@@ -1123,7 +1248,7 @@ export default function ProductsPage() {
                             <button
                                 onClick={async () => {
                                     await deleteProduct(itemToDelete.id);
-                                    toast.success("Masterpiece Removed");
+                                    toast.success("Product Removed");
                                     setIsDeleteModalOpen(false);
                                     loadData();
                                 }}

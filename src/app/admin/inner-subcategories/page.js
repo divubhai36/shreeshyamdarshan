@@ -126,7 +126,28 @@ export default function InnerSubcategoryPage() {
                inner.subCategory?.category?.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
 
-            if (filteredData.length === 0) {
+            const categoriesMap = new Map();
+            subs.forEach(sub => {
+              if (sub.category) {
+                if (!categoriesMap.has(sub.category.id)) {
+                  categoriesMap.set(sub.category.id, {
+                    id: sub.category.id,
+                    name: sub.category.name,
+                    subCategories: []
+                  });
+                }
+                const innerSubsForThisSub = filteredData.filter(inner => inner.subCategoryId === sub.id);
+                if (innerSubsForThisSub.length > 0) {
+                  categoriesMap.get(sub.category.id).subCategories.push({
+                    ...sub,
+                    innerSubCategories: innerSubsForThisSub
+                  });
+                }
+              }
+            });
+            const groupedCategories = Array.from(categoriesMap.values()).filter(cat => cat.subCategories.length > 0);
+
+            if (groupedCategories.length === 0) {
               return (
                 <div className="text-center py-32 opacity-20">
                   <Icon icon="solar:layers-broken" className="w-20 h-20 mx-auto mb-4" />
@@ -135,38 +156,53 @@ export default function InnerSubcategoryPage() {
               );
             }
 
-            return (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {filteredData.map((inner) => (
-                  <div key={inner.id} className="group relative bg-white p-6 rounded-[32px] border border-brand-primary/5 hover:border-brand-secondary/20 transition-all duration-500 hover:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.08)]">
-                    <div className="aspect-square w-full bg-brand-primary/[0.03] rounded-2xl overflow-hidden mb-5 relative group-hover:scale-[1.02] transition-transform duration-500 flex items-center justify-center">
-                      {inner.imageUrl ? (
-                        <img src={inner.imageUrl.startsWith('shree') ? `https://res.cloudinary.com/dumbddcvh/image/upload/${inner.imageUrl}` : inner.imageUrl} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="text-4xl font-serif font-bold text-brand-primary/20 tracking-tighter">
-                          {inner.name.split(' ').map(w => w[0]).join('').toUpperCase()}
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    </div>
+            return groupedCategories.map(cat => (
+              <div key={cat.id} className="space-y-8 bg-white/40 p-6 lg:p-8 rounded-[40px] border border-brand-primary/5 shadow-sm">
+                <div className="flex items-center gap-4 border-b border-brand-primary/10 pb-4">
+                  <div className="w-2 h-8 bg-brand-primary rounded-full" />
+                  <h2 className="text-2xl lg:text-3xl font-serif font-black text-brand-primary">
+                    {cat.name}
+                  </h2>
+                </div>
 
-                    <div>
-                      <h3 className="font-bold text-brand-primary text-base truncate pr-14">{inner.name}</h3>
-                      <p className="text-[9px] font-black text-brand-secondary/40 uppercase tracking-[0.2em] mt-1 italic">{inner.subCategory?.name} → {inner.subCategory?.category?.name}</p>
-                    </div>
+                <div className="space-y-10 pl-2 md:pl-6">
+                  {cat.subCategories.map(sub => (
+                    <div key={sub.id} className="space-y-5">
+                       <div className="flex items-center gap-3">
+                         <div className="w-1.5 h-6 bg-brand-secondary rounded-full" />
+                         <h3 className="text-lg lg:text-xl font-serif font-black text-brand-primary/80">
+                           {sub.name}
+                         </h3>
+                         <span className="text-[9px] font-sans font-black bg-brand-primary/5 text-brand-primary/60 px-3 py-1.5 rounded-full uppercase tracking-widest ml-2">
+                           {sub.innerSubCategories.length} Units
+                         </span>
+                       </div>
 
-                    <div className="absolute top-8 right-8 flex gap-2 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                      <button onClick={() => { setEditingId(inner.id); setForm({name: inner.name, slug: inner.slug, imageUrl: inner.imageUrl, subCategoryId: inner.subCategoryId}); setIsOpen(true); }} className="w-9 h-9 bg-white/90 backdrop-blur-md text-blue-500 hover:bg-blue-500 hover:text-white rounded-xl shadow-lg flex items-center justify-center transition-all">
-                        <Icon icon="solar:pen-new-square-bold-duotone" className="w-5 h-5" />
-                      </button>
-                      <button onClick={async () => { if(confirm("Delete this?")) { await deleteInnerSubCategory(inner.id); toast.success("Removed"); loadData(); } }} className="w-9 h-9 bg-white/90 backdrop-blur-md text-red-500 hover:bg-red-500 hover:text-white rounded-xl shadow-lg flex items-center justify-center transition-all">
-                        <Icon icon="solar:trash-bin-trash-bold-duotone" className="w-5 h-5" />
-                      </button>
+                       <div className="flex flex-wrap gap-4 pl-2 md:pl-6">
+                          {sub.innerSubCategories.map(inner => (
+                             <div key={inner.id} className="group relative bg-white pl-5 pr-20 py-3 rounded-full border border-brand-primary/10 hover:border-brand-secondary/40 transition-all duration-300  flex items-center min-h-[56px] overflow-hidden">
+                               <div className="absolute top-0 right-0 bottom-0 w-24 bg-gradient-to-l from-brand-primary/5 to-transparent -z-10 group-hover:from-brand-secondary/10 transition-colors" />
+
+                               <div className="relative z-10 flex flex-col justify-center">
+                                 <h4 className="font-bold text-brand-primary text-[14px] whitespace-nowrap">{inner.name}</h4>
+                               </div>
+
+                               <div className="absolute right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0 z-20">
+                                 <button onClick={() => { setEditingId(inner.id); setForm({name: inner.name, slug: inner.slug, imageUrl: inner.imageUrl, subCategoryId: inner.subCategoryId}); setIsOpen(true); }} className="w-8 h-8 bg-white/80 backdrop-blur text-blue-500 hover:bg-blue-500 hover:text-white rounded-full flex items-center justify-center transition-all shadow-sm border border-blue-100">
+                                   <Icon icon="solar:pen-new-square-bold-duotone" className="w-4 h-4" />
+                                 </button>
+                                 <button onClick={async () => { if(confirm("Delete this?")) { await deleteInnerSubCategory(inner.id); toast.success("Removed"); loadData(); } }} className="w-8 h-8 bg-white/80 backdrop-blur text-red-500 hover:bg-red-500 hover:text-white rounded-full flex items-center justify-center transition-all shadow-sm border border-red-100">
+                                   <Icon icon="solar:trash-bin-trash-bold-duotone" className="w-4 h-4" />
+                                 </button>
+                               </div>
+                             </div>
+                          ))}
+                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            );
+            ));
           })()}
         </div>
       )}
@@ -210,7 +246,7 @@ export default function InnerSubcategoryPage() {
                   />
                 </div>
 
-                {/* 
+                {/*
                   <div className="p-4 rounded-[32px] border-2 border-dashed border-brand-primary/5 group hover:border-brand-secondary/20 transition-all bg-brand-primary/[0.01]">
                     <label className="text-[10px] uppercase font-black tracking-[0.2em] mb-4 block text-center text-brand-primary/30">Image Preview</label>
                     <div className="flex flex-col items-center gap-6">

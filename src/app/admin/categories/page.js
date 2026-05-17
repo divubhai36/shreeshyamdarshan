@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
-import { getCategories, createCategory, updateCategory, deleteCategory } from "../actions";
+import { getCategories, createCategory, updateCategory, deleteCategory, swapCategoryOrder } from "../actions";
 import { deleteFromAllAccounts } from "@/lib/cloudinary";
 import Image from "next/image";
 import toast from "react-hot-toast";
@@ -155,6 +155,21 @@ export default function Categories() {
     }
   };
 
+  const handleMove = async (currentIndex, targetIndex, filteredData) => {
+    const currentItem = filteredData[currentIndex];
+    const targetItem = filteredData[targetIndex];
+    if (!currentItem || !targetItem) return;
+
+    toast.loading("Updating display order...", { id: "reorder" });
+    try {
+      await swapCategoryOrder(currentItem.id, targetItem.id);
+      toast.success("Order refined successfully", { id: "reorder" });
+      loadData();
+    } catch (err) {
+      toast.error("Reorder failed", { id: "reorder" });
+    }
+  };
+
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this category? All related items will be deleted too.")) {
       await deleteCategory(id);
@@ -234,22 +249,64 @@ export default function Categories() {
 
             return (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredData.map((cat) => (
+                {filteredData.map((cat, idx) => (
                   <div key={cat.id} className="bg-white rounded-2xl shadow-sm border border-brand-primary/5 overflow-hidden group">
                     <div className="h-40 relative bg-brand-primary/5">
                       {cat.imageUrl ? (
                         <img src={cat.imageUrl.startsWith('shree') ? `https://res.cloudinary.com/dumbddcvh/image/upload/${cat.imageUrl}` : cat.imageUrl} alt={cat.name} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center"><Icon icon="lucide:image" className="w-10 h-10 text-brand-primary/20" /></div>
+                        <div className="w-full h-full flex items-center justify-center bg-brand-primary/5">
+                          <span className="font-serif font-black text-4xl text-brand-primary/20 tracking-tighter italic">SSD</span>
+                        </div>
                       )}
-                      <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => openEdit(cat)} className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-blue-600 shadow-sm hover:scale-110 transition-transform"><Icon icon="lucide:edit-2" className="w-4 h-4" /></button>
-                        <button onClick={() => handleDelete(cat.id)} className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-600 shadow-sm hover:scale-110 transition-transform"><Icon icon="lucide:trash-2" className="w-4 h-4" /></button>
-                      </div>
+
+                      {/* Reorder Buttons (Top Right on Hover) */}
+                      {searchTerm === "" && (
+                        <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                          {idx > 0 && (
+                            <button 
+                              onClick={() => handleMove(idx, idx - 1, filteredData)} 
+                              className="w-8 h-8 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center text-brand-primary hover:text-brand-secondary shadow-sm hover:scale-110 transition-all outline-none cursor-pointer"
+                              title="Move Left"
+                            >
+                              <Icon icon="lucide:chevron-left" className="w-4 h-4" />
+                            </button>
+                          )}
+                          {idx < filteredData.length - 1 && (
+                            <button 
+                              onClick={() => handleMove(idx, idx + 1, filteredData)} 
+                              className="w-8 h-8 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center text-brand-primary hover:text-brand-secondary shadow-sm hover:scale-110 transition-all outline-none cursor-pointer"
+                              title="Move Right"
+                            >
+                              <Icon icon="lucide:chevron-right" className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-bold text-brand-primary truncate">{cat.name}</h3>
-                      <p className="text-[10px] text-brand-primary/40 font-mono mt-1">/{cat.slug}</p>
+                    
+                    {/* Category Title & Edit/Delete Actions (Bottom Section) */}
+                    <div className="p-4 flex justify-between items-center min-h-[72px]">
+                      <div className="truncate pr-2">
+                        <h3 className="font-bold text-brand-primary truncate">{cat.name}</h3>
+                        <p className="text-[10px] text-brand-primary/40 font-mono mt-1">/{cat.slug}</p>
+                      </div>
+                      <div className="flex gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => openEdit(cat)} 
+                          className="w-8 h-8 bg-blue-50 hover:bg-blue-100 rounded-full flex items-center justify-center text-blue-600 hover:scale-110 transition-all cursor-pointer"
+                          title="Edit"
+                        >
+                          <Icon icon="lucide:edit-2" className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(cat.id)} 
+                          className="w-8 h-8 bg-red-50 hover:bg-red-100 rounded-full flex items-center justify-center text-red-600 hover:scale-110 transition-all cursor-pointer"
+                          title="Delete"
+                        >
+                          <Icon icon="lucide:trash-2" className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

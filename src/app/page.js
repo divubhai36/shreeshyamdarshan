@@ -26,7 +26,7 @@ export default async function Home() {
             include: { category: true, subCategory: true },
             orderBy: { createdAt: 'desc' }
          }),
-         prisma.category.findMany({ include: { subCategories: true } }),
+         prisma.category.findMany({ include: { subCategories: true }, orderBy: { createdAt: 'asc' } }),
          // prisma.reviewVideo.findMany({
          //    where: { isActive: true },
          //    orderBy: { createdAt: 'desc' }
