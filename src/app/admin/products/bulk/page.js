@@ -408,7 +408,7 @@ export default function BulkUploadPage() {
                                                 'bg-white border-brand-primary/5 hover:border-brand-primary/20 shadow-sm'
                                             }`}
                                         >
-                                            <div className="w-20 h-24 shrink-0 rounded-2xl overflow-hidden border border-black/5 relative bg-gray-100">
+                                            <div className="w-24 h-24 shrink-0 rounded-2xl overflow-hidden border border-black/5 relative bg-gray-100">
                                                 <img src={item.preview} className="w-full h-full object-cover" />
                                                 {item.status === 'success' && (
                                                     <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center backdrop-blur-[1px]">

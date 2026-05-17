@@ -127,7 +127,7 @@ export async function updateOrderStatus(id, status) {
 }
 
 // Product Actions
-export async function getProducts() { return await prisma.product.findMany({ include: { category: true, subCategory: true, innerSubCategory: true }, orderBy: { createdAt: 'desc' } }); }
+export async function getProducts() { return await prisma.product.findMany({ include: { category: true, subCategory: true, innerSubCategory: true }, orderBy: { createdAt: 'asc' } }); }
 
 export async function createProduct(data) { 
   try {
