@@ -200,7 +200,7 @@ export default function ProductsPage() {
                 currentForm.videos = [...currentForm.videos, ...uploadedIds];
             }
 
-            toast.loading("Recording Product in DB...", { id: 'save' });
+            toast.loading("Updating...", { id: 'save' });
 
             const payload = {
                 ...currentForm,
