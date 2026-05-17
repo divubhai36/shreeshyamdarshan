@@ -30,11 +30,11 @@ export default function SecurityProvider() {
     // 2. Disable Specific Key Combinations
     const handleKeyDown = (e) => {
       // F12 key
-      // if (e.keyCode === 123) {
-      //   e.preventDefault();
-      //   showAlert();
-      //   return false;
-      // }
+      if (e.keyCode === 123) {
+        e.preventDefault();
+        showAlert();
+        return false;
+      }
 
       // Ctrl+Shift+I, J, C, U
       if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
