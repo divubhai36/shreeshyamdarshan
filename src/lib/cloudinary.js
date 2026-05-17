@@ -10,7 +10,17 @@ export async function getCloudinaryAccounts(mode = 'image') {
     try {
         const envVar = mode === 'video' ? process.env.VIDEO_CLOUDINARY_ACCOUNTS : process.env.IMAGE_CLOUDINARY_ACCOUNTS;
         // Fallback to CLOUDINARY_ACCOUNTS for backward compatibility if needed, but prefer split
-        const accountsStr = envVar || process.env.CLOUDINARY_ACCOUNTS || '[]';
+        let accountsStr = envVar || process.env.CLOUDINARY_ACCOUNTS || '[]';
+        
+        // Strip enclosing quotes if any (common copy-paste issue from env panels)
+        accountsStr = accountsStr.trim();
+        if (accountsStr.startsWith("'") && accountsStr.endsWith("'")) {
+            accountsStr = accountsStr.slice(1, -1).trim();
+        }
+        if (accountsStr.startsWith('"') && accountsStr.endsWith('"')) {
+            accountsStr = accountsStr.slice(1, -1).trim();
+        }
+
         const accounts = JSON.parse(accountsStr);
         return accounts;
     } catch (error) {

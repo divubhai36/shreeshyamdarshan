@@ -43,9 +43,10 @@ export const useCloudinary = () => {
                 );
                 
                 if (!response.ok) {
-                    const errData = await response.json();
-                    console.error(`Upload failed for account ${acc.cloudName}:`, errData);
-                    return null;
+                    const errData = await response.json().catch(() => ({}));
+                    const errMsg = errData.error?.message || "Unknown error";
+                    console.error(`Upload failed for account ${acc.cloudName}:`, errMsg);
+                    return { error: errMsg, cloudName: acc.cloudName };
                 }
                 return response.json();
             });
@@ -54,8 +55,11 @@ export const useCloudinary = () => {
             const results = await Promise.all(uploadPromises);
             
             // 4. Validate results (At least one must succeed)
-            const successful = results.find(r => r !== null);
-            if (!successful) throw new Error("All upload attempts failed.");
+            const successful = results.find(r => r && !r.error);
+            if (!successful) {
+                const errors = results.map(r => r?.error ? `${r.cloudName}: ${r.error}` : "Unknown error").join(", ");
+                throw new Error(`All upload attempts failed. Details: ${errors}`);
+            }
 
             return {
                 public_id: successful.public_id,
@@ -65,7 +69,7 @@ export const useCloudinary = () => {
 
         } catch (err) {
             console.error("Cloudinary Sync Upload Error:", err);
-            toast.error("Cloudinary Sync Failed. Check console for details.");
+            toast.error(`Cloudinary Sync Failed: ${err.message}`);
             throw err;
         } finally {
             setUploading(false);

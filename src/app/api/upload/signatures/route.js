@@ -9,6 +9,13 @@ export async function GET(request) {
     const timestamp = Math.round(new Date().getTime() / 1000);
     const signatures = await getUploadSignatures(timestamp, mode);
     
+    if (!signatures || signatures.length === 0) {
+      return NextResponse.json(
+        { error: `No Cloudinary accounts configured or parsed for mode "${mode}". Please verify your Vercel Environment Variables.` }, 
+        { status: 400 }
+      );
+    }
+    
     // Also trigger background usage check and auto-switch
     // We don't await this to keep the API fast
     autoCheckAndSwitchAccount();
