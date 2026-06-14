@@ -10,11 +10,13 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { toast } from "react-hot-toast";
 import { roundToTwo } from "@/lib/utils";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 // Replacing old fallback with global SmartImage
 
 export default function ProductClient({ product, navCategory, subCategory, innerSubCategory, relatedProducts, showcaseVideos = [] }) {
   const { cart, addToCart, addMultipleToCart, removeFromCart, toggleSave, isProductSaved, isAuthenticated } = useCart();
+  const { trackProductView } = useAnalytics();
   const saved = isProductSaved(product.id);
 
   // State Management
@@ -28,7 +30,8 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    trackProductView(product);
+  }, [product, trackProductView]);
 
   useEffect(() => {
     window.scrollTo(0, 0);

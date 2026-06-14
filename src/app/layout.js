@@ -8,6 +8,7 @@ import GlobalCartSummary from "@/components/GlobalCartSummary";
 import SecurityProvider from "@/components/SecurityProvider";
 import { Toaster } from "react-hot-toast";
 import NextTopLoader from 'nextjs-toploader';
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 
 const playfair = Playfair_Display({
@@ -87,6 +88,7 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
+        <GoogleAnalytics />
         <SecurityProvider />
         <NextTopLoader
           color="#c5a059"

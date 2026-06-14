@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { usePathname } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { roundToTwo } from '@/lib/utils';
+import { event as trackGAEvent } from '@/lib/analytics';
 
 const CartContext = createContext({
   cart: [],
@@ -156,6 +157,21 @@ export function CartProvider({ children }) {
     if (isAuthenticated) {
       cartMutation.mutate({ productId: product.id, quantity: finalQty, variantName, price: priceToUse, originalPrice: oldPrice });
     }
+
+    if (quantity > 0) {
+      trackGAEvent("add_to_cart", {
+        currency: "INR",
+        value: priceToUse * quantity,
+        items: [{
+          item_id: product.id,
+          item_name: product.name,
+          price: priceToUse,
+          quantity: quantity,
+          item_category: product.category || "Unknown",
+          item_variant: variantName || "Default"
+        }]
+      });
+    }
   }, [cart, isAuthenticated, cartMutation]);
 
   const addMultipleToCart = React.useCallback((items) => {
@@ -183,6 +199,27 @@ export function CartProvider({ children }) {
           price: item.variantPrice || item.product.price, 
           originalPrice: item.originalPrice || item.product.mrp || item.product.price 
         });
+      });
+    }
+
+    const gaItems = items.filter(item => item.quantity > 0).map(item => {
+      const priceToUse = roundToTwo(item.variantPrice ?? item.product.price ?? 0);
+      return {
+        item_id: item.product.id,
+        item_name: item.product.name,
+        price: priceToUse,
+        quantity: item.quantity,
+        item_category: item.product.category || "Unknown",
+        item_variant: item.variantName || "Default"
+      };
+    });
+
+    if (gaItems.length > 0) {
+      const totalVal = gaItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+      trackGAEvent("add_to_cart", {
+        currency: "INR",
+        value: totalVal,
+        items: gaItems
       });
     }
   }, [isAuthenticated, cartMutation]);
