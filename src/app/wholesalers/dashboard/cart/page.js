@@ -8,9 +8,11 @@ import { useCart } from '@/context/CartContext';
 import { roundToTwo } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import CartSummaryPill from '@/components/CartSummaryPill';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 export default function CartPage() {
   const { cart = [], addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, originalCartTotal, cartCount } = useCart();
+  const { trackCheckoutInitiated } = useAnalytics();
   const router = useRouter();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -103,6 +105,7 @@ export default function CartPage() {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
+    trackCheckoutInitiated(cart, cartTotal);
     checkoutMutation.mutate({
       items: cart,
       totalAmount: cartTotal

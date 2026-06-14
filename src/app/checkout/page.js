@@ -1,25 +1,31 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCart } from '@/context/CartContext';
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
+  const { trackCheckoutInitiated } = useAnalytics();
   const [loading, setLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderInfo, setOrderInfo] = useState(null);
   const router = useRouter();
+  const hasTrackedCheckout = useRef(false);
 
   useEffect(() => {
     if (cart.length === 0 && !orderSuccess) {
       router.push('/cart');
+    } else if (cart.length > 0 && !hasTrackedCheckout.current) {
+      trackCheckoutInitiated(cart, cartTotal);
+      hasTrackedCheckout.current = true;
     }
-  }, [cart, orderSuccess, router]);
+  }, [cart, orderSuccess, router, trackCheckoutInitiated, cartTotal]);
 
   const handlePlaceOrder = async () => {
     setLoading(true);
