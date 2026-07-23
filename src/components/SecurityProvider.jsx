@@ -52,8 +52,8 @@ export default function SecurityProvider() {
 
     // 3. Security Warning in Console
     const warningMessage = () => {
-        console.log("%cSTOP!", "color: red; font-family: sans-serif; font-size: 4.5em; font-weight: bolder; text-shadow: #000 1px 1px;");
-        console.log("%cThis is a security protected area of Shree Shyam Darshan (SSD). Unauthorized attempts to access source code or assets are monitored.", "color: #1a4332; font-size: 1.2em; font-weight: bold;");
+      console.log("%cSTOP!", "color: red; font-family: sans-serif; font-size: 4.5em; font-weight: bolder; text-shadow: #000 1px 1px;");
+      console.log("%cThis is a security protected area of Shree Shyam Darshan (SSD). Unauthorized attempts to access source code or assets are monitored.", "color: #1a4332; font-size: 1.2em; font-weight: bold;");
     };
 
     document.addEventListener('contextmenu', handleContextMenu);
