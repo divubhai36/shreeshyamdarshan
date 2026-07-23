@@ -52,7 +52,11 @@ const ProductCard = React.memo(({ product }) => {
 
         {/* Price Tag - Added rounded-bl to fix sharp corners on desktop */}
         <div className="absolute bottom-0 left-0 px-2 py-1 lg:px-4 lg:py-2 bg-brand-primary/90 text-white font-bold rounded-tr-2xl rounded-bl-xl lg:rounded-bl-2xl text-[10px] lg:text-sm backdrop-blur-sm shadow-xl z-20 transition-all">
-          {product.isOfferProduct && product.offerPrice ? `₹${product.offerPrice}` : `₹${product.price}`}
+          {Number(product.isOfferProduct ? product.offerPrice : product.price) === 0 ? (
+            <span className="text-[8px] lg:text-xs">Price on Request</span>
+          ) : (
+            product.isOfferProduct && product.offerPrice ? `₹${product.offerPrice}` : `₹${product.price}`
+          )}
         </div>
       </Link>
 
@@ -78,7 +82,7 @@ const ProductCard = React.memo(({ product }) => {
                   e.stopPropagation();
                   toggleSave(product);
                 }}
-                className={`transition-all duration-300 shrink-0 ${
+                className={`cursor-pointer transition-all duration-300 shrink-0 ${
                   saved ? "text-rose-500" : "text-brand-secondary/60 hover:text-brand-primary"
                 }`}
               >

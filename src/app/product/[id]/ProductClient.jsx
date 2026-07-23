@@ -114,7 +114,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
   const relatedSliderSettings = {
     dots: false,
-    infinite: true,
+    infinite: relatedProducts.length > 4,
     speed: 1000,
     slidesToShow: 4,
     slidesToScroll: 1,
@@ -126,7 +126,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
 
   const relatedMobileSettings = {
     dots: false,
-    infinite: true,
+    infinite: relatedProducts.length > 1,
     speed: 1000,
     slidesToShow: 1,
     centerMode: true,
@@ -177,13 +177,21 @@ export default function ProductClient({ product, navCategory, subCategory, inner
               {/* Price row */}
               <div className="flex items-center justify-between">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-white font-black text-[11px] lg:text-[14px] drop-shadow-md">
-                    ₹{p.isOfferProduct && p.offerPrice ? p.offerPrice : p.price}
-                  </span>
-                  {p.isOfferProduct && p.offerPrice && p.price > p.offerPrice && (
-                    <span className="text-white/50 font-bold text-[8px] lg:text-[10px] line-through">
-                      ₹{p.price}
+                  {Number(p.isOfferProduct && p.offerPrice ? p.offerPrice : p.price) === 0 ? (
+                    <span className="text-white font-bold text-[10px] lg:text-[12px] drop-shadow-md">
+                      Price on Request
                     </span>
+                  ) : (
+                    <>
+                      <span className="text-white font-black text-[11px] lg:text-[14px] drop-shadow-md">
+                        ₹{p.isOfferProduct && p.offerPrice ? p.offerPrice : p.price}
+                      </span>
+                      {p.isOfferProduct && p.offerPrice && p.price > p.offerPrice ? (
+                        <span className="text-white/50 font-bold text-[8px] lg:text-[10px] line-through">
+                          ₹{p.price}
+                        </span>
+                      ) : null}
+                    </>
                   )}
                 </div>
 
@@ -230,7 +238,8 @@ export default function ProductClient({ product, navCategory, subCategory, inner
       .map(([name, qty]) => `- ${name}: ${qty} ${unitLabel}`)
       .join('\n');
 
-    const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Product:* ${product.name}\n*Product ID:* *[${product.productId || 'N/A'}]*\n*Price:* ₹${finalPrice.toLocaleString()}\n*Order Unit:* ${unitLabel}\n${selectedVariants ? `\n*Interested Variants:*\n${selectedVariants}\n` : ''}\n------------------\nPlease help me with the details.`;
+    const priceStr = Number(finalPrice) === 0 ? "Price on Request" : `₹${finalPrice.toLocaleString()}`;
+    const text = `Hi, *Shree Shyam Darshan Team*\n\nNew Inquiry from Website:\n------------------\n*Product:* ${product.name}\n*Product ID:* *[${product.productId || 'N/A'}]*\n*Price:* ${priceStr}\n*Order Unit:* ${unitLabel}\n${selectedVariants ? `\n*Interested Variants:*\n${selectedVariants}\n` : ''}\n------------------\nPlease help me with the details.`;
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, "_blank");
   };
@@ -475,7 +484,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                         whileHover={{ scale: 1.1, y: -2 }}
                         whileTap={{ scale: 0.85 }}
                         onClick={handleShare}
-                        className="text-brand-primary/40 hover:text-brand-primary transition-colors p-2"
+                        className="text-brand-primary/40 hover:text-brand-primary transition-colors p-2 cursor-pointer"
                         title="Share Product"
                       >
                         <Icon icon="solar:share-linear" className="w-6 h-6 lg:w-8 lg:h-8" />
@@ -491,7 +500,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                             whileHover={{ scale: 1.1, y: -2 }}
                             whileTap={{ scale: 0.85 }}
                             onClick={() => toggleSave(product)}
-                            className={`transition-all duration-300 relative ${saved ? "text-rose-500" : "text-brand-primary hover:scale-95"
+                            className={`cursor-pointer transition-all duration-300 relative ${saved ? "text-rose-500" : "text-brand-primary hover:scale-95"
                               }`}
                           >
                             <motion.div
@@ -521,23 +530,33 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     <div className="min-w-[200px] lg:min-w-[180px]">
                       <div className="flex flex-row sm:flex-col gap-2 sm:gap-1">
                         <div className="flex items-baseline gap-3">
-                          <span className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${product.isOfferProduct ? 'text-red-600' : 'text-brand-primary'}`}>
-                            ₹{product.isOfferProduct ? product.offerPrice : product.price}
-                          </span>
-                          {(product.mrp && product.mrp > (product.isOfferProduct ? product.offerPrice : product.price)) && (
+                          {Number(product.isOfferProduct ? product.offerPrice : product.price) === 0 ? (
+                            <span className="text-base sm:text-lg lg:text-xl font-bold text-brand-secondary">
+                              Price on Request
+                            </span>
+                          ) : (
+                            <span className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${product.isOfferProduct ? 'text-red-600' : 'text-brand-primary'}`}>
+                              ₹{product.isOfferProduct ? product.offerPrice : product.price}
+                            </span>
+                          )}
+                          {Number(product.isOfferProduct ? product.offerPrice : product.price) > 0 &&
+                          product.mrp &&
+                          parseFloat(product.mrp) > (product.isOfferProduct ? product.offerPrice : product.price) ? (
                             <span className="text-[12px] lg:text-[18px] font-bold text-brand-primary/30 line-through">
                               ₹{product.mrp}
                             </span>
-                          )}
+                          ) : null}
                         </div>
 
-                        {(product.mrp && product.mrp > (product.isOfferProduct ? product.offerPrice : product.price)) && (
+                        {Number(product.isOfferProduct ? product.offerPrice : product.price) > 0 &&
+                        product.mrp &&
+                        parseFloat(product.mrp) > (product.isOfferProduct ? product.offerPrice : product.price) ? (
                           <div className="flex items-center gap-3 mt-1">
                             <span className="text-[8px] lg:text-[12px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
                               Save ₹{Math.round(parseFloat(product.mrp) - (product.isOfferProduct ? product.offerPrice : product.price))}
                             </span>
                           </div>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                     <div className="hidden lg:block h-8 w-px bg-brand-primary/10"></div>
@@ -583,10 +602,16 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                                   <>
                                     <div className="w-px h-3 bg-brand-primary/10"></div>
                                     <div className="flex items-center gap-2">
-                                      {hasDiscount && (
-                                        <span className="text-[14px] font-bold text-brand-primary/20 line-through">₹{originalP.toLocaleString()}</span>
+                                      {discountedPrice === 0 ? (
+                                        <span className="text-[12px] font-bold text-brand-secondary">Price on Request</span>
+                                      ) : (
+                                        <>
+                                          {hasDiscount && (
+                                            <span className="text-[14px] font-bold text-brand-primary/20 line-through">₹{originalP.toLocaleString()}</span>
+                                          )}
+                                          <span className="text-[14px] font-bold text-brand-secondary">₹{discountedPrice.toLocaleString()}</span>
+                                        </>
                                       )}
-                                      <span className="text-[14px] font-bold text-brand-secondary">₹{discountedPrice.toLocaleString()}</span>
                                     </div>
                                   </>
                                 )}
@@ -670,7 +695,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     <div className="flex flex-col sm:flex-row gap-4 mb-6">
                       <button
                         onClick={() => setIsCartModalOpen(true)}
-                        className="grow bg-brand-primary text-white py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-xl hover:bg-brand-secondary transition-all active:scale-[0.98] group"
+                        className="cursor-pointer grow bg-brand-primary text-white py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-xl hover:bg-brand-secondary transition-all active:scale-[0.98] group"
                       >
                         <Icon icon="solar:cart-large-bold" className="w-5 h-5" />
                         <span>Add To Cart</span>
@@ -698,14 +723,14 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   <div className="flex flex-col sm:flex-row gap-4">
                     <button
                       onClick={handleWhatsApp}
-                      className="grow bg-white text-brand-primary border border-brand-primary/10 py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-sm hover:shadow-lg hover:border-brand-primary/20 transition-all active:scale-[0.98] group"
+                      className="cursor-pointer grow bg-white text-brand-primary border border-brand-primary/10 py-5 px-8 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs lg:text-sm flex items-center justify-center gap-3 shadow-sm hover:shadow-lg hover:border-brand-primary/20 transition-all active:scale-[0.98] group"
                     >
                       <Icon icon="logos:whatsapp-icon" className="w-6 h-6" />
                       <span>Inquiry On Whatsapp</span>
                     </button>
                     <button
                       onClick={handleShare}
-                      className="shrink-0 bg-brand-primary/5 text-brand-primary p-5 rounded-2xl hover:bg-brand-primary/10 transition-all flex items-center justify-center"
+                      className="cursor-pointer shrink-0 bg-brand-primary/5 text-brand-primary p-5 rounded-2xl hover:bg-brand-primary/10 transition-all flex items-center justify-center"
                       title="Share Product"
                     >
                       <Icon icon="solar:share-bold" className="w-6 h-6" />
@@ -866,7 +891,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                   </div>
                   <button
                     onClick={() => setIsCartModalOpen(false)}
-                    className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-brand-primary/5 flex items-center justify-center text-brand-primary hover:bg-brand-primary/10 transition-all"
+                    className="cursor-pointer w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-brand-primary/5 flex items-center justify-center text-brand-primary hover:bg-brand-primary/10 transition-all"
                   >
                     <Icon icon="lucide:x" className="w-4 h-4 sm:w-6 sm:h-6" />
                   </button>
@@ -892,10 +917,16 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                           <div className="flex-grow min-w-0">
                             <p className="font-bold text-brand-primary text-xs sm:text-lg uppercase tracking-wider truncate">{v.name}</p>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                              {hasDiscount && (
-                                <span className="text-[8px] sm:text-xs font-bold text-brand-primary/20 line-through">₹{originalP.toLocaleString()}</span>
+                              {basePrice === 0 ? (
+                                <p className="text-[9px] sm:text-sm text-brand-secondary font-bold tracking-widest uppercase">Price on Request</p>
+                              ) : (
+                                <>
+                                  {hasDiscount && (
+                                    <span className="text-[8px] sm:text-xs font-bold text-brand-primary/20 line-through">₹{originalP.toLocaleString()}</span>
+                                  )}
+                                  <p className="text-[9px] sm:text-sm text-brand-secondary font-black tracking-widest uppercase">₹{basePrice.toLocaleString()}<span className="text-[8px] opacity-20 ml-0.5">/pc</span></p>
+                                </>
                               )}
-                              <p className="text-[9px] sm:text-sm text-brand-secondary font-black tracking-widest uppercase">₹{basePrice.toLocaleString()}<span className="text-[8px] opacity-20 ml-0.5">/pc</span></p>
                             </div>
                           </div>
 
@@ -907,7 +938,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                                   const newVal = Math.max(0, qty - 1);
                                   setVariantQuantities({ ...variantQuantities, [v.name]: newVal });
                                 }}
-                                className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white border border-brand-primary/5 shadow-sm flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                className="cursor-pointer w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white border border-brand-primary/5 shadow-sm flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition-all active:scale-90"
                               >
                                 <Icon icon="lucide:minus" className="w-3 h-3 sm:w-4 sm:h-4" />
                               </button>
@@ -917,7 +948,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                                 min="0"
                                 value={qty === 0 ? "" : qty}
                                 onChange={(e) => {
-                                  const val = e.target.value === "" ? 0 : parseInt(e.target.value);
+                                  const val = Math.max(0, e.target.value === "" ? 0 : parseInt(e.target.value));
                                   setVariantQuantities({ ...variantQuantities, [v.name]: isNaN(val) ? 0 : val });
                                 }}
                                 className="w-7 sm:w-12 text-center font-bold text-xs sm:text-xl text-brand-primary bg-transparent border-none outline-none p-0 appearance-none"
@@ -929,7 +960,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                                   const newVal = qty + 1;
                                   setVariantQuantities({ ...variantQuantities, [v.name]: newVal });
                                 }}
-                                className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white border border-brand-primary/5 shadow-sm flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition-all active:scale-90"
+                                className="cursor-pointer w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white border border-brand-primary/5 shadow-sm flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition-all active:scale-90"
                               >
                                 <Icon icon="lucide:plus" className="w-3 h-3 sm:w-4 sm:h-4" />
                               </button>
@@ -943,10 +974,16 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                           <div className="text-right min-w-[70px] sm:min-w-[120px] border-l border-brand-primary/5 pl-3 sm:pl-6">
                             <p className="text-[7px] sm:text-[9px] font-black text-brand-primary/20 uppercase tracking-[0.2em] mb-0.5 italic">Total</p>
                             <div className="flex flex-col items-end">
-                              {product.isOfferProduct && qty > 0 && (
-                                <span className="text-[8px] sm:text-base font-bold text-brand-primary/10 line-through leading-none mb-0.5">₹{(qty * unitMultiplier * v.price).toLocaleString()}</span>
+                              {basePrice === 0 ? (
+                                <p className="font-bold text-brand-primary text-sm sm:text-lg tracking-tighter leading-none">Price on Request</p>
+                              ) : (
+                                <>
+                                  {product.isOfferProduct && qty > 0 && (
+                                    <span className="text-[8px] sm:text-base font-bold text-brand-primary/10 line-through leading-none mb-0.5">₹{(qty * unitMultiplier * v.price).toLocaleString()}</span>
+                                  )}
+                                  <p className="font-bold text-brand-primary text-sm sm:text-2xl tracking-tighter leading-none">₹{(qty * unitMultiplier * basePrice).toLocaleString()}</p>
+                                </>
                               )}
-                              <p className="font-bold text-brand-primary text-sm sm:text-2xl tracking-tighter leading-none">₹{(qty * unitMultiplier * basePrice).toLocaleString()}</p>
                             </div>
                           </div>
                         </div>
@@ -962,22 +999,35 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                       <p className="text-[8px] sm:text-[10px] font-black text-brand-primary/30 uppercase tracking-[0.3em] mb-0.5">Total Order Amount</p>
                       <div className="flex flex-col">
                         <p className="text-xl sm:text-4xl font-bold text-brand-primary tracking-tighter">
-                          ₹{Object.entries(variantQuantities).reduce((acc, [vName, qty]) => {
+                          {Object.entries(variantQuantities).reduce((acc, [vName, qty]) => {
                             const v = (product.variants || []).find(v => v.name === vName) || { price: product.price };
                             const basePrice = product.isOfferProduct
                               ? (v.price * (1 - (product.discountPercent || 0) / 100))
                               : v.price;
                             const multiplier = product.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
                             return acc + (qty * multiplier * basePrice);
-                          }, 0).toLocaleString()}
-                          {product.isOfferProduct && Object.values(variantQuantities).some(q => q > 0) && (
-                            <span className="text-xs sm:text-xl font-bold text-brand-primary/20 line-through ml-3">
+                          }, 0) === 0 ? (
+                            "Price on Request"
+                          ) : (
+                            <>
                               ₹{Object.entries(variantQuantities).reduce((acc, [vName, qty]) => {
                                 const v = (product.variants || []).find(v => v.name === vName) || { price: product.price };
+                                const basePrice = product.isOfferProduct
+                                  ? (v.price * (1 - (product.discountPercent || 0) / 100))
+                                  : v.price;
                                 const multiplier = product.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
-                                return acc + (qty * multiplier * v.price);
+                                return acc + (qty * multiplier * basePrice);
                               }, 0).toLocaleString()}
-                            </span>
+                              {product.isOfferProduct && Object.values(variantQuantities).some(q => q > 0) && (
+                                <span className="text-xs sm:text-xl font-bold text-brand-primary/20 line-through ml-3">
+                                  ₹{Object.entries(variantQuantities).reduce((acc, [vName, qty]) => {
+                                    const v = (product.variants || []).find(v => v.name === vName) || { price: product.price };
+                                    const multiplier = product.unit?.toUpperCase() === "DOZEN" ? 12 : 1;
+                                    return acc + (qty * multiplier * v.price);
+                                  }, 0).toLocaleString()}
+                                </span>
+                              )}
+                            </>
                           )}
                         </p>
                       </div>
@@ -985,7 +1035,7 @@ export default function ProductClient({ product, navCategory, subCategory, inner
                     <button
                       onClick={handleAddToCartConfirm}
                       disabled={Object.values(variantQuantities).every(q => !q || q <= 0)}
-                      className="w-full sm:w-auto bg-brand-primary text-white py-4 sm:py-5 px-12 rounded-2xl font-bold uppercase tracking-[0.2em] text-[10px] sm:text-xs shadow-xl hover:bg-brand-secondary transition-all disabled:opacity-50 disabled:grayscale"
+                      className="cursor-pointer w-full sm:w-auto bg-brand-primary text-white py-4 sm:py-5 px-12 rounded-2xl font-bold uppercase tracking-[0.2em] text-[10px] sm:text-xs shadow-xl hover:bg-brand-secondary transition-all disabled:opacity-50 disabled:grayscale"
                     >
                       Add To Cart
                     </button>
